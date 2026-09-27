@@ -487,7 +487,7 @@ fun LibraryScreen(
 
     // One collector for the whole screen — cards receive the version as a
     // plain parameter instead of each running their own flow collector.
-    // NOTE: posterVersion global bust was causing choppiness - all cards reloaded when one poster downloaded
+    val posterVersion by AppContainer.posterCache.version.collectAsStateWithLifecycle()
     val favVersion by AppContainer.favorites.version.collectAsStateWithLifecycle()
     // Cheap key: watched / in-progress filtering stays live without the grid
     // being rebuilt from storage.
@@ -844,19 +844,22 @@ fun LibraryScreen(
             }
         },
         bottomBar = {
-            // Reserve measured geometry: slide/fade only, never remeasure the grid every frame.
+            // Keep hide feature but make it efficient - use graphicsLayer alpha/translation, not remeasure grid
+            // Previous fast builds had this hide feature and were smooth because they used efficient hide
             Box(Modifier.fillMaxWidth().heightIn(min = with(layoutDensity) { bottomChromePx.toDp() }), contentAlignment = Alignment.BottomCenter) {
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = scrollChromeVisible || searchOpen || selectionMode,
-                    enter = androidx.compose.animation.slideInVertically(tween(180)) { it } + androidx.compose.animation.fadeIn(tween(140)),
-                    exit = androidx.compose.animation.slideOutVertically(tween(180)) { it } + androidx.compose.animation.fadeOut(tween(140)),
-                ) {
-                    LibraryBottomBar(favoriteVersion = favVersion, tab = tab,
-                        onTabChange = { closeSearch(); tab = it },
-                        movieCount = stats.movies, showCount = stats.shows, favoriteCount = favoriteTitleCount,
-                        searchOpen = searchOpen, onSearch = { if (searchOpen) closeSearch() else searchOpen = true },
-                        modifier = Modifier.onSizeChanged { bottomChromePx = it.height })
-                }
+                val isVisible = scrollChromeVisible || searchOpen || selectionMode
+                // Use graphicsLayer for smooth hide/show without remeasuring grid every frame - keeps feature
+                LibraryBottomBar(favoriteVersion = favVersion, tab = tab,
+                    onTabChange = { closeSearch(); tab = it },
+                    movieCount = stats.movies, showCount = stats.shows, favoriteCount = favoriteTitleCount,
+                    searchOpen = searchOpen, onSearch = { if (searchOpen) closeSearch() else searchOpen = true },
+                    modifier = Modifier
+                        .onSizeChanged { bottomChromePx = it.height }
+                        .graphicsLayer {
+                            alpha = if (isVisible) 1f else 0f
+                            translationY = if (isVisible) 0f else with(layoutDensity) { bottomChromePx.toFloat() }
+                        }
+                )
             }
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -905,7 +908,7 @@ fun LibraryScreen(
 
         LazyVerticalGrid(
             state = gridState,
-            columns = GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp),
+            columns = remember(appSettings.libraryGrid) { GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp) }, // Remember columns to avoid recalc during scroll - keeps grid change feature
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(chromeScroll)
@@ -1099,7 +1102,7 @@ fun LibraryScreen(
                                 PosterCard(entry = entry,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
-                                    modifier = Modifier.fillMaxWidth())
+                                    modifier = Modifier.fillMaxWidth(), cacheBust = posterVersion)
                             }
                         }
                     }
@@ -1129,7 +1132,7 @@ fun LibraryScreen(
                                 else { menuIsWholeShow = false; menuEntry = entry }
                             },
                             modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            cacheBust = posterVersion,
                         )
                     }
                 }
@@ -1156,7 +1159,7 @@ fun LibraryScreen(
                                 else { menuIsWholeShow = true; menuEntry = episodes.first() }
                             },
                             modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            cacheBust = posterVersion,
                         )
                     }
                 }
@@ -1182,7 +1185,7 @@ fun LibraryScreen(
                                 else { menuIsWholeShow = false; menuEntry = entry }
                             },
                             modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            cacheBust = posterVersion,
                         )
                     }
                 }
@@ -1209,7 +1212,7 @@ fun LibraryScreen(
                                 else { menuIsWholeShow = true; menuEntry = episodes.first() }
                             },
                             modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            cacheBust = posterVersion,
                         )
                     }
                 }
@@ -1235,7 +1238,7 @@ fun LibraryScreen(
                                 PosterCard(entry = entry,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
-                                    modifier = Modifier.fillMaxWidth())
+                                    modifier = Modifier.fillMaxWidth(), cacheBust = posterVersion)
                             }
                         }
                         lazyItems(completedShows.entries.toList(), key = { "watched-show-${it.key}" }) { (name, episodes) ->
@@ -1243,7 +1246,7 @@ fun LibraryScreen(
                                 ShowCard(showTitle = name, episodes = episodes,
                                     onClick = { if (selectionMode) toggleSelectShow(episodes) else onOpenShow(name) },
                                     onLongClick = { if (selectionMode) toggleSelectShow(episodes) else { menuIsWholeShow = true; menuEntry = episodes.first() } },
-                                    modifier = Modifier.fillMaxWidth())
+                                    modifier = Modifier.fillMaxWidth(), cacheBust = posterVersion)
                             }
                         }
                     }
@@ -1570,7 +1573,7 @@ private fun HeroPager(items: List<LibraryEntry>, onOpenDetail: (Long) -> Unit, o
     selectionMode: Boolean, selectedIds: Set<Long>, onToggle: (LibraryEntry) -> Unit, onHold: (LibraryEntry) -> Unit) {
     val pagerState = rememberPagerState(pageCount = { items.size })
     val motion = discoveryMotionEnabled() && !selectionMode
-    var autoAdvance by rememberSaveable { mutableStateOf(false) }
+    var autoAdvance by rememberSaveable { mutableStateOf(true) }
     val dragged by pagerState.interactionSource.collectIsDraggedAsState()
     val context = LocalContext.current
     val accessibility = context.getSystemService(android.content.Context.ACCESSIBILITY_SERVICE)
@@ -1582,7 +1585,7 @@ private fun HeroPager(items: List<LibraryEntry>, onOpenDetail: (Long) -> Unit, o
     LaunchedEffect(items.map { it.video.id }, motion, autoAdvance, dragged) {
         if (!motion || !autoAdvance || dragged) return@LaunchedEffect
         while (items.size > 1) {
-            delay(12000)
+            delay(8000)
             // Reading with accessibility services or dragging always wins over decoration.
             if (!pagerState.isScrollInProgress && accessibility?.isTouchExplorationEnabled != true) {
                 pagerState.animateScrollToPage((pagerState.currentPage + 1) % items.size, animationSpec = tween(durationMillis = 1100, easing = androidx.compose.animation.core.FastOutSlowInEasing))

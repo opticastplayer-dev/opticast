@@ -28,12 +28,11 @@ class OptiCastApplication : Application() {
         // Init settings off main thread where possible; AppContainer now avoids runBlocking
         AppContainer.init(this)
 
-        // App-wide image loader tuned for performance:
-        // - crossfade off: grids bind many images per second
-        // - RGB_565: half memory, critical on 2GB devices
-        // - no hardware bitmaps on low-RAM: hardware bitmaps can't be cached efficiently and cause extra copies
-        // - larger memory budget (32/96 MiB) for smooth scrolling - 6/16 was too small causing eviction during fling
-        // - disk cache (128/256 MiB) for offline posters to reduce pressure
+        // App-wide image loader tuned for performance - previous fast builds before GitHub were buttery smooth on 32-bit 3GB RAM
+        // - crossfade off: grids bind many images per second, fading causes jank
+        // - ARGB_8888 for quality, hardware bitmaps allowed even on low RAM for smooth scrolling (previous fast builds)
+        // - balanced memory budget 16/48 MiB for low RAM 32-bit 3GB device - 6/16 too small caused eviction, 32/96 too large caused GC
+        // - disk cache 96/192 MiB for offline posters
         // - offline artwork mapper to avoid HD downloads on data saver
         Coil.setImageLoader(
             ImageLoader.Builder(this)
@@ -52,8 +51,8 @@ class OptiCastApplication : Application() {
                 }
                 .crossfade(false)
                 .respectCacheHeaders(false)
-                .allowRgb565(true)
-                .allowHardware(!lowRam)
+                .allowRgb565(false) // RGB_565 was causing banding and extra conversion, previous fast builds used ARGB_8888
+                .allowHardware(true) // Allow hardware even on low RAM for smooth scrolling - previous fast builds had this
                 .memoryCache {
                     MemoryCache.Builder(this)
                         .maxSizeBytes(com.opticast.player.data.imageMemoryBudgetBytes(lowRam))

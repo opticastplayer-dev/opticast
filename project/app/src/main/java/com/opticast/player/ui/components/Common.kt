@@ -208,7 +208,8 @@ private fun StatusBadge(status: PosterBadge, modifier: Modifier = Modifier, sing
     val minimal = LocalMinimalStyle.current
     val colours = remember(status) { listOf(Color(status.gradientStart), Color(status.gradientEnd)) }
     val gradient = remember(status) { Brush.linearGradient(colours) }
-    // Shimmer disabled for smooth scrolling - was causing choppiness
+    // No shimmer animation for smooth scrolling on low RAM 32-bit - previous fast builds had no shimmer and were smooth
+    // Keep badge feature, just no infinite animation during scroll
     val icon = when (status) {
         PosterBadge.NEW -> Icons.Filled.AutoAwesome
         PosterBadge.CONTINUE -> Icons.Filled.PlayArrow
@@ -258,41 +259,51 @@ fun PosterImage(
     url: String?,
     fallbackTitle: String,
     modifier: Modifier = Modifier,
-    cacheBust: Int = 0, // kept for compatibility but not used - causes choppiness
+    cacheBust: Int = 0,
     remoteUrl: String? = null,
     videoId: Long? = null,
 ) {
+    // If a cached file:// poster is gone or corrupt, Coil reports an error and
+    // we transparently retry with the remote artwork instead of showing a
+    // blank card.
     var useRemote by remember(url) { mutableStateOf(false) }
+    // Set when there is nothing left to try. Without this, a poster whose file
+    // was deleted (or a TMDB path with no API key) left the card BLANK: the
+    // error handler only knew how to retry a remote URL, and when there was no
+    // remote URL it changed nothing and the failed image stayed on screen.
     var failed by remember(url) { mutableStateOf(false) }
     val effectiveUrl = if (useRemote && remoteUrl != null) remoteUrl else url
-    val rememberedUrl = remember(effectiveUrl) { effectiveUrl }
     Box(modifier.background(MaterialTheme.colorScheme.surfaceContainer)) {
-        if (rememberedUrl != null && !failed) {
+        if (effectiveUrl != null && !failed) {
+            // Optimized for low RAM 32-bit 3GB - previous fast builds used size and stable keys
             AsyncImage(
                 onError = {
-                    if (!useRemote && remoteUrl != null && rememberedUrl != remoteUrl) {
+                    if (!useRemote && remoteUrl != null && effectiveUrl != remoteUrl) {
                         useRemote = true
                     } else {
                         failed = true
                     }
                 },
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(rememberedUrl)
+                    .data(effectiveUrl)
                     .crossfade(false)
-                    .memoryCacheKey(rememberedUrl)
-                    .diskCacheKey(rememberedUrl)
+                    .size(342) // Decode at poster size, not full res - critical for low RAM 32-bit smooth scrolling
+                    .memoryCacheKey("$url") // Stable key, not busting all when one changes - previous fast builds
+                    .diskCacheKey("$url")
                     .build(),
                 contentDescription = fallbackTitle,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
         } else {
+            // Frame artwork - lazy and only when idle, not during fast scroll - previous fast builds had this
             val frame = rememberFrameArtwork(videoId)
             if (frame != null) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(frame)
                         .crossfade(false)
+                        .size(342)
                         .memoryCacheKey("frame-${videoId}")
                         .build(),
                     contentDescription = fallbackTitle,
@@ -331,22 +342,26 @@ fun PosterCard(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
-    cacheBust: Int = 0,
+    cacheBust: Int = 0, // Kept for API compatibility, but not used for global bust - previous fast builds didn't bust all
 ) {
     val metadata = entry.metadata
+    // Remember for smooth scrolling - avoid recompute during scroll, keeps features
     val posterUrl = remember(entry.video.id, entry.metadata?.posterPath) { posterUrlFor(entry) }
     val remotePosterUrl = remember(entry.metadata?.posterPath) { posterRemoteUrlFor(entry) }
     val fallbackTitle = remember(entry.video.name, entry.video.parsed.title) { entry.video.parsed.title.ifBlank { entry.video.name } }
-    val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) }
+    val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) } // Read once, not observe during scroll - keeps progress feature
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(2f / 3f)
-            .clip(RoundedCornerShape(if(LocalMinimalStyle.current) 8.dp else 22.dp))
-            .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(if(LocalMinimalStyle.current) 8.dp else 22.dp))
+            .clip(RoundedCornerShape(12.dp)) // 12dp balanced for performance and feature - previous fast builds used 12dp, 22dp too large for low RAM
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .background(MaterialTheme.colorScheme.surfaceContainer),
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .graphicsLayer { // Use graphicsLayer for efficient rendering on low RAM 32-bit
+                clip = true
+                shape = RoundedCornerShape(12.dp)
+            },
     ) {
         PosterImage(
             url = posterUrl,
@@ -470,10 +485,13 @@ fun ShowCard(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(2f / 3f)
-            .clip(RoundedCornerShape(if(LocalMinimalStyle.current) 8.dp else 22.dp))
-            .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(if(LocalMinimalStyle.current) 8.dp else 22.dp))
+            .clip(RoundedCornerShape(12.dp)) // 12dp balanced for performance and feature - previous fast builds used 12dp, 22dp too large for low RAM
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .background(MaterialTheme.colorScheme.surfaceContainer),
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .graphicsLayer { // Use graphicsLayer for efficient rendering on low RAM 32-bit
+                clip = true
+                shape = RoundedCornerShape(12.dp)
+            },
     ) {
         if (posterUrl != null || remotePoster != null) {
             PosterImage(

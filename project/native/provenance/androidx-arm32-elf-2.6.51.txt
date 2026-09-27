@@ -1,0 +1,154 @@
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              DYN (Shared object file)
+  Machine:                           ARM
+  Version:                           0x1
+  Entry point address:               0x0
+  Start of program headers:          52 (bytes into file)
+  Start of section headers:          6252 (bytes into file)
+  Flags:                             0x5000200
+  Size of this header:               52 (bytes)
+  Size of program headers:           32 (bytes)
+  Number of program headers:         9
+  Size of section headers:           40 (bytes)
+  Number of section headers:         25
+  Section header string table index: 24
+
+Elf file type is DYN (Shared object file)
+Entry point 0x0
+There are 9 program headers, starting at offset 52
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  PHDR           0x000034 0x00000034 0x00000034 0x00120 0x00120 R   0x4
+  LOAD           0x000000 0x00000000 0x00000000 0x014c0 0x014c0 R E 0x4000
+  LOAD           0x0014c0 0x000054c0 0x000054c0 0x001cc 0x001cc RW  0x4000
+  LOAD           0x00168c 0x0000968c 0x0000968c 0x00000 0x00008 RW  0x4000
+  DYNAMIC        0x001580 0x00005580 0x00005580 0x000e0 0x000e0 RW  0x4
+  GNU_RELRO      0x0014c0 0x000054c0 0x000054c0 0x001cc 0x00b40 R   0x1
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x0
+  NOTE           0x000154 0x00000154 0x00000154 0x000bc 0x000bc R   0x4
+  EXIDX          0x0005e0 0x000005e0 0x000005e0 0x00030 0x00030 R   0x4
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     
+   01     .note.android.ident .note.gnu.build-id .dynsym .gnu.version .gnu.version_d .gnu.version_r .gnu.hash .hash .dynstr .rel.dyn .ARM.exidx .rel.plt .rodata .text .plt 
+   02     .data.rel.ro .fini_array .dynamic .got .got.plt 
+   03     .bss 
+   04     .dynamic 
+   05     .data.rel.ro .fini_array .dynamic .got .got.plt 
+   06     
+   07     .note.android.ident .note.gnu.build-id 
+   08     .ARM.exidx 
+   None   .comment .ARM.attributes .shstrtab 
+Dynamic section at offset 0x1580 contains 28 entries:
+  Tag        Type           Name/Value
+  0x00000001 (NEEDED)       Shared library: [libm.so]
+  0x00000001 (NEEDED)       Shared library: [libdl.so]
+  0x00000001 (NEEDED)       Shared library: [libc.so]
+  0x0000000e (SONAME)       Library soname: [libandroidx.graphics.path.so]
+  0x0000001e (FLAGS)        BIND_NOW 
+  0x6ffffffb (FLAGS_1)      NOW 
+  0x00000011 (REL)          0x458
+  0x00000012 (RELSZ)        392 (bytes)
+  0x00000013 (RELENT)       8 (bytes)
+  0x6ffffffa (RELCOUNT)     48
+  0x00000017 (JMPREL)       0x610
+  0x00000002 (PLTRELSZ)     56 (bytes)
+  0x00000003 (PLTGOT)       0x5664
+  0x00000014 (PLTREL)       REL
+  0x00000006 (SYMTAB)       0x210
+  0x0000000b (SYMENT)       16 (bytes)
+  0x00000005 (STRTAB)       0x390
+  0x0000000a (STRSZ)        199 (bytes)
+  0x6ffffef5 (GNU_HASH)     0x31c
+  0x00000004 (HASH)         0x338
+  0x0000001a (FINI_ARRAY)   0x5578
+  0x0000001c (FINI_ARRAYSZ) 8 (bytes)
+  0x6ffffff0 (VERSYM)       0x2b0
+  0x6ffffffc (VERDEF)       0x2c4
+  0x6ffffffd (VERDEFNUM)    2
+  0x6ffffffe (VERNEED)      0x2fc
+  0x6fffffff (VERNEEDNUM)   1
+  0x00000000 (NULL)         0x0
+ELF Header:
+  Magic:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00
+  Class:                             ELF32
+  Data:                              2's complement, little endian
+  Version:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  ABI Version:                       0
+  Type:                              DYN (Shared object file)
+  Machine:                           ARM
+  Version:                           0x1
+  Entry point address:               0x0
+  Start of program headers:          52 (bytes into file)
+  Start of section headers:          3456 (bytes into file)
+  Flags:                             0x5000200
+  Size of this header:               52 (bytes)
+  Size of program headers:           32 (bytes)
+  Number of program headers:         8
+  Size of section headers:           40 (bytes)
+  Number of section headers:         24
+  Section header string table index: 23
+
+Elf file type is DYN (Shared object file)
+Entry point 0x0
+There are 8 program headers, starting at offset 52
+
+Program Headers:
+  Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+  PHDR           0x000034 0x00000034 0x00000034 0x00100 0x00100 R   0x4
+  LOAD           0x000000 0x00000000 0x00000000 0x00a90 0x00a90 R E 0x4000
+  LOAD           0x000a90 0x00004a90 0x00004a90 0x00118 0x00118 RW  0x4000
+  DYNAMIC        0x000a9c 0x00004a9c 0x00004a9c 0x000d0 0x000d0 RW  0x4
+  GNU_RELRO      0x000a90 0x00004a90 0x00004a90 0x00118 0x00570 R   0x1
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RW  0x0
+  NOTE           0x000134 0x00000134 0x00000134 0x000bc 0x000bc R   0x4
+  EXIDX          0x000700 0x00000700 0x00000700 0x00060 0x00060 R   0x4
+
+ Section to Segment mapping:
+  Segment Sections...
+   00     
+   01     .note.android.ident .note.gnu.build-id .dynsym .gnu.version .gnu.version_r .gnu.hash .hash .dynstr .rel.dyn .ARM.exidx .rel.plt .ARM.extab .rodata .text .plt 
+   02     .data.rel.ro .fini_array .dynamic .got .got.plt 
+   03     .dynamic 
+   04     .data.rel.ro .fini_array .dynamic .got .got.plt 
+   05     
+   06     .note.android.ident .note.gnu.build-id 
+   07     .ARM.exidx 
+   None   .comment .ARM.attributes .shstrtab 
+Dynamic section at offset 0xa9c contains 26 entries:
+  Tag        Type           Name/Value
+  0x00000001 (NEEDED)       Shared library: [libm.so]
+  0x00000001 (NEEDED)       Shared library: [libdl.so]
+  0x00000001 (NEEDED)       Shared library: [libc.so]
+  0x0000000e (SONAME)       Library soname: [libdatastore_shared_counter.so]
+  0x0000001e (FLAGS)        BIND_NOW 
+  0x6ffffffb (FLAGS_1)      NOW 
+  0x00000011 (REL)          0x6e0
+  0x00000012 (RELSZ)        32 (bytes)
+  0x00000013 (RELENT)       8 (bytes)
+  0x6ffffffa (RELCOUNT)     3
+  0x00000017 (JMPREL)       0x760
+  0x00000002 (PLTRELSZ)     88 (bytes)
+  0x00000003 (PLTGOT)       0x4b70
+  0x00000014 (PLTREL)       REL
+  0x00000006 (SYMTAB)       0x1f0
+  0x0000000b (SYMENT)       16 (bytes)
+  0x00000005 (STRTAB)       0x438
+  0x0000000a (STRSZ)        677 (bytes)
+  0x6ffffef5 (GNU_HASH)     0x354
+  0x00000004 (HASH)         0x3a0
+  0x0000001a (FINI_ARRAY)   0x4a94
+  0x0000001c (FINI_ARRAYSZ) 8 (bytes)
+  0x6ffffff0 (VERSYM)       0x310
+  0x6ffffffe (VERNEED)      0x334
+  0x6fffffff (VERNEEDNUM)   1
+  0x00000000 (NULL)         0x0

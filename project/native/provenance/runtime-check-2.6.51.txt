@@ -1,0 +1,22 @@
+jni/arm64-v8a/libavcodec.so ELF class/machine verified; >= 16KB alignment; dependency closure verified
+jni/arm64-v8a/libavdevice.so ELF class/machine verified; >= 16KB alignment; dependency closure verified
+jni/arm64-v8a/libavfilter.so ELF class/machine verified; >= 16KB alignment; dependency closure verified
+jni/arm64-v8a/libavformat.so ELF class/machine verified; >= 16KB alignment; dependency closure verified
+jni/arm64-v8a/libavutil.so ELF class/machine verified; >= 16KB alignment; dependency closure verified
+jni/arm64-v8a/libc++_shared.so ELF class/machine verified; >= 16KB alignment; dependency closure verified
+jni/arm64-v8a/libmpv.so ELF class/machine verified; >= 16KB alignment; dependency closure verified
+jni/arm64-v8a/libopticast_mpv.so ELF class/machine verified; >= 16KB alignment; dependency closure verified
+jni/arm64-v8a/libswresample.so ELF class/machine verified; >= 16KB alignment; dependency closure verified
+jni/arm64-v8a/libswscale.so ELF class/machine verified; >= 16KB alignment; dependency closure verified
+arm64-v8a JNI exports and actual GPL/version3 FFmpeg configuration verified.
+jni/armeabi-v7a/libavcodec.so ELF class/machine verified; >= 4KB alignment; dependency closure verified
+jni/armeabi-v7a/libavdevice.so ELF class/machine verified; >= 4KB alignment; dependency closure verified
+jni/armeabi-v7a/libavfilter.so ELF class/machine verified; >= 4KB alignment; dependency closure verified
+jni/armeabi-v7a/libavformat.so ELF class/machine verified; >= 4KB alignment; dependency closure verified
+jni/armeabi-v7a/libavutil.so ELF class/machine verified; >= 4KB alignment; dependency closure verified
+jni/armeabi-v7a/libc++_shared.so ELF class/machine verified; >= 4KB alignment; dependency closure verified
+jni/armeabi-v7a/libmpv.so ELF class/machine verified; >= 4KB alignment; dependency closure verified
+jni/armeabi-v7a/libopticast_mpv.so ELF class/machine verified; >= 4KB alignment; dependency closure verified
+jni/armeabi-v7a/libswresample.so ELF class/machine verified; >= 4KB alignment; dependency closure verified
+jni/armeabi-v7a/libswscale.so ELF class/machine verified; >= 4KB alignment; dependency closure verified
+armeabi-v7a JNI exports and actual GPL/version3 FFmpeg configuration verified.

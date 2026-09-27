@@ -1,0 +1,4 @@
+74084d45f74c166ea09302274d27aa0da8c0d2ca8feb494fa4a2b3c23dac689d  OptiCast-2.6.59.apk
+fc2f5b422b77df06208f50ded946e8cf78b3166f41c2c80d20b3f3af2d75f2d2  OptiCast-2.6.59-complete-source.zip
+143d6b98f67711ad6636cf29022c77d108f400d1fc2e34b5287ef4b73e07aa03  signature-verification-2.6.59.txt
+c9e6839fed3b787bc0a783fb28eaf613d0932aa8d9577a6094f2ec9f9248cddc  obfuscation-mapping-2.6.59.txt.xz

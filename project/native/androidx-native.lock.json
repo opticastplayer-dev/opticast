@@ -1,0 +1,28 @@
+{
+  "artifacts": [
+    {
+      "coordinate": "androidx.graphics:graphics-path:1.0.1",
+      "release_commit": "8a05a22af450d589ef911d772a001a49dcb05b71",
+      "source_url": "https://android.googlesource.com/platform/frameworks/support/+archive/8a05a22af450d589ef911d772a001a49dcb05b71/graphics/graphics-path.tar.gz",
+      "release_evidence": "https://developer.android.com/jetpack/androidx/releases/graphics#graphics-path-1.0.1",
+      "source_archive": "androidx.graphics-graphics-path-1.0.1.tar.gz",
+      "source_sha256": "6e714de4d1a3922d1d7ab394c2f0be1708aba56463bdd37cd1417f015f7fcf1f",
+      "libraries": {
+        "lib/arm64-v8a/libandroidx.graphics.path.so": "41e9a793c43a0f4fddb19e33f346bace464f30f888ba7b9eaf96294ea115bfb6",
+        "lib/armeabi-v7a/libandroidx.graphics.path.so": "41399eba6fc2a60f6f14642375c1824f3cf25eb8fec7397d753730a3ceda3e2b"
+      }
+    },
+    {
+      "coordinate": "androidx.datastore:datastore-core-android:1.1.3",
+      "release_commit": "ae63f655454c1548483e3f34d8f47d98ae21119b",
+      "source_url": "https://android.googlesource.com/platform/frameworks/support/+archive/ae63f655454c1548483e3f34d8f47d98ae21119b/datastore/datastore-core.tar.gz",
+      "release_evidence": "https://developer.android.com/jetpack/androidx/releases/datastore#1.1.3",
+      "source_archive": "androidx.datastore-datastore-core-android-1.1.3.tar.gz",
+      "source_sha256": "02bfb8fa7ca91034592680690844fce19124140546d905f3675f4714036d1bda",
+      "libraries": {
+        "lib/arm64-v8a/libdatastore_shared_counter.so": "d3e48717c9aa147e0ab21063ba0e8e0211cabf8bf40b222640829519edbf58e1",
+        "lib/armeabi-v7a/libdatastore_shared_counter.so": "716c5d8d2cac8ca0edf65da8f139c7886b726ac79d542a14edeb94994ba6d3dc"
+      }
+    }
+  ]
+}

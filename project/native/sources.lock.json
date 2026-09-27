@@ -1,0 +1,147 @@
+{
+  "mpv": {
+    "repository": "mpv-player/mpv",
+    "requested_ref": "2a4eb8067ca68ec19adf23daf8ccbb1a05afd6ed",
+    "commit": "2a4eb8067ca68ec19adf23daf8ccbb1a05afd6ed",
+    "url": "https://codeload.github.com/mpv-player/mpv/tar.gz/2a4eb8067ca68ec19adf23daf8ccbb1a05afd6ed",
+    "sha256": "40ebece44ed4749e97d4d50c970aea95f036cc7e403a5d05c027a06da9bb9cd9"
+  },
+  "ffmpeg": {
+    "repository": "FFmpeg/FFmpeg",
+    "requested_ref": "28ab05da84b3194d49eabeead9291af97ba251d4",
+    "commit": "28ab05da84b3194d49eabeead9291af97ba251d4",
+    "url": "https://codeload.github.com/FFmpeg/FFmpeg/tar.gz/28ab05da84b3194d49eabeead9291af97ba251d4",
+    "sha256": "b4d0a67fc229f77d2e71a0488d15ea74fa1326341cc38744c3140932dbb7960a"
+  },
+  "libplacebo": {
+    "repository": "haasn/libplacebo",
+    "requested_ref": "c42968d8616a1d1c8ad5f4f1a8d6f5a9cb396e56",
+    "commit": "c42968d8616a1d1c8ad5f4f1a8d6f5a9cb396e56",
+    "url": "https://codeload.github.com/haasn/libplacebo/tar.gz/c42968d8616a1d1c8ad5f4f1a8d6f5a9cb396e56",
+    "sha256": "0b4bb07babd488eff24ec07c7e3714134fbc125c6212a38e4400e4a6aa9ed671",
+    "submodules": [
+      {
+        "path": "demos/3rdparty/nuklear",
+        "repository": "Immediate-Mode-UI/Nuklear",
+        "commit": "242f35efa067a46c595645eeda7b1771ea1f83b1",
+        "sha256": "ac567995f917c10a722409e0141d226e737d06488b0a31166f6e4925da8e58f0"
+      },
+      {
+        "path": "3rdparty/glad",
+        "repository": "Dav1dde/glad",
+        "commit": "73db193f853e2ee079bf3ca8a64aa2eaf6459043",
+        "sha256": "33dbeae44d8315ece57e14eba4b1b4a02ac5406d1c4f49cd20048c91522a6b9a"
+      },
+      {
+        "path": "3rdparty/jinja",
+        "repository": "pallets/jinja",
+        "commit": "15206881c006c79667fe5154fe80c01c65410679",
+        "sha256": "b88a20dcc2e34072fcf4159325bc6c34cd4b29a81a8b83d15d2f28ba561da296"
+      },
+      {
+        "path": "3rdparty/markupsafe",
+        "repository": "pallets/markupsafe",
+        "commit": "297fc8e356e6836a62087949245d09a28e9f1b13",
+        "sha256": "da7c010c9c81a66ac73036558c1fcb6212b50482f43211cd1254035b94f82414"
+      },
+      {
+        "path": "3rdparty/Vulkan-Headers",
+        "repository": "KhronosGroup/Vulkan-Headers",
+        "commit": "74d8a6cb930c68ef617b202c3ff3c59d919e086b",
+        "sha256": "75967a8288ff16044a86d1af462b96d2e75c435937efb75f2bb4102ab0382f29"
+      },
+      {
+        "path": "3rdparty/fast_float",
+        "repository": "fastfloat/fast_float",
+        "commit": "97b54ca9e75f5303507699d27c6b4f4efe4641a1",
+        "sha256": "2b132274539286e41f37857cac22aa8441d21bd86d55de825a3342b149f66801"
+      }
+    ]
+  },
+  "dav1d": {
+    "repository": "videolan/dav1d",
+    "requested_ref": "1.5.1",
+    "commit": "42b2b24fb8819f1ed3643aa9cf2a62f03868e3aa",
+    "url": "https://codeload.github.com/videolan/dav1d/tar.gz/42b2b24fb8819f1ed3643aa9cf2a62f03868e3aa",
+    "sha256": "e26d41e2f496c1598f418726b871ce252ce9f18f8dbe3ad199349a42ed2cb02f"
+  },
+  "libass": {
+    "repository": "libass/libass",
+    "requested_ref": "0.17.4",
+    "commit": "bbb3c7f1570a4a021e52683f3fbdf74fe492ae84",
+    "url": "https://codeload.github.com/libass/libass/tar.gz/bbb3c7f1570a4a021e52683f3fbdf74fe492ae84",
+    "sha256": "93796cd47cc878220f3466352315888daba8a48d673cdd8c44350b26f516e064"
+  },
+  "freetype2": {
+    "repository": "freetype/freetype",
+    "requested_ref": "VER-2-14-3",
+    "commit": "0a0221a1347e2f1e07c395263540026e9a0aa7c7",
+    "url": "https://codeload.github.com/freetype/freetype/tar.gz/0a0221a1347e2f1e07c395263540026e9a0aa7c7",
+    "sha256": "11cd478953fc1d382f20a233b8e2aed6c31b47cbf0568c4bdb3334bcc1550698",
+    "submodules": [
+      {
+        "path": "subprojects/dlg",
+        "repository": "nyorain/dlg",
+        "commit": "395ccad2c1e0daae535c4d20bb0a3f2424648e17",
+        "sha256": "263a4a3777d9839e34cd41db988310659e0c00eab37beb7aedd30511a460133b"
+      }
+    ]
+  },
+  "fribidi": {
+    "repository": "fribidi/fribidi",
+    "requested_ref": "v1.0.16",
+    "commit": "68162babff4f39c4e2dc164a5e825af93bda9983",
+    "url": "https://codeload.github.com/fribidi/fribidi/tar.gz/68162babff4f39c4e2dc164a5e825af93bda9983",
+    "sha256": "fa34a057a414c85f7e1f3c0fd717bc93d74d370ed474ef2feca90868b4938f72"
+  },
+  "harfbuzz": {
+    "repository": "harfbuzz/harfbuzz",
+    "requested_ref": "14.4.0",
+    "commit": "36cb489cb02ce4b92099669ba9f9bea348eff93f",
+    "url": "https://codeload.github.com/harfbuzz/harfbuzz/tar.gz/36cb489cb02ce4b92099669ba9f9bea348eff93f",
+    "sha256": "0afa12c8ef4bc4ffebd99e5d2a4a2c56dfe329c661feda08a9bc878b7352be89"
+  },
+  "unibreak": {
+    "repository": "adah1972/libunibreak",
+    "requested_ref": "libunibreak_8_0",
+    "commit": "28a2756b864c343f438cd22537d49d394d4666a5",
+    "url": "https://codeload.github.com/adah1972/libunibreak/tar.gz/28a2756b864c343f438cd22537d49d394d4666a5",
+    "sha256": "4d0714d29207bfcaabe2a9376f83330bfb477673ecfb53994e47bd6d07738581"
+  },
+  "libxml2": {
+    "repository": "GNOME/libxml2",
+    "requested_ref": "v2.15.4",
+    "commit": "96498992efa48d52b0e8b83058bd88dbdaf153c1",
+    "url": "https://codeload.github.com/GNOME/libxml2/tar.gz/96498992efa48d52b0e8b83058bd88dbdaf153c1",
+    "sha256": "3fa264c6117569780ea0f6447d98c77f29b285cfd665ced2ec7da4f51183607f"
+  },
+  "fontconfig": {
+    "repository": "fontconfig/fontconfig",
+    "requested_ref": "2.18.3",
+    "commit": "0f236723a3c26bd9745e32ba2b3ee21e5f809295",
+    "url": "https://codeload.github.com/fontconfig/fontconfig/tar.gz/0f236723a3c26bd9745e32ba2b3ee21e5f809295",
+    "sha256": "3e23f526b5fdb12d92a2b87ebcf2aba27ec9e75113a86f71d5b79ea1669df9bb"
+  },
+  "mbedtls": {
+    "repository": "Mbed-TLS/mbedtls",
+    "requested_ref": "mbedtls-3.6.7",
+    "commit": "068ff080b369adfac81509f9b57b2afabaf82dc5",
+    "url": "https://codeload.github.com/Mbed-TLS/mbedtls/tar.gz/068ff080b369adfac81509f9b57b2afabaf82dc5",
+    "sha256": "ca6bd316bbec49ef20088f39b8755fcaec0b7e45781506de55b17cd191ae6937",
+    "submodules": [
+      {
+        "path": "framework",
+        "repository": "Mbed-TLS/mbedtls-framework",
+        "commit": "dde0c4a0e448a0552f18817dcea633bb851fd288",
+        "sha256": "3b0d4864fa877dc9165b90ff3d5b68505c6176c0b22d317d99fe8c89a993e9fd"
+      }
+    ]
+  },
+  "curl": {
+    "repository": "curl/curl",
+    "requested_ref": "curl-8_21_0",
+    "commit": "68720b4837284335b2d63cb358f8f6ce65f5bc55",
+    "url": "https://codeload.github.com/curl/curl/tar.gz/68720b4837284335b2d63cb358f8f6ce65f5bc55",
+    "sha256": "93cce13a8f65bf83e27a277916fb69917736fb578a8e6c24630175d506f9d4e5"
+  }
+}

@@ -1,0 +1,307 @@
+package com.opticast.player.data.remote
+
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import androidx.core.content.FileProvider
+import com.opticast.player.data.AppContainer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.io.File
+import java.util.concurrent.TimeUnit
+
+/**
+ * Checks for updates from GitHub releases, supports in-app download and install,
+ * and tracks what's new.
+ * - Checks at startup (once per 24h)
+ * - Allows manual check
+ * - Downloads APK and triggers install via FileProvider
+ * - Shows changelog for new versions
+ */
+object UpdateChecker {
+
+    private const val GITHUB_API_URL = "https://api.github.com/repos/opticast-project/opticast/releases/latest"
+    private const val GITHUB_RELEASES_URL = "https://github.com/opticast-project/opticast/releases"
+    private const val PREFS_NAME = "update_checker"
+    private const val KEY_LAST_CHECK = "last_check"
+    private const val KEY_LAST_VERSION = "last_version"
+    private const val KEY_SKIPPED_VERSION = "skipped_version"
+    private const val CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000L // 24h
+
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .build()
+
+    private val json = Json { ignoreUnknownKeys = true; isLenient = true }
+
+    @Serializable
+    data class GitHubRelease(
+        val tag_name: String = "",
+        val name: String = "",
+        val body: String = "",
+        val html_url: String = "",
+        val assets: List<Asset> = emptyList()
+    ) {
+        @Serializable
+        data class Asset(
+            val name: String = "",
+            val browser_download_url: String = "",
+            val size: Long = 0L
+        )
+    }
+
+    data class UpdateInfo(
+        val version: String,
+        val versionCode: Long,
+        val changelog: String,
+        val downloadUrl: String,
+        val htmlUrl: String,
+        val size: Long,
+        val isNewer: Boolean
+    )
+
+    private fun prefs(context: Context): SharedPreferences =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    fun getInstalledVersion(context: Context): Pair<String, Long> {
+        return try {
+            val pm = context.packageManager
+            val info = pm.getPackageInfo(context.packageName, 0)
+            val versionName = info.versionName ?: "unknown"
+            val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                info.longVersionCode
+            } else {
+                @Suppress("DEPRECATION")
+                info.versionCode.toLong()
+            }
+            versionName to versionCode
+        } catch (_: Exception) {
+            "unknown" to 0L
+        }
+    }
+
+    suspend fun checkForUpdate(context: Context, force: Boolean = false): UpdateInfo? = withContext(Dispatchers.IO) {
+        try {
+            if (!AppContainer.isOnline()) return@withContext null
+            if (!force) {
+                val lastCheck = prefs(context).getLong(KEY_LAST_CHECK, 0L)
+                if (System.currentTimeMillis() - lastCheck < CHECK_INTERVAL_MS) {
+                    return@withContext null
+                }
+            }
+
+            val request = Request.Builder()
+                .url(GITHUB_API_URL)
+                .header("Accept", "application/vnd.github.v3+json")
+                .header("User-Agent", "OptiCast-UpdateChecker")
+                .build()
+
+            val response = client.newCall(request).execute()
+            if (!response.isSuccessful) {
+                // Fallback: if API fails, still allow opening releases page
+                return@withContext null
+            }
+
+            val body = response.body?.string() ?: return@withContext null
+            val release = json.decodeFromString<GitHubRelease>(body)
+
+            prefs(context).edit().putLong(KEY_LAST_CHECK, System.currentTimeMillis()).apply()
+
+            val tag = release.tag_name.removePrefix("v")
+            val installed = getInstalledVersion(context)
+            val installedCode = installed.second
+
+            // Parse version code from tag if possible, or compare version names
+            val remoteCode = parseVersionCode(tag)
+            val isNewer = when {
+                remoteCode > 0 && installedCode > 0 -> remoteCode > installedCode
+                else -> isVersionNewer(tag, installed.first)
+            }
+
+            // Find APK asset
+            val apkAsset = release.assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains("OptiCast", ignoreCase = true) }
+                ?: release.assets.firstOrNull { it.name.endsWith(".apk") }
+
+            UpdateInfo(
+                version = tag,
+                versionCode = remoteCode,
+                changelog = release.body,
+                downloadUrl = apkAsset?.browser_download_url ?: release.html_url,
+                htmlUrl = release.html_url.ifBlank { GITHUB_RELEASES_URL },
+                size = apkAsset?.size ?: 0L,
+                isNewer = isNewer
+            )
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun checkAtStartup(context: Context) = withContext(Dispatchers.IO) {
+        try {
+            val update = checkForUpdate(context, force = false)
+            if (update != null && update.isNewer) {
+                // Store that an update is available - UI can show badge
+                prefs(context).edit().putString("available_update", update.version).apply()
+            }
+            // Check if this is a new version install - show what's new
+            val installed = getInstalledVersion(context)
+            val lastVersion = prefs(context).getString(KEY_LAST_VERSION, null)
+            if (lastVersion != null && lastVersion != installed.first) {
+                // Version changed - mark to show what's new
+                prefs(context).edit().putString("whats_new_version", installed.first).apply()
+            }
+            prefs(context).edit().putString(KEY_LAST_VERSION, installed.first).apply()
+        } catch (_: Exception) { }
+    }
+
+    fun shouldShowWhatsNew(context: Context): Boolean {
+        val whatsNewVersion = prefs(context).getString("whats_new_version", null)
+        return whatsNewVersion != null
+    }
+
+    fun getWhatsNewVersion(context: Context): String? {
+        return prefs(context).getString("whats_new_version", null)
+    }
+
+    fun dismissWhatsNew(context: Context) {
+        prefs(context).edit().remove("whats_new_version").apply()
+    }
+
+    fun skipVersion(context: Context, version: String) {
+        prefs(context).edit().putString(KEY_SKIPPED_VERSION, version).apply()
+    }
+
+    fun isSkipped(context: Context, version: String): Boolean {
+        return prefs(context).getString(KEY_SKIPPED_VERSION, null) == version
+    }
+
+    fun getAvailableUpdate(context: Context): String? {
+        return prefs(context).getString("available_update", null)
+    }
+
+    fun clearAvailableUpdate(context: Context) {
+        prefs(context).edit().remove("available_update").apply()
+    }
+
+    suspend fun downloadAndInstall(context: Context, downloadUrl: String, onProgress: (Int) -> Unit = {}): Boolean = withContext(Dispatchers.IO) {
+        try {
+            // Check if we can request install packages
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val pm = context.packageManager
+                if (!pm.canRequestPackageInstalls()) {
+                    // Need to request permission - open settings
+                    withContext(Dispatchers.Main) {
+                        val intent = Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                            data = Uri.parse("package:${context.packageName}")
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        context.startActivity(intent)
+                    }
+                    return@withContext false
+                }
+            }
+
+            val request = Request.Builder().url(downloadUrl).build()
+            val response = client.newCall(request).execute()
+            if (!response.isSuccessful) return@withContext false
+
+            val body = response.body ?: return@withContext false
+            val total = body.contentLength()
+            val file = File(context.cacheDir, "update.apk")
+            file.delete()
+
+            body.byteStream().use { input ->
+                file.outputStream().use { output ->
+                    val buffer = ByteArray(8192)
+                    var downloaded = 0L
+                    var read: Int
+                    while (input.read(buffer).also { read = it } != -1) {
+                        output.write(buffer, 0, read)
+                        downloaded += read
+                        if (total > 0) {
+                            val progress = ((downloaded * 100) / total).toInt()
+                            withContext(Dispatchers.Main) { onProgress(progress) }
+                        }
+                    }
+                }
+            }
+
+            // Trigger install via FileProvider
+            withContext(Dispatchers.Main) {
+                val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "application/vnd.android.package-archive")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                context.startActivity(intent)
+            }
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    fun openReleasesPage(context: Context) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_RELEASES_URL)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        } catch (_: Exception) { }
+    }
+
+    fun openReleasePage(context: Context, htmlUrl: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(htmlUrl)).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        } catch (_: Exception) {
+            openReleasesPage(context)
+        }
+    }
+
+    private fun parseVersionCode(version: String): Long {
+        return try {
+            // Try to parse version like 2.6.58 -> 108 or 2.6.58 as code
+            // For simplicity, extract numbers and convert
+            val parts = version.split(".")
+            if (parts.size >= 3) {
+                val major = parts[0].toLongOrNull() ?: 0
+                val minor = parts[1].toLongOrNull() ?: 0
+                val patch = parts[2].substringBefore("-").toLongOrNull() ?: 0
+                // Rough conversion, but we also check version name comparison
+                major * 10000 + minor * 100 + patch
+            } else {
+                0L
+            }
+        } catch (_: Exception) {
+            0L
+        }
+    }
+
+    private fun isVersionNewer(remote: String, installed: String): Boolean {
+        return try {
+            val remoteParts = remote.split(".").map { it.substringBefore("-").toIntOrNull() ?: 0 }
+            val installedParts = installed.split(".").map { it.substringBefore("-").toIntOrNull() ?: 0 }
+            for (i in 0 until maxOf(remoteParts.size, installedParts.size)) {
+                val r = remoteParts.getOrNull(i) ?: 0
+                val inst = installedParts.getOrNull(i) ?: 0
+                if (r > inst) return true
+                if (r < inst) return false
+            }
+            false
+        } catch (_: Exception) {
+            remote != installed
+        }
+    }
+}

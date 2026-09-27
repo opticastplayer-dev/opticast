@@ -1,0 +1,72 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!--
+      OptiCast mark: thick gradient "C" (cyan -> blue -> violet) opening to the
+      right, a white play triangle seated in the bowl, and three speed dashes.
+      Every element stays inside the central 66dp safe zone of the adaptive
+      canvas: the C's outer edge reaches 32 units from the icon centre, the
+      longest dash 30.25 - both under the 33 limit.
+    -->
+    <group>
+        <!-- the C: open on the right, gradient stroke -->
+        <path android:pathData="M54.31,42.69 A16,16 0 1 0 54.31,65.31"
+            android:strokeWidth="10" android:strokeLineCap="round" android:fillColor="#00000000">
+            <aapt:attr name="android:strokeColor">
+                <gradient android:type="linear" android:startX="20" android:startY="32"
+                    android:endX="84" android:endY="76">
+                    <item android:offset="0" android:color="#FF35C8FF" />
+                    <item android:offset="0.5" android:color="#FF1E6BF5" />
+                    <item android:offset="1" android:color="#FF7B2FF7" />
+                </gradient>
+            </aapt:attr>
+        </path>
+        <!-- play triangle -->
+        <path android:pathData="M39,48 L52,54 L39,60 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient android:type="linear" android:startX="45" android:startY="48"
+                    android:endX="45" android:endY="60">
+                    <item android:offset="0" android:color="#FFFFFFFF" />
+                    <item android:offset="1" android:color="#FFD9E3FF" />
+                </gradient>
+            </aapt:attr>
+        </path>
+        <!-- speed dashes -->
+        <path android:pathData="M66,46 L71,46" android:strokeWidth="3.5"
+            android:strokeLineCap="round" android:fillColor="#00000000">
+            <aapt:attr name="android:strokeColor">
+                <gradient android:type="linear" android:startX="20" android:startY="32"
+                    android:endX="84" android:endY="76">
+                    <item android:offset="0" android:color="#FF35C8FF" />
+                    <item android:offset="0.5" android:color="#FF1E6BF5" />
+                    <item android:offset="1" android:color="#FF7B2FF7" />
+                </gradient>
+            </aapt:attr>
+        </path>
+        <path android:pathData="M66,54 L82,54" android:strokeWidth="4.5"
+            android:strokeLineCap="round" android:fillColor="#00000000">
+            <aapt:attr name="android:strokeColor">
+                <gradient android:type="linear" android:startX="20" android:startY="32"
+                    android:endX="84" android:endY="76">
+                    <item android:offset="0" android:color="#FF35C8FF" />
+                    <item android:offset="0.5" android:color="#FF1E6BF5" />
+                    <item android:offset="1" android:color="#FF7B2FF7" />
+                </gradient>
+            </aapt:attr>
+        </path>
+        <path android:pathData="M66,62 L73,62" android:strokeWidth="3.5"
+            android:strokeLineCap="round" android:fillColor="#00000000">
+            <aapt:attr name="android:strokeColor">
+                <gradient android:type="linear" android:startX="20" android:startY="32"
+                    android:endX="84" android:endY="76">
+                    <item android:offset="0" android:color="#FF35C8FF" />
+                    <item android:offset="0.5" android:color="#FF1E6BF5" />
+                    <item android:offset="1" android:color="#FF7B2FF7" />
+                </gradient>
+            </aapt:attr>
+        </path>
+    </group>
+</vector>

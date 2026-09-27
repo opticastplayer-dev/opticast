@@ -1,0 +1,14 @@
+OptiCast 2.6.42
+Copyright © 2026 OptiCast contributors.
+
+This release's application code is free software under the GNU General Public License, version 3 or (at your option) any later version. There is NO WARRANTY, to the extent permitted by law. You may copy, modify and redistribute under that license. Third-party components retain their own copyright and compatible licenses. Product names/trademarks are not licensed by the software license.
+
+Complete corresponding source is supplied alongside this APK as OptiCast-2.6.42-source.zip. It contains the application source, native sources, source patches/build scripts, a pinned dependency inventory, dependency sources and build/install instructions. Keep the source distribution available when redistributing this GPL build; consult the included GPL for the applicable requirements.
+
+Use your own signing key for modified builds. The official signing key is private and is not included. Build/install instructions explain how to install a separately signed development package alongside the official app.
+
+mpv is the default for local videos, with one-time Media3 fallback. Media3 handles network sources. This native build is rebuilt from pinned sources, not the unaudited mpv-android Maven AAR. It uses OpenGL ES rather than Vulkan, with Lua disabled. Local-file playback is the supported integration scope; choose Media3 for network sources and EQ/boost.
+
+Hardware decoding is requested first, but software fallback, supported formats, HDR output and performance depend on the file and device. No universal compatibility or startup-speed claim is made.
+
+Contact: opticastproject@gmail.com

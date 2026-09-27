@@ -1,0 +1,38 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!--
+      OptiCast mark: thick gradient "C" (cyan -> blue -> violet) opening to the
+      right, a white play triangle seated in the bowl, and three speed dashes.
+      Every element stays inside the central 66dp safe zone of the adaptive
+      canvas: the C's outer edge reaches 32 units from the icon centre, the
+      longest dash 30.25 - both under the 33 limit.
+    -->
+    <group>
+        <!-- the C: open on the right, gradient stroke -->
+        <path android:pathData="M54.31,42.69 A16,16 0 1 0 54.31,65.31"
+            android:strokeWidth="10" android:strokeLineCap="round" android:strokeColor="#FFFFFFFF">
+            
+        </path>
+        <!-- play triangle -->
+        <path android:fillColor="#FFFFFFFF" android:pathData="M39,48 L52,54 L39,60 Z">
+            
+        </path>
+        <!-- speed dashes -->
+        <path android:pathData="M66,46 L71,46" android:strokeWidth="3.5"
+            android:strokeLineCap="round" android:strokeColor="#FFFFFFFF">
+            
+        </path>
+        <path android:pathData="M66,54 L82,54" android:strokeWidth="4.5"
+            android:strokeLineCap="round" android:strokeColor="#FFFFFFFF">
+            
+        </path>
+        <path android:pathData="M66,62 L73,62" android:strokeWidth="3.5"
+            android:strokeLineCap="round" android:strokeColor="#FFFFFFFF">
+            
+        </path>
+    </group>
+</vector>

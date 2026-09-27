@@ -1,0 +1,83 @@
+{
+  "controlled_source_build": true,
+  "source_lock_sha256": "090509673b2170a28cab105e9867b8980c6c29ee63373c5c13ed1e31bf8f1ca3",
+  "runtime_sha256": "cfeafe5d70fc19a16005cef8f97c47e4b3a19f4a540aba402ea68db3e7287233",
+  "jni_source_sha256": "94e7f2eb392f6a64d898be565656a24f36e285a15db21e379f58bac87428aca8",
+  "build_script_sha256": {
+    "buildscripts/buildall.sh": "23d9ef2b96e185bafe6db8d2b8a02b73723cf08a48401eb75c10c740b4e8ae2b",
+    "buildscripts/ci.sh": "dd2e7afc30807781f4e9575e547bf1568bccb72065bf82b2609174dcd6023d72",
+    "buildscripts/docker-build.sh": "88accdf57952a2b27d3611e8e4d5fbf9d8e51000753d1961f1dc908a51623956",
+    "buildscripts/docker-entrypoint.sh": "3650f9f93f4a732acba7b6218640174cafaa4b479b9451781e0bcd3de66ea5b1",
+    "buildscripts/download.sh": "e3ce82c0377e443e5ca00e6eeeae5c31249b65826f3776fed9951ae3a0f9e60a",
+    "buildscripts/include/ci.sh": "bc48bec00b246b2ccc77682ea367c06e9af49480821d0cb3b8f42746254c4a24",
+    "buildscripts/include/depinfo.sh": "225570c454d706e9cabf95c73bce7582c6267d0b2e715e401b1420713daa534b",
+    "buildscripts/include/download-deps.sh": "70daca45fef08c5c25793037172c4eca23d67970babf3ccbf501a2e2d4eb3c04",
+    "buildscripts/include/download-sdk.sh": "cd7b565c9b12ea9de9f2c09540b550101ef2a2629858e9ab9c75b1e76c3cadd1",
+    "buildscripts/include/path.sh": "b7869b3d5ec68ab3018579d5fe7b194512a7aa410f37798f46849bbd4c3709ff",
+    "buildscripts/scripts/curl.sh": "9b3a9f5c94db6c346b5ec4ee94a2df6e3b158576433c94641d25bb5e35f466c9",
+    "buildscripts/scripts/dav1d.sh": "8717a693b35c5e6100917f9d4dcca5d589c39fec431ff32f09989187b5b2785a",
+    "buildscripts/scripts/ffmpeg.sh": "3d6693d3ef359437ca54cabaadb973901a95198d4d917a4438d8bf285af3f6fe",
+    "buildscripts/scripts/fontconfig.sh": "8506836424e3b5ea329a8138b9db5fff2ee844883458fe4531398e805ae873e9",
+    "buildscripts/scripts/freetype2.sh": "7106e47146cd38ab345bbe1c2e76a2823d8e385728b5ac10ae99a6c1534f97a3",
+    "buildscripts/scripts/fribidi.sh": "133bc90a43e5ed52049450c690d1e441250354b5ae6f877edae4e579d2081e31",
+    "buildscripts/scripts/harfbuzz.sh": "35c1d28835920de6b9e69f00164eae7a3d14987e71fb8871acb0e1bac075c1b2",
+    "buildscripts/scripts/libass.sh": "030fa9e5893ae3cea8d3dbb1ac35846a26047b4552363c1a8252c259722e6b74",
+    "buildscripts/scripts/libplacebo.sh": "68aa48e3eb0aa6f300b52752a63218f346a09fdd1b58f165fc2cd451116d86aa",
+    "buildscripts/scripts/libxml2.sh": "c1ae9c57f149501539a82348fa07bda1bd83784038835db37280311c9af8649f",
+    "buildscripts/scripts/lua.sh": "111bc1f7fd28231b926b9c8f55e7b5b99d57c18832a536f387b0f8828ccc37c8",
+    "buildscripts/scripts/mbedtls.sh": "b5ec1bbf8ff077c4d1a97f07b4c8c2d42320586f245286a643b1a3e654ad8b12",
+    "buildscripts/scripts/mpv-android.sh": "474f033658bedb68f03199eb838865a210b2741886c37a1f63101ff1d00bfe8d",
+    "buildscripts/scripts/mpv.sh": "639a54543ed8fe521e5fd5b7dee978c7283cc7e1f6d94eac1ef1ffbcc8e1941b",
+    "buildscripts/scripts/shaderc.sh": "e8a8fbc3a955a2a2ffce15f4fedb32036d3863ee94beca8585da522cd6617416",
+    "buildscripts/scripts/unibreak.sh": "83f94f6a6c407ca3e2e8d11ea7bc0fc86abfa9e0b598c1e318d7f380b15ff222",
+    "buildscripts/scripts/write_versions.sh": "1828ac4206a049558fe7e939f31ab3700a2eca7ea4c51dddda57ba96aec007bb"
+  },
+  "libraries": {
+    "jni/arm64-v8a/libavcodec.so": "cc57585348a8c04b6caee4f234af41b212c93598f4784efa6360872dd7cc7709",
+    "jni/arm64-v8a/libavdevice.so": "cca55beb9e0c50843adfbc8d6ffbc76b676eeaad20432f12487b20b41ea93a34",
+    "jni/arm64-v8a/libavfilter.so": "9d9a923c344643ed39d355c9416178855212d5e33abe249656176650d6566c13",
+    "jni/arm64-v8a/libavformat.so": "8e5a5ea31deaf4e29711319a54a1033dc06e39c474f57053448390b649ff7d5f",
+    "jni/arm64-v8a/libavutil.so": "905212975c9929ab9dbbe6e58ea22ed69fe47ef62648530372273d9a36262674",
+    "jni/arm64-v8a/libc++_shared.so": "cd61762848882a16c8244c964a6f396c0caa0b440588a210ce9cc4ab0e6d9f0c",
+    "jni/arm64-v8a/libmpv.so": "5e827c1be0c64f8d6090ffa72236b77681988f322a25c89a9f99711021104e38",
+    "jni/arm64-v8a/libopticast_mpv.so": "e672fe2de314a3d6078c9d3ff838a6d668c02aa00ef823930dd196e12a4f93eb",
+    "jni/arm64-v8a/libswresample.so": "ba47876a8053b67bb0aac702a5ddad2bb2911ad587a138d3a77bcb91a4c04e87",
+    "jni/arm64-v8a/libswscale.so": "cec5b6ace6cdb6d8444f43d06718f4c37a1138ab2baefcd80a985d5c295eb9bc",
+    "jni/armeabi-v7a/libavcodec.so": "e786a4904d0d03daffcde5ce903704a9ddbeb239ea6127702a88f11261947fb7",
+    "jni/armeabi-v7a/libavdevice.so": "02c0fa7a4aef1ae2108744fbbf83f6ad5c9f9d56c17c95b23f17d53dfe31d060",
+    "jni/armeabi-v7a/libavfilter.so": "735a1075b755feabd99b369da5b208feb2c75f3ec241d47ef465315ab071574a",
+    "jni/armeabi-v7a/libavformat.so": "df56ce34c13942e2de312cf8ae1cec7d77f97a09f66bc5dfc37bd522b953185e",
+    "jni/armeabi-v7a/libavutil.so": "957c93e47e7f4b0a878303d0306c34f9095010ce8a690a0570e93e7dad4832a1",
+    "jni/armeabi-v7a/libc++_shared.so": "e7e20f6e0f3f181e853cea50373ecee2ccfe95c668dce72d0999b2469c92d0e1",
+    "jni/armeabi-v7a/libmpv.so": "fd7d66eeb7d0edb554ea2877a32a8851cededfff1b3d296c24f664e0c043ad98",
+    "jni/armeabi-v7a/libopticast_mpv.so": "6a61a7a81d83256cdda52556190bdaf26cc41f0c10cc8e88e0b460685d066fed",
+    "jni/armeabi-v7a/libswresample.so": "a4fac018ead7cc3ee5fbe4dff23c4995b865b2bde80061c40b0720fff3308e59",
+    "jni/armeabi-v7a/libswscale.so": "a068797c9ba90bb3de4120d32ccde2f1ad4417191b2a005e317e5a0a502dac2b"
+  },
+  "toolchain": {
+    "ndk": "r28c / 28.2.13676358",
+    "api": 26,
+    "meson": "1.9.2 for initial dependencies; 1.11.0 for fontconfig/mpv; rebuild with 1.11.0",
+    "native_jobs": 2
+  },
+  "features": {
+    "renderer": "OpenGL ES",
+    "vulkan": false,
+    "lua": false,
+    "hardware_preference": "mediacodec,mediacodec-copy,no"
+  },
+  "abi_provenance": {
+    "arm64-v8a": {
+      "origin": "Locked 2.6.50 controlled source build, reused byte-for-byte",
+      "prior_manifest": "provenance/arm64-2.6.50-runtime-manifest.json"
+    },
+    "armeabi-v7a": {
+      "origin": "Controlled build from identical bundled source inventory",
+      "ndk": "28.2.13676358",
+      "api": 26,
+      "meson": "1.11.0",
+      "native_jobs": 2,
+      "device_tested": false
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "version": "2.6.51",
+  "license": "GPL-3.0-or-later",
+  "native_source_strategy": "controlled pinned-source rebuild",
+  "sources": {
+    "native-sources.tar.xz": "30585917308d0a13d3c8fa0f0f40c608734ff9aecf3c9d03e2286527542f8006",
+    "native-source-inventory.json": "f4413a11287c3fb57190ce8b696f504d3c28b95a1a2c517afabd5cb483817701",
+    "maven-sources.zip": "2449d98db64577d1175026ddb813174f2a4a25d5725dedf5bf62e7e7bd1f8da2",
+    "androidx-native-sources.zip": "d85bbc5e79835ec52560256dea9428471cfb198b807e1a8e23fb26df7b797d60"
+  },
+  "source_lock_sha256": "090509673b2170a28cab105e9867b8980c6c29ee63373c5c13ed1e31bf8f1ca3",
+  "runtime_manifest_sha256": "652d206b47d8ca05d6f5ca4d47607d6da3810febab6b6bfb8a37d8a4d885b923",
+  "androidx_native_lock_sha256": "a162e55b26f6d8c87b59c9d3f8829597dc8ba73fedd1e5723a7a89300a3f4be2",
+  "maven_lock_sha256": "ca508c4b6499575efc06b89111432fe356f4242c3b78ba9f3e19b2d3e14a2e04",
+  "jni_source_sha256": "94e7f2eb392f6a64d898be565656a24f36e285a15db21e379f58bac87428aca8",
+  "native_binary_check_report_sha256": "860ac5fa612655f7b0d725dd05265daeab273bff48310a3c77395599782f96f5",
+  "review": {
+    "maven_artifacts": 117,
+    "unused_proprietary_cronet_removed": true,
+    "native_sources_provided": true,
+    "runtime_sources_provided": true,
+    "ndk_runtime": "unmodified standard NDK r28c runtime; System Library/toolchain with included notices",
+    "formal_legal_certification": false,
+    "phone_playback_tested": false
+  }
+}

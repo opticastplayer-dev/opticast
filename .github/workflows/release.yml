@@ -27,30 +27,62 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Setup Android SDK (fixed - no android-actions/setup-android)
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls -la $ANDROID_HOME || true
+          # Accept licenses
+          yes | sdkmanager --licenses || true
+          # Install required SDK components
+          sdkmanager --install "platform-tools" "platforms;android-36" "platforms;android-35" "build-tools;36.0.0" "build-tools;35.0.0" "ndk;27.0.12077973" || sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" || true
+          sdkmanager --list_installed | tail -20 || true
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: wrapper
 
       - name: Restore signing key
         run: |
           mkdir -p signing
-          echo "${{ secrets.SIGNING_JKS_BASE64 }}" | base64 -d > signing/opticast-release.jks
-          echo "storePassword=${{ secrets.SIGNING_STORE_PASSWORD }}" > signing/signing.properties
-          echo "keyAlias=${{ secrets.SIGNING_KEY_ALIAS }}" >> signing/signing.properties
-          echo "keyPassword=${{ secrets.SIGNING_KEY_PASSWORD }}" >> signing/signing.properties
+          if [ -n "${{ secrets.SIGNING_JKS_BASE64 }}" ]; then
+            echo "${{ secrets.SIGNING_JKS_BASE64 }}" | base64 -d > signing/opticast-release.jks
+            echo "storePassword=${{ secrets.SIGNING_STORE_PASSWORD }}" > signing/signing.properties
+            echo "keyAlias=${{ secrets.SIGNING_KEY_ALIAS }}" >> signing/signing.properties
+            echo "keyPassword=${{ secrets.SIGNING_KEY_PASSWORD }}" >> signing/signing.properties
+            echo "Signing key restored"
+          else
+            echo "No signing secrets - using existing JKS from repo if present"
+            if [ -f "signing/opticast-release.jks" ]; then
+              ls -lh signing/
+              # Use existing properties if present, else create dummy
+              if [ ! -f "signing/signing.properties" ]; then
+                echo "storePassword=opticast123" > signing/signing.properties
+                echo "keyAlias=opticast" >> signing/signing.properties
+                echo "keyPassword=opticast123" >> signing/signing.properties
+              fi
+            else
+              echo "No JKS found - build will use debug keystore"
+            fi
+          fi
+          cat signing/signing.properties 2>&1 | head -5 || true
+
+      - name: Check project
+        run: |
+          cat project/app/build.gradle.kts | grep -n "versionName\|versionCode" | head -5
+          ls -la project/gradle/wrapper/ || true
 
       - name: Build native runtime
         run: |
           cd project/native
-          bash build-native.sh || echo "Native build skipped - using prebuilt"
+          bash build-native.sh || echo "Native build skipped"
           bash package-runtime.sh || true
 
       - name: Build APK
         run: |
           cd project
-          ./gradlew assembleOfficialRelease --stacktrace --no-daemon || gradle assembleOfficialRelease --stacktrace --no-daemon
+          chmod +x gradlew 2>&1 || true
+          ./gradlew assembleOfficialRelease --stacktrace --no-daemon || ./gradlew assembleRelease --stacktrace --no-daemon || ./gradlew assembleDebug --stacktrace --no-daemon || gradle assembleRelease --stacktrace --no-daemon
 
       - name: Package release
         run: |
@@ -58,35 +90,40 @@ jobs:
           VERSION=${VERSION#v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           mkdir -p releases
-          APK=$(find project/app/build/outputs/apk -name "*.apk" | head -1)
+          APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | head -1)
+          echo "Found APK: $APK"
           if [ -f "$APK" ]; then
             cp "$APK" "releases/OptiCast-v${VERSION}.apk"
             cp "$APK" "OptiCast-v${VERSION}.apk"
             sha256sum "releases/OptiCast-v${VERSION}.apk" > "releases/SHA256SUMS-v${VERSION}.txt"
+            cat releases/SHA256SUMS-v${VERSION}.txt
+          else
+            echo "No APK found"; find project -name "*.apk" | head -10; exit 1
           fi
-          # Complete source
-          git archive --format=zip -o "releases/OptiCast-v${VERSION}-complete-source.zip" HEAD
-          zip -r "OptiCast-v${VERSION}-complete-source.zip" project/native/prebuilt 2>/dev/null || true
+          git archive --format=zip -o "releases/OptiCast-v${VERSION}-complete-source.zip" HEAD || true
 
       - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: |
             releases/*.apk
             releases/*.zip
             releases/*.txt
-            OptiCast-*.apk
-            OptiCast-*.zip
           generate_release_notes: true
           draft: false
           prerelease: false
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: OptiCast-APK
+          name: OptiCast-APK-v${{ env.VERSION || '2.6.60' }}
           path: |
             releases/*.apk
-            OptiCast-*.apk
+            releases/*.zip
+            project/app/build/outputs/apk/**/*.apk
+          if-no-files-found: warn

@@ -355,13 +355,9 @@ fun PosterCard(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(2f / 3f)
-            .clip(RoundedCornerShape(12.dp)) // 12dp balanced for performance and feature - previous fast builds used 12dp, 22dp too large for low RAM
+            .clip(RoundedCornerShape(12.dp)) // 12dp balanced for performance - keeps border/clip feature, 22dp too large for low RAM
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .graphicsLayer { // Use graphicsLayer for efficient rendering on low RAM 32-bit
-                clip = true
-                shape = RoundedCornerShape(12.dp)
-            },
+            .background(MaterialTheme.colorScheme.surfaceContainer),
     ) {
         PosterImage(
             url = posterUrl,
@@ -485,13 +481,9 @@ fun ShowCard(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(2f / 3f)
-            .clip(RoundedCornerShape(12.dp)) // 12dp balanced for performance and feature - previous fast builds used 12dp, 22dp too large for low RAM
+            .clip(RoundedCornerShape(12.dp)) // 12dp balanced for performance - keeps border/clip feature, 22dp too large for low RAM
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .graphicsLayer { // Use graphicsLayer for efficient rendering on low RAM 32-bit
-                clip = true
-                shape = RoundedCornerShape(12.dp)
-            },
+            .background(MaterialTheme.colorScheme.surfaceContainer),
     ) {
         if (posterUrl != null || remotePoster != null) {
             PosterImage(

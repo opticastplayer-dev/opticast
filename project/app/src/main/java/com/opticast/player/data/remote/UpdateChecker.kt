@@ -44,7 +44,10 @@ object UpdateChecker {
     private const val KEY_LAST_CHECK = "last_check"
     private const val KEY_LAST_VERSION = "last_version"
     private const val KEY_SKIPPED_VERSION = "skipped_version"
-    private const val CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000L // 24h
+    private const val KEY_AUTO_CHECK_ENABLED = "auto_check_enabled"
+    private const val KEY_AVAILABLE_UPDATE_JSON = "available_update_json"
+    private const val KEY_BACKGROUND_CHECK = "background_check"
+    private const val CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000L // 6h for background auto check on startup (was 24h) - checks at most every 6h to allow background auto check
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
@@ -170,13 +173,41 @@ object UpdateChecker {
         }
     }
 
+    // Background auto check on startup - now allowed and enabled by default
+    fun isAutoCheckEnabled(context: Context): Boolean {
+        return prefs(context).getBoolean(KEY_AUTO_CHECK_ENABLED, true) // enabled by default
+    }
+
+    fun setAutoCheckEnabled(context: Context, enabled: Boolean) {
+        prefs(context).edit().putBoolean(KEY_AUTO_CHECK_ENABLED, enabled).apply()
+    }
+
     suspend fun checkAtStartup(context: Context) = withContext(Dispatchers.IO) {
         try {
+            // Allow background auto check for updates on app startup - enabled by default
+            if (!isAutoCheckEnabled(context)) return@withContext
+
+            // Check if we should skip due to interval, but allow background check
             val update = checkForUpdate(context, force = false)
-            if (update != null && update.isNewer) {
-                // Store that an update is available - UI can show badge
-                prefs(context).edit().putString("available_update", update.version).apply()
+            if (update != null && update.isNewer && !isSkipped(context, update.version)) {
+                // Store that an update is available - UI can show badge/dialog on startup
+                prefs(context).edit()
+                    .putString("available_update", update.version)
+                    .putString(KEY_AVAILABLE_UPDATE_JSON, json.encodeToString(GitHubRelease.serializer(), GitHubRelease(
+                        tag_name = "v${update.version}",
+                        name = update.version,
+                        body = update.changelog,
+                        html_url = update.htmlUrl,
+                        assets = listOf(GitHubRelease.Asset(name = "OptiCast-v${update.version}.apk", browser_download_url = update.downloadUrl, size = update.size))
+                    )))
+                    .apply()
+                // Store full update info as JSON for auto dialog
+                prefs(context).edit().putString("available_update_info", "${update.version}|${update.downloadUrl}|${update.htmlUrl}|${update.changelog.take(500)}|${update.size}").apply()
+            } else if (update == null || !update.isNewer) {
+                // No newer version - clear available update if same or older
+                // Don't clear if we haven't checked yet
             }
+
             // Check if this is a new version install - show what's new
             val installed = getInstalledVersion(context)
             val lastVersion = prefs(context).getString(KEY_LAST_VERSION, null)
@@ -186,6 +217,42 @@ object UpdateChecker {
             }
             prefs(context).edit().putString(KEY_LAST_VERSION, installed.first).apply()
         } catch (_: Exception) { }
+    }
+
+    // Called from MainActivity on startup to show auto update dialog if available - background auto check
+    suspend fun getAvailableUpdateInfo(context: Context): UpdateInfo? = withContext(Dispatchers.IO) {
+        try {
+            // First try to get from stored pref (from background check at startup)
+            val stored = prefs(context).getString("available_update_info", null)
+            if (stored != null) {
+                val parts = stored.split("|")
+                if (parts.size >= 4) {
+                    val version = parts[0]
+                    if (!isSkipped(context, version)) {
+                        val installed = getInstalledVersion(context)
+                        val isNewer = isVersionNewer(version, installed.first)
+                        if (isNewer) {
+                            return@withContext UpdateInfo(
+                                version = version,
+                                versionCode = parseVersionCode(version),
+                                changelog = parts.getOrNull(3) ?: "",
+                                downloadUrl = parts.getOrNull(1) ?: "",
+                                htmlUrl = parts.getOrNull(2) ?: GITHUB_RELEASES_URL,
+                                size = parts.getOrNull(4)?.toLongOrNull() ?: 0L,
+                                isNewer = true
+                            )
+                        }
+                    }
+                }
+            }
+            // If no stored info, do a fresh check (force = false respects interval, but background auto check allows it)
+            if (isAutoCheckEnabled(context)) {
+                return@withContext checkForUpdate(context, force = false)
+            }
+            null
+        } catch (_: Exception) {
+            null
+        }
     }
 
     fun shouldShowWhatsNew(context: Context): Boolean {
@@ -214,7 +281,7 @@ object UpdateChecker {
     }
 
     fun clearAvailableUpdate(context: Context) {
-        prefs(context).edit().remove("available_update").apply()
+        prefs(context).edit().remove("available_update").remove("available_update_info").remove(KEY_AVAILABLE_UPDATE_JSON).apply()
     }
 
     suspend fun downloadAndInstall(context: Context, downloadUrl: String, onProgress: (Int) -> Unit = {}): Boolean = withContext(Dispatchers.IO) {

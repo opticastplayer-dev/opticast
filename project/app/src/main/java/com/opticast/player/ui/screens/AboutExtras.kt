@@ -24,11 +24,35 @@ internal fun UpdateCheckOption(version: String) {
     var downloading by remember { mutableStateOf(false) }
     var progress by remember { mutableIntStateOf(0) }
 
+    var autoCheckEnabled by remember { mutableStateOf(UpdateChecker.isAutoCheckEnabled(context)) }
+
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("App updates", style = MaterialTheme.typography.titleMedium)
         Text(
-            "Checks GitHub releases. Downloads and installs within the app when possible. Checks automatically at startup once per day.",
+            "Checks GitHub releases. Downloads and installs within the app when possible. Background auto check for updates on app startup is now allowed and enabled by default (checks every 6h in background).",
             style = MaterialTheme.typography.bodySmall
+        )
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Background auto check on startup", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            Switch(
+                checked = autoCheckEnabled,
+                onCheckedChange = { enabled ->
+                    autoCheckEnabled = enabled
+                    UpdateChecker.setAutoCheckEnabled(context, enabled)
+                    if (enabled) {
+                        scope.launch {
+                            try {
+                                UpdateChecker.checkAtStartup(context)
+                            } catch (_: Exception) { }
+                        }
+                    }
+                }
+            )
+        }
+        Text(
+            if (autoCheckEnabled) "✅ Auto check enabled — will check in background on every app startup (every 6h)" else "❌ Auto check disabled — only manual checks",
+            style = MaterialTheme.typography.bodySmall,
+            color = if (autoCheckEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(
@@ -168,6 +192,14 @@ internal fun WhatsNewDialog() {
 
     if (show) {
         val changelog = when {
+            version.contains("2.6.60") -> """
+                • Signed release 56M with mpv — plays all videos
+                • Background auto check for updates on app startup — now allowed and enabled by default
+                • Auto update dialog shows when new version available on startup
+                • Changed wording: official signed full mpv → signed release
+                • Fixed YAML syntax error in release workflow (block style)
+                • Secrets correctly implemented — restore signing key success
+            """.trimIndent()
             version.contains("2.6.59") -> """
                 • Fixed PiP: expanding PiP now auto-resumes playback on 32-bit devices
                 • Removed WhatsApp contact
@@ -209,6 +241,95 @@ internal fun WhatsNewDialog() {
                 TextButton(onClick = {
                     UpdateChecker.openReleasesPage(context)
                 }) { Text("Open Releases") }
+            }
+        )
+    }
+}
+
+@Composable
+internal fun AutoUpdateDialog() {
+    val context = LocalContext.current
+    var show by remember { mutableStateOf(false) }
+    var updateInfo by remember { mutableStateOf<UpdateChecker.UpdateInfo?>(null) }
+    var downloading by remember { mutableStateOf(false) }
+    var progress by remember { mutableIntStateOf(0) }
+    val scope = rememberCoroutineScope()
+
+    // Background auto check for updates on app startup - allowed
+    LaunchedEffect(Unit) {
+        // Delay 3s to let app start, then check if update available from background auto check
+        kotlinx.coroutines.delay(3000)
+        if (!UpdateChecker.isAutoCheckEnabled(context)) return@LaunchedEffect
+        try {
+            val info = UpdateChecker.getAvailableUpdateInfo(context)
+            if (info != null && info.isNewer && !UpdateChecker.isSkipped(context, info.version)) {
+                updateInfo = info
+                show = true
+            } else {
+                // If no stored info, try fresh check in background (respects 6h interval)
+                val fresh = UpdateChecker.checkForUpdate(context, force = false)
+                if (fresh != null && fresh.isNewer && !UpdateChecker.isSkipped(context, fresh.version)) {
+                    updateInfo = fresh
+                    show = true
+                }
+            }
+        } catch (_: Exception) { }
+    }
+
+    if (show && updateInfo != null) {
+        val info = updateInfo!!
+        AlertDialog(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
+            onDismissRequest = { show = false },
+            title = { Text("Update available: ${info.version}") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("A new signed release is available!", style = MaterialTheme.typography.titleSmall)
+                    Text("Installed: ${UpdateChecker.getInstalledVersion(context).first}", style = MaterialTheme.typography.bodySmall)
+                    Text("Latest: ${info.version}", style = MaterialTheme.typography.bodyMedium)
+                    if (info.changelog.isNotBlank()) {
+                        Text("What's new:", style = MaterialTheme.typography.titleSmall)
+                        Text(info.changelog.take(600), style = MaterialTheme.typography.bodySmall, maxLines = 8)
+                    }
+                    if (info.size > 0) {
+                        Text("Size: ${info.size / 1024 / 1024} MB", style = MaterialTheme.typography.bodySmall)
+                    }
+                    if (downloading) {
+                        LinearProgressIndicator(progress = { progress / 100f }, modifier = Modifier.fillMaxWidth())
+                        Text("Downloading: $progress%", style = MaterialTheme.typography.bodySmall)
+                    }
+                    Text("Background auto check enabled — checks on every startup (every 6h)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            downloading = true
+                            progress = 0
+                            val success = UpdateChecker.downloadAndInstall(context, info.downloadUrl) { p -> progress = p }
+                            downloading = false
+                            if (success) {
+                                show = false
+                            } else {
+                                UpdateChecker.openReleasePage(context, info.htmlUrl)
+                            }
+                        }
+                    },
+                    enabled = !downloading
+                ) { Text("Download & Install") }
+            },
+            dismissButton = {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TextButton(onClick = {
+                        UpdateChecker.skipVersion(context, info.version)
+                        show = false
+                    }) { Text("Skip") }
+                    TextButton(onClick = {
+                        UpdateChecker.clearAvailableUpdate(context)
+                        show = false
+                    }) { Text("Later") }
+                }
             }
         )
     }

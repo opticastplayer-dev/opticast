@@ -70,10 +70,29 @@ class OptiCastApplication : Application() {
         // Build poster index off main thread - first fling never waits on FS stats
         startupScope.launch { AppContainer.posterCache.warmUp() }
 
-        // Check for updates at startup (non-blocking) and show what's new
+        // Background auto check for updates on app startup - allowed and enabled by default
+        // Runs in background IO thread, non-blocking, checks GitHub releases
+        // - Checks at most every 6h to avoid spam
+        // - Stores available update for auto dialog in MainActivity
+        // - User can disable in Settings > Check for updates
         startupScope.launch {
             try {
+                // Small delay to let app start quickly (2s) - background auto check shouldn't block startup
+                kotlinx.coroutines.delay(2000)
                 com.opticast.player.data.remote.UpdateChecker.checkAtStartup(this@OptiCastApplication)
+            } catch (_: Exception) { }
+        }
+
+        // Also schedule a second check after 10s if first failed (e.g. no internet at startup)
+        startupScope.launch {
+            try {
+                kotlinx.coroutines.delay(10000)
+                // If no update info yet and online, try again - handles slow network on startup
+                if (com.opticast.player.data.remote.UpdateChecker.getAvailableUpdate(this@OptiCastApplication) == null) {
+                    if (com.opticast.player.data.AppContainer.isOnline()) {
+                        com.opticast.player.data.remote.UpdateChecker.checkAtStartup(this@OptiCastApplication)
+                    }
+                }
             } catch (_: Exception) { }
         }
     }

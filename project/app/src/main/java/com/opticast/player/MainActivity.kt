@@ -112,6 +112,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 OptiCastApp(libraryReturnRevision.intValue, returnDetailId.longValue, returnShowTitle.value)
                 com.opticast.player.ui.screens.WhatsNewDialog()
+                com.opticast.player.ui.screens.AutoUpdateDialog()
             }
         }
     }

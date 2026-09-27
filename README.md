@@ -9,7 +9,7 @@
 
 - **No ads, no tracking, GPL-3.0**
 - **ARM32 + ARM64, Android 8+**
-- **FULL mpv ONLY — 56M with libmpv.so 6.1M + libavcodec 12M — plays all videos (Media3-only doesn't)**
+- **signed release — 56M with libmpv.so 6.1M + libavcodec 12M — plays all videos (Media3-only doesn't)**
 - **PiP auto-resume fixed for 32-bit, in-app updates, What's New**
 - **100% REAL device screenshots**
 
@@ -33,7 +33,7 @@
 
 **Detail/Show:** Backdrop hero, poster, rating, genres, runtime, synopsis, cast headshots, episode list with In progress 0% tracking, Resume/Mark Watched/Refresh artwork/Share.
 
-**Player (mpv + Media3):** **FULL mpv default local** — libmpv.so 6.1M + libavcodec 12M + FFmpeg + libplacebo, Media3 fallback, edge-to-edge Compose: thick progress, ±10s, speed 0.5-3x, aspect fit/zoom/stretch, subtitle/audio picker, sync ±250ms, audio boost, EQ, gestures double-tap seek swipe volume/brightness hold 2x-4x, sleep timer, auto-play next 5s, chapters, MediaSession, Now Playing horizontal cards 14/27. **FULL mpv plays all videos — Media3-only doesn't.**
+**Player (mpv + Media3):** **signed release default local** — libmpv.so 6.1M + libavcodec 12M + FFmpeg + libplacebo, Media3 fallback, edge-to-edge Compose: thick progress, ±10s, speed 0.5-3x, aspect fit/zoom/stretch, subtitle/audio picker, sync ±250ms, audio boost, EQ, gestures double-tap seek swipe volume/brightness hold 2x-4x, sleep timer, auto-play next 5s, chapters, MediaSession, Now Playing horizontal cards 14/27. **signed release plays all videos — Media3-only doesn't.**
 
 **PiP:** Manual entry via PictureInPictureAlt icon, auto-resume on expand fixed for 32-bit (wasPlayingBeforePip + onReturnFromPip + 1000ms delay + RESUMED check), X closes.
 
@@ -47,21 +47,21 @@
 
 ## Installation — Available For Everyone Now!
 
-### GitHub Releases (Recommended) — FULL mpv ONLY
+### GitHub Releases (Recommended) — signed release
 1. Go to **https://github.com/opticastplayer-dev/opticast/releases**
-2. **Latest: v2.6.60 FULL mpv** — Download `OptiCast-v2.6.60.apk` **56M FULL with mpv** (libmpv.so 6.1M + libavcodec 12M + libavformat + libavfilter + libswscale + libopticast_mpv.so) — https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.60/OptiCast-v2.6.60.apk
+2. **Latest: v2.6.60 signed release** — Download `OptiCast-v2.6.60.apk` **56M signed release with mpv** (libmpv.so 6.1M + libavcodec 12M + libavformat + libavfilter + libswscale + libopticast_mpv.so) — https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.60/OptiCast-v2.6.60.apk
 3. SHA256 `b5a2f0f8a7d84a03187c183905c03c8569d699685774612848957266b5a2d3d9` — verify in `SHA256SUMS-v2.6.60.txt`
 4. Install APK (allow unknown sources)
 5. Open → Grant video permission → Auto-scan → Enjoy!
 6. Settings → Check for updates → Download & Install in-app for future versions — now checks **opticastplayer-dev/opticast** first (live), no more "Could not resolve opticast-project/opticast" error
 
-**What's included in Release v2.6.60 FULL mpv:**
-- **APK 56M FULL mpv ONLY** — ARM64 + ARM32 Android 8+, libmpv.so 6.1M + libavcodec 12M + FFmpeg + libplacebo, plays all videos (Media3-only 28M doesn't)
+**What's included in Release v2.6.60 signed release:**
+- **APK 56M signed release** — ARM64 + ARM32 Android 8+, libmpv.so 6.1M + libavcodec 12M + FFmpeg + libplacebo, plays all videos (Media3-only 28M doesn't)
 - Complete source 8.5M
 - SHA256SUMS verification
 - What's New dialog after update
 - 6 REAL screenshots (100% real, no mockups)
-- **Build #14 Success** 7m 42s — FULL-mpv restored from 2.6.59 APK via `project/native/restore-from-apk.py` (downloads 2.6.59 APK 32.9M, extracts 24 .so files, repacks AAR 26M, builds full APK 56M)
+- **Build #14 Success** 7m 42s — signed release restored from 2.6.59 APK via `project/native/restore-from-apk.py` (downloads 2.6.59 APK 32.9M, extracts 24 .so files, repacks AAR 26M, builds signed release APK 56M)
 
 **Previous: v2.6.59** — 31.4M APK + 65.7M complete source — PiP fix + in-app updates + showcase
 
@@ -74,7 +74,7 @@
 ```bash
 # Full release with mpv (fast path — restore from existing APK):
 python3 project/native/restore-from-apk.py  # downloads 2.6.59 APK, extracts .so, creates AAR 26M
-cd project && ./gradlew assembleOfficialRelease  # builds FULL mpv APK 56M
+cd project && ./gradlew assembleOfficialRelease  # builds signed release APK 56M
 
 # Full source build from scratch (heavy, 1-2 hours):
 bash project/native/build-native.sh arm64  # needs NDK r28c, meson, ninja, cmake, etc.
@@ -94,7 +94,7 @@ Requires Android Studio Ladybug+ (AGP 8.7, Kotlin 2.0, compileSdk 36, minSdk 26,
 
 **Update Checker 2.6.60:** **LIVE repo first** — now tries `opticastplayer-dev/opticast` (live) first, then `opticast-project/opticast` (desired org, doesn't exist yet) — fixes error screenshot "Could not resolve to a Repository with the name 'opticast-project/opticast'". Loop GITHUB_API_URLS with try/catch. Files: UpdateChecker.kt (order swapped live first), AboutExtras.kt (uses openReleasesPage() not hardcoded dead link)
 
-**Full mpv Build 2.6.60:** `project/native/restore-from-apk.py` downloads 2.6.59 APK 32.9M, extracts 24 .so files (libavcodec 12M, libmpv 6.1M, etc.), repacks as `.cache/native-runtime/opticast-mpv-runtime.aar` 26M, then builds full APK 56M with mpv. Build #14 Success 7m 42s FULL-mpv. Files: restore-from-apk.py, build.gradle.kts (mpv optional for CI), release.yml (full_mpv input, restore step)
+**Signed Release Build 2.6.60:** `project/native/restore-from-apk.py` downloads 2.6.59 APK 32.9M, extracts 24 .so files (libavcodec 12M, libmpv 6.1M, etc.), repacks as `.cache/native-runtime/opticast-mpv-runtime.aar` 26M, then builds signed release APK 56M with mpv. Build #14 Success 7m 42s signed release. Files: restore-from-apk.py, build.gradle.kts (mpv optional for CI), release.yml (full_mpv input, restore step)
 
 ## Privacy & Permissions
 
@@ -115,11 +115,11 @@ Contact: opticastproject@gmail.com (WhatsApp removed 2.6.59)
 - [x] GitHub Actions release workflow — fixed block style YAML, duplicate deletion, gradlew generation, signing.properties always created, mpv optional + restore from APK
 - [x] F-Droid metadata + fastlane — 6 REAL screenshots
 - [x] 100% REAL device screenshots — 6 real captures (Library 997K, Just Play Dead 762K, Banshee 609K, Spider-Noir 778K, Player Now Playing 761K, Settings 317K) — NO mockups — 17.64 MiB clean
-- [x] Build 2.6.60 APK FULL mpv ONLY — 56M with libmpv.so 6.1M + libavcodec 12M — Build #14 Success 7m 42s FULL-mpv — restore-from-apk.py + optional native build
-- [x] GitHub Release v2.6.60 FULL mpv ONLY — 56M APK + 8.5M source + SHA256 — Media3-only doesn't play some videos, so only FULL mpv available
+- [x] Build 2.6.60 APK signed release — 56M with libmpv.so 6.1M + libavcodec 12M — Build #14 Success 7m 42s signed release — restore-from-apk.py + optional native build
+- [x] GitHub Release v2.6.60 signed release — 56M APK + 8.5M source + SHA256 — Media3-only doesn't play some videos, so only signed release available
 - [ ] F-Droid inclusion MR
 - [ ] Create org opticast-project and transfer (optional — fallback ensures no breakage)
 - [ ] Optional: Add real PiP floating window screenshot if available (currently 6 real cover all features)
 
-**Locked Baseline:** 2.6.60 / 110 — 746 tests, budget 17.64 MiB / 128 MiB cleaned (100% real), FULL mpv 56M
-**Live:** https://github.com/opticastplayer-dev/opticast — Releases v2.6.59 (31.4M) + **v2.6.60 FULL mpv ONLY 56M** — 6 REAL screenshots — Build #14 Success FULL-mpv — Available for everyone now!
+**Locked Baseline:** 2.6.60 / 110 — 746 tests, budget 17.64 MiB / 128 MiB cleaned (100% real), signed release 56M
+**Live:** https://github.com/opticastplayer-dev/opticast — Releases v2.6.59 (31.4M) + **v2.6.60 signed release 56M** — 6 REAL screenshots — Build #14 Success signed release — Available for everyone now!

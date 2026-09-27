@@ -27,17 +27,19 @@ import java.util.concurrent.TimeUnit
  */
 object UpdateChecker {
 
-    // Primary (desired org) and fallback (current live) — supports transfer from opticastplayer-dev to opticast-project
+    // LIVE repo first (opticastplayer-dev is current live), desired org second (opticast-project doesn't exist yet — see screenshot error)
+    // Order: live first to avoid "Could not resolve to a Repository with the name 'opticast-project/opticast'" error
+    // When opticast-project org is created and repo transferred, both will work — fallback ensures no breakage
     private val GITHUB_API_URLS = listOf(
-        "https://api.github.com/repos/opticast-project/opticast/releases/latest",
-        "https://api.github.com/repos/opticastplayer-dev/opticast/releases/latest"
+        "https://api.github.com/repos/opticastplayer-dev/opticast/releases/latest",
+        "https://api.github.com/repos/opticast-project/opticast/releases/latest"
     )
-    private const val GITHUB_API_URL = "https://api.github.com/repos/opticast-project/opticast/releases/latest"
+    private const val GITHUB_API_URL = "https://api.github.com/repos/opticastplayer-dev/opticast/releases/latest"
     private val GITHUB_RELEASES_URLS = listOf(
-        "https://github.com/opticast-project/opticast/releases",
-        "https://github.com/opticastplayer-dev/opticast/releases"
+        "https://github.com/opticastplayer-dev/opticast/releases",
+        "https://github.com/opticast-project/opticast/releases"
     )
-    private const val GITHUB_RELEASES_URL = "https://github.com/opticast-project/opticast/releases"
+    private const val GITHUB_RELEASES_URL = "https://github.com/opticastplayer-dev/opticast/releases"
     private const val PREFS_NAME = "update_checker"
     private const val KEY_LAST_CHECK = "last_check"
     private const val KEY_LAST_VERSION = "last_version"
@@ -151,8 +153,8 @@ object UpdateChecker {
             val apkAsset = resolvedRelease.assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains("OptiCast", ignoreCase = true) }
                 ?: resolvedRelease.assets.firstOrNull { it.name.endsWith(".apk") }
 
-            // Determine best htmlUrl: use release's own, else fallback list
-            val fallbackHtml = if (successfulApiUrl?.contains("opticastplayer-dev") == true) GITHUB_RELEASES_URLS[1] else GITHUB_RELEASES_URLS[0]
+            // Determine best htmlUrl: use release's own, else fallback list (live repo first now)
+            val fallbackHtml = if (successfulApiUrl?.contains("opticast-project") == true) GITHUB_RELEASES_URLS[1] else GITHUB_RELEASES_URLS[0]
 
             UpdateInfo(
                 version = tag,

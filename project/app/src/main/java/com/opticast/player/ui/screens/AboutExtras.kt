@@ -207,8 +207,7 @@ internal fun WhatsNewDialog() {
             },
             dismissButton = {
                 TextButton(onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/opticast-project/opticast/releases"))
-                    runCatching { context.startActivity(intent) }
+                    UpdateChecker.openReleasesPage(context)
                 }) { Text("Open Releases") }
             }
         )

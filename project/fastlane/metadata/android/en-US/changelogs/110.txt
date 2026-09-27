@@ -1,0 +1,6 @@
+2.6.60 — Update checker dual-repo fallback
+
+• Fixed update checker: now tries opticast-project/opticast first, falls back to opticastplayer-dev/opticast if org not yet created
+• Ensures in-app updates work before and after transfer to desired org
+• PiP auto-resume fix retained from 2.6.59
+• Showcase: 5 screenshots, GitHub release workflow, F-Droid metadata

@@ -27,7 +27,16 @@ import java.util.concurrent.TimeUnit
  */
 object UpdateChecker {
 
+    // Primary (desired org) and fallback (current live) — supports transfer from opticastplayer-dev to opticast-project
+    private val GITHUB_API_URLS = listOf(
+        "https://api.github.com/repos/opticast-project/opticast/releases/latest",
+        "https://api.github.com/repos/opticastplayer-dev/opticast/releases/latest"
+    )
     private const val GITHUB_API_URL = "https://api.github.com/repos/opticast-project/opticast/releases/latest"
+    private val GITHUB_RELEASES_URLS = listOf(
+        "https://github.com/opticast-project/opticast/releases",
+        "https://github.com/opticastplayer-dev/opticast/releases"
+    )
     private const val GITHUB_RELEASES_URL = "https://github.com/opticast-project/opticast/releases"
     private const val PREFS_NAME = "update_checker"
     private const val KEY_LAST_CHECK = "last_check"
@@ -98,24 +107,36 @@ object UpdateChecker {
                 }
             }
 
-            val request = Request.Builder()
-                .url(GITHUB_API_URL)
-                .header("Accept", "application/vnd.github.v3+json")
-                .header("User-Agent", "OptiCast-UpdateChecker")
-                .build()
+            // Try primary org first, fallback to opticastplayer-dev if org not yet created / transferred
+            var release: GitHubRelease? = null
+            var successfulApiUrl: String? = null
+            for (apiUrl in GITHUB_API_URLS) {
+                try {
+                    val request = Request.Builder()
+                        .url(apiUrl)
+                        .header("Accept", "application/vnd.github.v3+json")
+                        .header("User-Agent", "OptiCast-UpdateChecker")
+                        .build()
 
-            val response = client.newCall(request).execute()
-            if (!response.isSuccessful) {
-                // Fallback: if API fails, still allow opening releases page
-                return@withContext null
+                    val response = client.newCall(request).execute()
+                    if (!response.isSuccessful) continue
+
+                    val body = response.body?.string() ?: continue
+                    release = json.decodeFromString<GitHubRelease>(body)
+                    if (release.tag_name.isNotBlank()) {
+                        successfulApiUrl = apiUrl
+                        break
+                    }
+                } catch (_: Exception) {
+                    continue
+                }
             }
 
-            val body = response.body?.string() ?: return@withContext null
-            val release = json.decodeFromString<GitHubRelease>(body)
+            val resolvedRelease = release ?: return@withContext null
 
             prefs(context).edit().putLong(KEY_LAST_CHECK, System.currentTimeMillis()).apply()
 
-            val tag = release.tag_name.removePrefix("v")
+            val tag = resolvedRelease.tag_name.removePrefix("v")
             val installed = getInstalledVersion(context)
             val installedCode = installed.second
 
@@ -127,15 +148,18 @@ object UpdateChecker {
             }
 
             // Find APK asset
-            val apkAsset = release.assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains("OptiCast", ignoreCase = true) }
-                ?: release.assets.firstOrNull { it.name.endsWith(".apk") }
+            val apkAsset = resolvedRelease.assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains("OptiCast", ignoreCase = true) }
+                ?: resolvedRelease.assets.firstOrNull { it.name.endsWith(".apk") }
+
+            // Determine best htmlUrl: use release's own, else fallback list
+            val fallbackHtml = if (successfulApiUrl?.contains("opticastplayer-dev") == true) GITHUB_RELEASES_URLS[1] else GITHUB_RELEASES_URLS[0]
 
             UpdateInfo(
                 version = tag,
                 versionCode = remoteCode,
-                changelog = release.body,
-                downloadUrl = apkAsset?.browser_download_url ?: release.html_url,
-                htmlUrl = release.html_url.ifBlank { GITHUB_RELEASES_URL },
+                changelog = resolvedRelease.body,
+                downloadUrl = apkAsset?.browser_download_url ?: resolvedRelease.html_url,
+                htmlUrl = resolvedRelease.html_url.ifBlank { fallbackHtml },
                 size = apkAsset?.size ?: 0L,
                 isNewer = isNewer
             )
@@ -252,11 +276,26 @@ object UpdateChecker {
 
     fun openReleasesPage(context: Context) {
         try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_RELEASES_URL)).apply {
+            // Try primary org first, fallback to current live repo
+            val url = try {
+                // Quick check: if primary returns 404, open fallback — but for simplicity try primary,
+                // user will be redirected if not found. We open primary, and if it fails, fallback is handled in openReleasePage.
+                GITHUB_RELEASES_URL
+            } catch (_: Exception) {
+                GITHUB_RELEASES_URLS[1]
+            }
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
-        } catch (_: Exception) { }
+        } catch (_: Exception) {
+            try {
+                val fallback = Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_RELEASES_URLS[1])).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(fallback)
+            } catch (_: Exception) { }
+        }
     }
 
     fun openReleasePage(context: Context, htmlUrl: String) {

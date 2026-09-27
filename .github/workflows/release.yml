@@ -1,23 +1,44 @@
 name: Release Build
+
 on:
-  push: {tags: ['v*']}
-  workflow_dispatch: {inputs: {version: {description: 'Version (e.g. 2.6.60)', required: true, default: '2.6.60'}}}
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 2.6.60)'
+        required: true
+        default: '2.6.60'
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions: {contents: write}
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
-      - uses: actions/setup-java@v4
-        with: {java-version: '17', distribution: 'temurin'}
-      - name: Setup Android SDK (fixed - no android-actions/setup-android)
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
         run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
           yes | sdkmanager --licenses || true
-          sdkmanager --install "platform-tools" "platforms;android-36" "platforms;android-35" "build-tools;36.0.0" "build-tools;35.0.0" "ndk;27.0.12077973" || sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" || true
-      - uses: gradle/actions/setup-gradle@v3
-        with: {gradle-version: wrapper}
-      - name: Restore signing key (fixed - always creates properties)
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" || true
+          sdkmanager --list_installed | tail -10 || true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Restore signing key
         run: |
           mkdir -p signing
           if [ -n "${{ secrets.SIGNING_JKS_BASE64 }}" ]; then
@@ -26,34 +47,50 @@ jobs:
             echo "keyAlias=${{ secrets.SIGNING_KEY_ALIAS }}" >> signing/signing.properties
             echo "keyPassword=${{ secrets.SIGNING_KEY_PASSWORD }}" >> signing/signing.properties
           else
-            if [ -f "signing/opticast-release.jks" ]; then
-              if [ ! -f "signing/signing.properties" ]; then
-                echo "storePassword=opticast123" > signing/signing.properties
-                echo "keyAlias=opticast" >> signing/signing.properties
-                echo "keyPassword=opticast123" >> signing/signing.properties
-              fi
-            else
-              echo "storePassword=android" > signing/signing.properties
-              echo "keyAlias=androiddebugkey" >> signing/signing.properties
-              echo "keyPassword=android" >> signing/signing.properties
-            fi
+            echo "storePassword=android" > signing/signing.properties
+            echo "keyAlias=androiddebugkey" >> signing/signing.properties
+            echo "keyPassword=android" >> signing/signing.properties
           fi
-          chmod +x project/gradlew || true
+          ls -lh signing/ || true
+          cat signing/signing.properties || true
+
       - name: Build APK
         run: |
           cd project
           chmod +x gradlew || true
-          ./gradlew assembleOfficialRelease --stacktrace --no-daemon || ./gradlew assembleRelease --stacktrace --no-daemon || ./gradlew assembleDebug --stacktrace --no-daemon
-      - name: Package release
+          ./gradlew assembleDebug --stacktrace --no-daemon
+
+      - name: Find APK
         run: |
-          VERSION=${{ github.event.inputs.version || github.ref_name }}; VERSION=${VERSION#v}; echo "VERSION=$VERSION" >> $GITHUB_ENV; mkdir -p releases
+          find project/app/build/outputs/apk -name "*.apk" -type f
+          ls -lh project/app/build/outputs/apk/debug/ || true
+
+      - name: Package
+        run: |
+          VERSION=${{ github.event.inputs.version || '2.6.60' }}
+          VERSION=${VERSION#v}
+          mkdir -p releases
           APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | head -1)
-          [ -f "$APK" ] && cp "$APK" "releases/OptiCast-v${VERSION}.apk" && sha256sum "releases/OptiCast-v${VERSION}.apk" > "releases/SHA256SUMS-v${VERSION}.txt" || (echo "No APK"; exit 1)
-          git archive --format=zip -o "releases/OptiCast-v${VERSION}-complete-source.zip" HEAD || true
-      - uses: softprops/action-gh-release@v2
+          echo "APK=$APK"
+          if [ -f "$APK" ]; then
+            cp "$APK" "releases/OptiCast-v${VERSION}.apk"
+            sha256sum "releases/OptiCast-v${VERSION}.apk" > "releases/SHA256SUMS-v${VERSION}.txt"
+          else
+            echo "No APK found"
+            exit 1
+          fi
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OptiCast-APK
+          path: releases/*.apk
+
+      - name: Create Release
         if: startsWith(github.ref, 'refs/tags/')
-        with: {files: "releases/*", generate_release_notes: true, fail_on_unmatched_files: false}
-        env: {GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}}
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: {name: OptiCast-APK-v${{ env.VERSION || '2.6.60' }}, path: "releases/*\nproject/app/build/outputs/apk/**/*.apk", if-no-files-found: warn}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: releases/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

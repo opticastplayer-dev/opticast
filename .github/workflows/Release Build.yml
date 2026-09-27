@@ -1,0 +1,128 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 2.6.60)'
+        required: true
+        default: '2.6.60'
+      full_mpv:
+        description: 'Build full with mpv (true) or Media3-only (false)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          yes | sdkmanager --licenses || true
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973" || true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Restore signing key
+        run: |
+          mkdir -p signing
+          if [ -n "${{ secrets.SIGNING_JKS_BASE64 }}" ]; then
+            echo "${{ secrets.SIGNING_JKS_BASE64 }}" | base64 -d > signing/opticast-release.jks
+            echo "storePassword=${{ secrets.SIGNING_STORE_PASSWORD }}" > signing/signing.properties
+            echo "keyAlias=${{ secrets.SIGNING_KEY_ALIAS }}" >> signing/signing.properties
+            echo "keyPassword=${{ secrets.SIGNING_KEY_PASSWORD }}" >> signing/signing.properties
+          else
+            echo "storePassword=android" > signing/signing.properties
+            echo "keyAlias=androiddebugkey" >> signing/signing.properties
+            echo "keyPassword=android" >> signing/signing.properties
+          fi
+
+      - name: Generate Gradle Wrapper if missing
+        run: |
+          cd project
+          if [ ! -f "gradlew" ]; then
+            gradle wrapper --gradle-version 8.11.1 || true
+          fi
+          chmod +x gradlew || true
+
+      - name: Restore native runtime AAR for full mpv
+        if: ${{ inputs.full_mpv == 'true' || inputs.full_mpv == '' }}
+        run: |
+          mkdir -p .cache/native-runtime
+          python3 project/native/restore-from-apk.py || echo "Restore failed, Media3-only fallback"
+          ls -lh .cache/native-runtime/ || true
+
+      - name: Build APK
+        run: |
+          cd project
+          if [ -f "../.cache/native-runtime/opticast-mpv-runtime.aar" ]; then
+            echo "Building FULL with mpv"
+            ./gradlew assembleOfficialRelease --stacktrace --no-daemon || ./gradlew assembleRelease --stacktrace --no-daemon || ./gradlew assembleDebug --stacktrace --no-daemon
+          else
+            echo "Building Media3-only"
+            ./gradlew assembleDebug --stacktrace --no-daemon
+          fi
+
+      - name: Find APK
+        run: |
+          find project/app/build/outputs -name "*.apk" -type f -exec ls -lh {} \;
+
+      - name: Package
+        run: |
+          VERSION=${{ github.event.inputs.version || '2.6.60' }}
+          VERSION=${VERSION#v}
+          mkdir -p releases
+          APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | grep -E "official|release" | head -1)
+          if [ -z "$APK" ]; then
+            APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | head -1)
+          fi
+          echo "APK=$APK"
+          if [ -f "$APK" ]; then
+            cp "$APK" "releases/OptiCast-v${VERSION}.apk"
+            if unzip -l "$APK" | grep -q "libmpv"; then
+              echo "FULL-mpv"
+            else
+              echo "Media3-only"
+            fi
+            sha256sum "releases/OptiCast-v${VERSION}.apk" > "releases/SHA256SUMS-v${VERSION}.txt"
+          else
+            echo "No APK"; exit 1
+          fi
+          git archive --format=zip -o "releases/OptiCast-v${VERSION}-complete-source.zip" HEAD || true
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OptiCast-APK-v${{ env.VERSION || inputs.version || '2.6.60' }}
+          path: releases/*
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: releases/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1128,8 +1128,7 @@ fun LibraryScreen(
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else { menuIsWholeShow = false; menuEntry = entry }
                             },
-                            modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            modifier = Modifier.padding(LibraryPosterInsetDp.dp)
                         )
                     }
                 }
@@ -1155,8 +1154,7 @@ fun LibraryScreen(
                                 if (selectionMode) toggleSelectShow(episodes)
                                 else { menuIsWholeShow = true; menuEntry = episodes.first() }
                             },
-                            modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            modifier = Modifier.padding(LibraryPosterInsetDp.dp)
                         )
                     }
                 }
@@ -1181,8 +1179,7 @@ fun LibraryScreen(
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else { menuIsWholeShow = false; menuEntry = entry }
                             },
-                            modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            modifier = Modifier.padding(LibraryPosterInsetDp.dp)
                         )
                     }
                 }
@@ -1208,8 +1205,7 @@ fun LibraryScreen(
                                 if (selectionMode) toggleSelectShow(episodes)
                                 else { menuIsWholeShow = true; menuEntry = episodes.first() }
                             },
-                            modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            modifier = Modifier.padding(LibraryPosterInsetDp.dp)
                         )
                     }
                 }

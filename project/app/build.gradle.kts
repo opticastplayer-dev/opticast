@@ -141,7 +141,13 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.9.0")
 
     // Controlled, pinned-source mpv runtime (no third-party prebuilt AAR).
-    implementation(files(rootProject.file("../.cache/native-runtime/opticast-mpv-runtime.aar")))
+    // In CI without native build, this AAR may be missing — make it optional so build still succeeds with Media3 fallback
+    val mpvAar = rootProject.file("../.cache/native-runtime/opticast-mpv-runtime.aar")
+    if (mpvAar.exists()) {
+        implementation(files(mpvAar))
+    } else {
+        println("WARNING: mpv runtime AAR not found at ${mpvAar.absolutePath} — building with Media3 only (CI fallback)")
+    }
 
     // Media3 / ExoPlayer handles fallback, explicit selection and network sources
     implementation("androidx.media3:media3-exoplayer:1.7.1")

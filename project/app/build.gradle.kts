@@ -26,13 +26,38 @@ android {
 
     signingConfigs {
         create("official") {
+            // Gracefully handle missing signing files in CI without secrets — fallback to debug keystore
+            val signingPropsFile = rootProject.file("../signing/signing.properties")
+            val signingJksFile = rootProject.file("../signing/opticast-release.jks")
             val credentials = Properties().apply {
-                rootProject.file("../signing/signing.properties").inputStream().use { load(it) }
+                if (signingPropsFile.exists()) {
+                    signingPropsFile.inputStream().use { load(it) }
+                } else {
+                    // Dummy for CI without secrets — build will fallback to debug signing if JKS missing
+                    setProperty("storePassword", "dummy")
+                    setProperty("keyAlias", "dummy")
+                    setProperty("keyPassword", "dummy")
+                }
             }
-            storeFile = rootProject.file("../signing/opticast-release.jks")
-            storePassword = credentials.getProperty("storePassword")
-            keyAlias = credentials.getProperty("keyAlias")
-            keyPassword = credentials.getProperty("keyPassword")
+            // Use release JKS if exists, otherwise debug keystore will be used via fallback in buildTypes
+            if (signingJksFile.exists()) {
+                storeFile = signingJksFile
+                storePassword = credentials.getProperty("storePassword")
+                keyAlias = credentials.getProperty("keyAlias")
+                keyPassword = credentials.getProperty("keyPassword")
+            } else {
+                // Fallback to debug keystore for CI without secrets — still builds APK for testing
+                // This allows GitHub Actions to build without SIGNING_JKS_BASE64 secret
+                storeFile = rootProject.file("../signing/debug.keystore").takeIf { it.exists() }
+                // If no keystore at all, signing will fail gracefully and we fallback to debug buildType
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
+        // Debug keystore always available
+        getByName("debug") {
+            // Use default debug keystore
         }
     }
 
@@ -47,7 +72,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("official")
+            // Use official signing if JKS exists, otherwise debug for CI without secrets
+            val officialJks = rootProject.file("../signing/opticast-release.jks")
+            signingConfig = if (officialJks.exists()) {
+                signingConfigs.getByName("official")
+            } else {
+                // CI without secrets — use debug keystore so build still produces APK for testing
+                signingConfigs.getByName("debug")
+            }
         }
         debug {
             isMinifyEnabled = false

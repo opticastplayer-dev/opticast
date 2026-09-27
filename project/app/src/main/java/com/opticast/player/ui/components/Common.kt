@@ -343,8 +343,7 @@ fun PosterCard(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(2f / 3f)
-            .clip(RoundedCornerShape(if(LocalMinimalStyle.current) 8.dp else 22.dp))
-            .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(if(LocalMinimalStyle.current) 8.dp else 22.dp))
+            .clip(RoundedCornerShape(12.dp)) // Simplified from 22dp for performance
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .background(MaterialTheme.colorScheme.surfaceContainer),
     ) {
@@ -470,8 +469,7 @@ fun ShowCard(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(2f / 3f)
-            .clip(RoundedCornerShape(if(LocalMinimalStyle.current) 8.dp else 22.dp))
-            .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(if(LocalMinimalStyle.current) 8.dp else 22.dp))
+            .clip(RoundedCornerShape(12.dp)) // Simplified from 22dp for performance
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .background(MaterialTheme.colorScheme.surfaceContainer),
     ) {

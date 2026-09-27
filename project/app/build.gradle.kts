@@ -19,8 +19,8 @@ android {
             // First controlled mpv release targets ARM64 (including the reported SM-A155M).
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
-        versionCode = 112
-        versionName = "2.6.62"
+        versionCode = 113
+        versionName = "2.6.63"
         vectorDrawables { useSupportLibrary = true }
     }
 

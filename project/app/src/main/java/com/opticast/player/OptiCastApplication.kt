@@ -32,7 +32,8 @@ class OptiCastApplication : Application() {
         // - crossfade off: grids bind many images per second
         // - RGB_565: half memory, critical on 2GB devices
         // - no hardware bitmaps on low-RAM: hardware bitmaps can't be cached efficiently and cause extra copies
-        // - smaller memory budget (6/16 MiB) and disk cache (64/192 MiB) to reduce pressure
+        // - larger memory budget (32/96 MiB) for smooth scrolling - 6/16 was too small causing eviction during fling
+        // - disk cache (128/256 MiB) for offline posters to reduce pressure
         // - offline artwork mapper to avoid HD downloads on data saver
         Coil.setImageLoader(
             ImageLoader.Builder(this)

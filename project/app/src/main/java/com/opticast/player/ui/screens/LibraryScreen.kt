@@ -487,7 +487,7 @@ fun LibraryScreen(
 
     // One collector for the whole screen — cards receive the version as a
     // plain parameter instead of each running their own flow collector.
-    val posterVersion by AppContainer.posterCache.version.collectAsStateWithLifecycle()
+    // NOTE: posterVersion global bust was causing choppiness - all cards reloaded when one poster downloaded
     val favVersion by AppContainer.favorites.version.collectAsStateWithLifecycle()
     // Cheap key: watched / in-progress filtering stays live without the grid
     // being rebuilt from storage.
@@ -1099,7 +1099,7 @@ fun LibraryScreen(
                                 PosterCard(entry = entry,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
-                                    modifier = Modifier.fillMaxWidth(), cacheBust = posterVersion)
+                                    modifier = Modifier.fillMaxWidth())
                             }
                         }
                     }
@@ -1129,7 +1129,7 @@ fun LibraryScreen(
                                 else { menuIsWholeShow = false; menuEntry = entry }
                             },
                             modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            cacheBust = posterVersion,
+                            ,
                         )
                     }
                 }
@@ -1156,7 +1156,7 @@ fun LibraryScreen(
                                 else { menuIsWholeShow = true; menuEntry = episodes.first() }
                             },
                             modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            cacheBust = posterVersion,
+                            ,
                         )
                     }
                 }
@@ -1182,7 +1182,7 @@ fun LibraryScreen(
                                 else { menuIsWholeShow = false; menuEntry = entry }
                             },
                             modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            cacheBust = posterVersion,
+                            ,
                         )
                     }
                 }
@@ -1209,7 +1209,7 @@ fun LibraryScreen(
                                 else { menuIsWholeShow = true; menuEntry = episodes.first() }
                             },
                             modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            cacheBust = posterVersion,
+                            ,
                         )
                     }
                 }
@@ -1235,7 +1235,7 @@ fun LibraryScreen(
                                 PosterCard(entry = entry,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
-                                    modifier = Modifier.fillMaxWidth(), cacheBust = posterVersion)
+                                    modifier = Modifier.fillMaxWidth())
                             }
                         }
                         lazyItems(completedShows.entries.toList(), key = { "watched-show-${it.key}" }) { (name, episodes) ->
@@ -1243,7 +1243,7 @@ fun LibraryScreen(
                                 ShowCard(showTitle = name, episodes = episodes,
                                     onClick = { if (selectionMode) toggleSelectShow(episodes) else onOpenShow(name) },
                                     onLongClick = { if (selectionMode) toggleSelectShow(episodes) else { menuIsWholeShow = true; menuEntry = episodes.first() } },
-                                    modifier = Modifier.fillMaxWidth(), cacheBust = posterVersion)
+                                    modifier = Modifier.fillMaxWidth())
                             }
                         }
                     }
@@ -1570,7 +1570,7 @@ private fun HeroPager(items: List<LibraryEntry>, onOpenDetail: (Long) -> Unit, o
     selectionMode: Boolean, selectedIds: Set<Long>, onToggle: (LibraryEntry) -> Unit, onHold: (LibraryEntry) -> Unit) {
     val pagerState = rememberPagerState(pageCount = { items.size })
     val motion = discoveryMotionEnabled() && !selectionMode
-    var autoAdvance by rememberSaveable { mutableStateOf(true) }
+    var autoAdvance by rememberSaveable { mutableStateOf(false) }
     val dragged by pagerState.interactionSource.collectIsDraggedAsState()
     val context = LocalContext.current
     val accessibility = context.getSystemService(android.content.Context.ACCESSIBILITY_SERVICE)
@@ -1582,7 +1582,7 @@ private fun HeroPager(items: List<LibraryEntry>, onOpenDetail: (Long) -> Unit, o
     LaunchedEffect(items.map { it.video.id }, motion, autoAdvance, dragged) {
         if (!motion || !autoAdvance || dragged) return@LaunchedEffect
         while (items.size > 1) {
-            delay(8000)
+            delay(12000)
             // Reading with accessibility services or dragging always wins over decoration.
             if (!pagerState.isScrollInProgress && accessibility?.isTouchExplorationEnabled != true) {
                 pagerState.animateScrollToPage((pagerState.currentPage + 1) % items.size, animationSpec = tween(durationMillis = 1100, easing = androidx.compose.animation.core.FastOutSlowInEasing))

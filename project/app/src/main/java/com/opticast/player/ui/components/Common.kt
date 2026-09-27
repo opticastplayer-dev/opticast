@@ -208,17 +208,7 @@ private fun StatusBadge(status: PosterBadge, modifier: Modifier = Modifier, sing
     val minimal = LocalMinimalStyle.current
     val colours = remember(status) { listOf(Color(status.gradientStart), Color(status.gradientEnd)) }
     val gradient = remember(status) { Brush.linearGradient(colours) }
-    val canAnimate = status == PosterBadge.NEW && badgeShouldAnimate(status, discoveryMotionEnabled())
-    val shimmer: State<Float>? = if (canAnimate) {
-        val transition = rememberInfiniteTransition(label = "newBadgeShimmer")
-        transition.animateFloat(initialValue = 0f, targetValue = 1f,
-            animationSpec = infiniteRepeatable(animation = keyframes {
-                durationMillis = 5200
-                0f at 0
-                1f at 1800
-                1f at 5200
-            }), label = "newBadgeHighlight")
-    } else null
+    // Shimmer disabled for smooth scrolling - was causing choppiness
     val icon = when (status) {
         PosterBadge.NEW -> Icons.Filled.AutoAwesome
         PosterBadge.CONTINUE -> Icons.Filled.PlayArrow
@@ -227,16 +217,7 @@ private fun StatusBadge(status: PosterBadge, modifier: Modifier = Modifier, sing
     Surface(modifier = modifier, shape = RoundedCornerShape(7.dp),
         color = Color.Transparent, contentColor = BadgeInk,
         border = BorderStroke(1.dp, Color.White.copy(alpha = if(minimal) 0.16f else 0.75f)), shadowElevation = if(minimal) 0.dp else 2.dp) {
-        Row(Modifier.background(gradient).drawBehind {
-            // Read animation state during drawing, not composition/layout.
-            shimmer?.let { animation ->
-                val x = (-1f + 3f * animation.value) * size.width
-                val band = size.width * 0.55f
-                drawRect(Brush.linearGradient(
-                    listOf(Color.Transparent, Color.White.copy(alpha = 0.42f), Color.Transparent),
-                    start = Offset(x - band, 0f), end = Offset(x, size.height)))
-            }
-        }.padding(horizontal = 4.dp, vertical = 2.dp),
+        Row(Modifier.background(gradient).padding(horizontal = 4.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(3.dp)) {
             // Reserve the narrow portrait badge for the full two-line resume label.
@@ -277,49 +258,42 @@ fun PosterImage(
     url: String?,
     fallbackTitle: String,
     modifier: Modifier = Modifier,
-    cacheBust: Int = 0,
+    cacheBust: Int = 0, // kept for compatibility but not used - causes choppiness
     remoteUrl: String? = null,
     videoId: Long? = null,
 ) {
-    // If a cached file:// poster is gone or corrupt, Coil reports an error and
-    // we transparently retry with the remote artwork instead of showing a
-    // blank card.
     var useRemote by remember(url) { mutableStateOf(false) }
-    // Set when there is nothing left to try. Without this, a poster whose file
-    // was deleted (or a TMDB path with no API key) left the card BLANK: the
-    // error handler only knew how to retry a remote URL, and when there was no
-    // remote URL it changed nothing and the failed image stayed on screen.
     var failed by remember(url) { mutableStateOf(false) }
     val effectiveUrl = if (useRemote && remoteUrl != null) remoteUrl else url
+    val rememberedUrl = remember(effectiveUrl) { effectiveUrl }
     Box(modifier.background(MaterialTheme.colorScheme.surfaceContainer)) {
-        if (effectiveUrl != null && !failed) {
+        if (rememberedUrl != null && !failed) {
             AsyncImage(
                 onError = {
-                    if (!useRemote && remoteUrl != null && effectiveUrl != remoteUrl) {
+                    if (!useRemote && remoteUrl != null && rememberedUrl != remoteUrl) {
                         useRemote = true
                     } else {
                         failed = true
                     }
                 },
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(effectiveUrl)
-                    // No crossfade for grid posters: a dozen fading bitmaps at
-                    // once is exactly what makes a fast fling feel jittery.
+                    .data(rememberedUrl)
                     .crossfade(false)
-                    .memoryCacheKey("$url#$cacheBust")
+                    .memoryCacheKey(rememberedUrl)
+                    .diskCacheKey(rememberedUrl)
                     .build(),
                 contentDescription = fallbackTitle,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
             )
         } else {
-            // No poster to show: use a real frame from the video itself.
             val frame = rememberFrameArtwork(videoId)
             if (frame != null) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(frame)
                         .crossfade(false)
+                        .memoryCacheKey("frame-${videoId}")
                         .build(),
                     contentDescription = fallbackTitle,
                     contentScale = ContentScale.Crop,
@@ -360,9 +334,10 @@ fun PosterCard(
     cacheBust: Int = 0,
 ) {
     val metadata = entry.metadata
-    val posterUrl = posterUrlFor(entry)
-    val fallbackTitle = entry.video.parsed.title.ifBlank { entry.video.name }
-    val playback = AppContainer.playbackState.progressOf(entry.video.id)
+    val posterUrl = remember(entry.video.id, entry.metadata?.posterPath) { posterUrlFor(entry) }
+    val remotePosterUrl = remember(entry.metadata?.posterPath) { posterRemoteUrlFor(entry) }
+    val fallbackTitle = remember(entry.video.name, entry.video.parsed.title) { entry.video.parsed.title.ifBlank { entry.video.name } }
+    val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) }
 
     Box(
         modifier = modifier

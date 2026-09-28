@@ -924,8 +924,9 @@ fun LibraryScreen(
                     val context = LocalContext.current
                     var dismissed by remember { mutableStateOf(false) }
                     var whatsNewVersion by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.getWhatsNewVersion(context)) }
-                    if (!dismissed && whatsNewVersion != null) {
-                        WhatsNewCard(version = whatsNewVersion, onDismiss = {
+                    val currentWhatsNew = whatsNewVersion
+                    if (!dismissed && currentWhatsNew != null) {
+                        WhatsNewCard(version = currentWhatsNew, onDismiss = {
                             com.opticast.player.data.remote.UpdateChecker.dismissWhatsNew(context)
                             dismissed = true
                             whatsNewVersion = null
@@ -940,8 +941,9 @@ fun LibraryScreen(
                     var dismissed by remember { mutableStateOf(false) }
                     var isUpToDate by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.isUpToDate(context)) }
                     var upToDateVersion by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.getUpToDateVersion(context)) }
-                    if (!dismissed && isUpToDate && upToDateVersion != null) {
-                        UpToDateCard(version = upToDateVersion, onDismiss = {
+                    val currentUpToDate = upToDateVersion
+                    if (!dismissed && isUpToDate && currentUpToDate != null) {
+                        UpToDateCard(version = currentUpToDate, onDismiss = {
                             com.opticast.player.data.remote.UpdateChecker.clearUpToDate(context)
                             dismissed = true
                             isUpToDate = false

@@ -252,7 +252,7 @@ fun rememberFrameArtwork(videoId: Long?): File? {
     return artwork
 }
 
-/** Loads a poster image with a graceful gradient fallback. */
+/** Loads a poster image with placeholder for buttery smooth scrolling on low-RAM 32-bit 3GB devices. */
 @Composable
 fun PosterImage(
     url: String?,
@@ -266,7 +266,17 @@ fun PosterImage(
     var failed by remember(url) { mutableStateOf(false) }
     val effectiveUrl = if (useRemote && remoteUrl != null) remoteUrl else url
     val rememberedUrl = remember(effectiveUrl) { effectiveUrl }
-    Box(modifier.background(MaterialTheme.colorScheme.surfaceContainer)) {
+    // Placeholder brush - shows immediately while real poster loads, prevents white flash
+    val placeholderBrush = remember {
+        Brush.linearGradient(
+            colors = listOf(
+                Color(0xFF2A2A2A),
+                Color(0xFF3A3A3A),
+                Color(0xFF2A2A2A)
+            )
+        )
+    }
+    Box(modifier.background(placeholderBrush)) {
         if (rememberedUrl != null && !failed) {
             AsyncImage(
                 onError = {
@@ -278,9 +288,12 @@ fun PosterImage(
                 },
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(rememberedUrl)
-                    .crossfade(false)
+                    .crossfade(true)
+                    .crossfade(200)
                     .memoryCacheKey(rememberedUrl)
                     .diskCacheKey(rememberedUrl)
+                    .diskCachePolicy(coil.request.CachePolicy.ENABLED)
+                    .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                     .build(),
                 contentDescription = fallbackTitle,
                 contentScale = ContentScale.Crop,
@@ -292,8 +305,10 @@ fun PosterImage(
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(frame)
-                        .crossfade(false)
+                        .crossfade(true)
+                        .crossfade(200)
                         .memoryCacheKey("frame-${videoId}")
+                        .diskCacheKey("frame-${videoId}")
                         .build(),
                     contentDescription = fallbackTitle,
                     contentScale = ContentScale.Crop,

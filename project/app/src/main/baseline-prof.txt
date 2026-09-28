@@ -1,5 +1,6 @@
-# Locked baseline for v2.6.73 (versionCode 123) - 2026-09-28T10:35:39.335524 - optimized official release - Google discoverable
-# This baseline locks performance for buttery smooth library scrolling on low-RAM 32-bit
+# Locked baseline for v2.6.76 (versionCode 125) - 2026-09-28 - ultra bulletproof + smooth scrolling
+# Optimized for buttery smooth library scrolling on low-RAM 32-bit 3GB devices
+# Includes: startup, library grid, poster loading, discovery, search
 HSPLcom/opticast/player/OptiCastApplication;-><init>()V
 HSPLcom/opticast/player/OptiCastApplication;->onCreate()V
 HSPLcom/opticast/player/MainActivity;-><init>()V
@@ -12,15 +13,32 @@ HSPLcom/opticast/player/data/local/MediaScanner;->scan(J)Ljava/util/List;
 HSPLcom/opticast/player/data/local/PosterCache;-><init>(Landroid/content/Context;)V
 HSPLcom/opticast/player/data/local/PosterCache;->warmUp()V
 HSPLcom/opticast/player/data/local/PosterCache;->localUrl(JLcom/opticast/player/data/model/Metadata;)Ljava/lang/String;
+HSPLcom/opticast/player/data/local/PosterCache;->prefetch(Ljava/util/List;)V
 HSPLcom/opticast/player/ui/screens/LibraryScreenKt;->LibraryScreen(Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;I)V
 HSPLcom/opticast/player/ui/screens/LibraryViewModel;-><init>()V
+HSPLcom/opticast/player/ui/screens/LibraryViewModel;->scan(Z)V
 HSPLcom/opticast/player/data/SettingsRepository;-><init>(Landroid/content/Context;)V
 HSPLcom/opticast/player/data/model/LibraryEntry;-><init>(Lcom/opticast/player/data/model/LocalVideo;Lcom/opticast/player/data/model/Metadata;)V
 HSPLcom/opticast/player/data/local/MetadataStore;-><init>(Landroid/content/Context;)V
 HSPLcom/opticast/player/data/local/PlaybackStateStore;-><init>(Landroid/content/Context;)V
-HSPLcom/opticast/player/data/PlaybackWorkBudget;-><clinit>()V
-PLcom/opticast/player/data/local/PosterCache;->localUrl(JLcom/opticast/player/data/model/Metadata;)Ljava/lang/String;
-PLcom/opticast/player/ui/screens/LibraryScreenKt;->LibraryScreen(Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;I)V
-HSPLandroidx/compose/ui/platform/AndroidCompositionLocals_androidKt;->provideAndroidCompositionLocals(Landroidx/compose/ui/platform/AndroidComposeView;Landroidx/compose/runtime/CompositionContext;)V
-HSPLandroidx/compose/foundation/lazy/LazyListKt;->LazyColumn(Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/ui/Modifier;Landroidx/compose/foundation/lazy/LazyListState;Landroidx/compose/foundation/layout/Arrangement$Vertical;Landroidx/compose/ui/Alignment$Horizontal;Landroidx/compose/foundation/gestures/FlingBehavior;ZLkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;II)V
-HSPLcoil/Coil;->setImageLoader(Lcoil/ImageLoader;)V
+HSPLcom/opticast/player/data/local/PlaybackStateStore;->progressOf(J)Lcom/opticast/player/data/local/PlaybackState;
+HSPLcom/opticast/player/ui/components/CommonKt;->PosterCard(Lcom/opticast/player/data/model/LibraryEntry;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;IILandroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/ui/components/CommonKt;->PosterImage(Ljava/lang/String;Ljava/lang/String;Landroidx/compose/ui/Modifier;ILjava/lang/String;Ljava/lang/Long;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/ui/components/CommonKt;->ShowCard(Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;IILandroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/ui/components/CommonKt;->ContinueWatchingCard(Lcom/opticast/player/data/model/LibraryEntry;FLjava/lang/String;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;ZLandroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/ui/components/OptimizedPosterKt;->OptimizedPoster(Ljava/lang/String;Ljava/lang/String;Landroidx/compose/ui/Modifier;ILandroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/ui/components/OptimizedLibraryGridKt;->OptimizedLibraryGrid(Ljava/util/List;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Landroidx/compose/foundation/layout/PaddingValues;Lkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/data/repository/LibraryRepositoryImpl;-><init>(Lcom/opticast/player/data/local/MediaScanner;Lcom/opticast/player/data/local/MetadataStore;Lcom/opticast/player/data/local/PosterCache;)V
+HSPLcom/opticast/player/data/repository/LibraryRepositoryImpl;->refresh()V
+HSPLcom/opticast/player/data/repository/LibraryRepositoryImpl;->search(Ljava/lang/String;)Ljava/util/List;
+HSPLcom/opticast/player/ui/screens/LibraryDesignStore;-><init>(Landroid/content/Context;)V
+HSPLcom/opticast/player/ui/screens/LibraryDesignStore;->collections()Ljava/util/List;
+HSPLcom/opticast/player/data/local/FavoritesStore;-><init>(Landroid/content/Context;)V
+HSPLcom/opticast/player/data/local/FavoritesStore;->isFavorite(J)Z
+HSPLcom/opticast/player/ui/components/LibraryVisualStyleKt;->LocalMinimalStyle()Landroidx/compose/runtime/ProvidableCompositionLocal;
+HSPLcom/opticast/player/ui/components/PosterBadgeKt;->primaryPosterBadge(ZZZ)Lcom/opticast/player/ui/components/PosterBadge;
+HSPLcom/opticast/player/ui/components/CommonKt;->posterUrlFor(Lcom/opticast/player/data/model/LibraryEntry;)Ljava/lang/String;
+HSPLcom/opticast/player/ui/components/CommonKt;->tmdbPosterUrl(Ljava/lang/String;)Ljava/lang/String;
+HSPLcom/opticast/player/data/remote/UpdateChecker;->isUpToDate(Landroid/content/Context;)Z
+HSPLcom/opticast/player/data/remote/UpdateChecker;->getUpToDateVersion(Landroid/content/Context;)Ljava/lang/String;
+HSPLcom/opticast/player/data/remote/UpdateChecker;->getWhatsNewVersion(Landroid/content/Context;)Ljava/lang/String;

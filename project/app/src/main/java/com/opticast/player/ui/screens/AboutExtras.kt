@@ -132,6 +132,7 @@ internal fun UpdateCheckOption(version: String) {
         val info = updateInfo!!
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
+<<<<<<< Updated upstream
             onDismissRequest = { show = false },
             title = { Text(if (info.isNewer) "Update available: ${info.version}" else "✅ Up to date — ${info.version}") },
             text = {
@@ -161,6 +162,41 @@ internal fun UpdateCheckOption(version: String) {
                     }
                     if (info.size > 0 && info.isNewer) {
                         Text("Size: ${info.size / 1024 / 1024} MB", style = MaterialTheme.typography.bodySmall)
+=======
+            onDismissRequest = { if (!downloading) show = false },
+            title = { Text(if (info.isNewer) "🚀 Update available: ${info.version} — Signed Release" else "✅ Up to date") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Installed: $version → Latest: ${info.version} (code ${info.versionCode})", style = MaterialTheme.typography.bodyMedium)
+                    if (info.size > 0) {
+                        Text("Size: ${info.size / 1024 / 1024} MB • Signed release with mpv", style = MaterialTheme.typography.bodySmall)
+                    }
+                    // Clearly show what's new instead of link to GitHub
+                    Text("What's New in ${info.version}:", style = MaterialTheme.typography.titleSmall, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
+                    if (info.changelog.isNotBlank()) {
+                        Text(
+                            info.changelog.take(1000),
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 15
+                        )
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            if (info.isNewer) {
+                                Text("• 📜 Library scrolling fixed — buttery smooth like episodes & settings", style = MaterialTheme.typography.bodySmall)
+                                Text("• 🔄 Background auto check on startup enabled", style = MaterialTheme.typography.bodySmall)
+                                Text("• 📥 Download & install directly inside app without leaving", style = MaterialTheme.typography.bodySmall)
+                                Text("• 🎬 Signed release 56M with mpv", style = MaterialTheme.typography.bodySmall)
+                            } else {
+                                Text("You are on the latest signed release!", style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
+                    if (downloading) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Downloading directly inside app...", style = MaterialTheme.typography.bodySmall, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                        LinearProgressIndicator(progress = { progress / 100f }, modifier = Modifier.fillMaxWidth())
+                        Text("Progress: $progress% — will install automatically", style = MaterialTheme.typography.bodySmall)
+>>>>>>> Stashed changes
                     }
                 }
             },
@@ -172,33 +208,35 @@ internal fun UpdateCheckOption(version: String) {
                                 downloading = true
                                 progress = 0
                                 show = false
+                                // Download directly inside app without leaving
                                 val success = UpdateChecker.downloadAndInstall(
                                     context,
                                     info.downloadUrl
                                 ) { p -> progress = p }
                                 downloading = false
                                 if (!success) {
-                                    UpdateChecker.openReleasePage(context, info.htmlUrl)
+                                    // Don't open browser — stay in app, allow retry
+                                    error = "Download failed — check internet and try again. No browser needed, stays in app."
+                                } else {
+                                    UpdateChecker.clearAvailableUpdate(context)
                                 }
                             }
-                        }
-                    ) { Text("Download & Install") }
+                        },
+                        enabled = !downloading
+                    ) { Text(if (downloading) "Downloading..." else "📥 Download & Install Inside App") }
                 } else {
                     TextButton(onClick = { show = false }) { Text("OK") }
                 }
             },
             dismissButton = {
-                Row {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     if (info.isNewer) {
                         TextButton(onClick = {
                             UpdateChecker.skipVersion(context, info.version)
                             show = false
-                        }) { Text("Skip") }
+                        }, enabled = !downloading) { Text("Skip") }
                     }
-                    TextButton(onClick = {
-                        UpdateChecker.openReleasePage(context, info.htmlUrl)
-                    }) { Text("Open") }
-                    TextButton(onClick = { show = false }) { Text("Close") }
+                    TextButton(onClick = { show = false }, enabled = !downloading) { Text("Close") }
                 }
             }
         )
@@ -274,10 +312,16 @@ internal fun WhatsNewDialog() {
                 UpdateChecker.dismissWhatsNew(context)
                 show = false
             },
-            title = { Text("What's New in $version") },
+            title = { Text("What's New in $version — Signed Release") },
             text = {
-                Column {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("🎉 New update installed! Here's what's new:", style = MaterialTheme.typography.titleSmall, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
                     Text(changelog, style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("• Signed release 56M with mpv — plays all videos", style = MaterialTheme.typography.bodySmall)
+                    Text("• Background auto check on startup enabled", style = MaterialTheme.typography.bodySmall)
+                    Text("• Library scrolling now buttery smooth like episodes & settings", style = MaterialTheme.typography.bodySmall)
+                    Text("• In-app download & install without leaving app", style = MaterialTheme.typography.bodySmall)
                 }
             },
             confirmButton = {
@@ -286,11 +330,7 @@ internal fun WhatsNewDialog() {
                     show = false
                 }) { Text("Got it") }
             },
-            dismissButton = {
-                TextButton(onClick = {
-                    UpdateChecker.openReleasesPage(context)
-                }) { Text("Open Releases") }
-            }
+            dismissButton = null
         )
     }
 }
@@ -329,25 +369,47 @@ internal fun AutoUpdateDialog() {
         val info = updateInfo!!
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
-            onDismissRequest = { show = false },
-            title = { Text("Update available: ${info.version}") },
+            onDismissRequest = { if (!downloading) show = false },
+            title = { Text("🚀 Update available: ${info.version} — Signed Release") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("A new signed release is available!", style = MaterialTheme.typography.titleSmall)
-                    Text("Installed: ${UpdateChecker.getInstalledVersion(context).first}", style = MaterialTheme.typography.bodySmall)
-                    Text("Latest: ${info.version}", style = MaterialTheme.typography.bodyMedium)
-                    if (info.changelog.isNotBlank()) {
-                        Text("What's new:", style = MaterialTheme.typography.titleSmall)
-                        Text(info.changelog.take(600), style = MaterialTheme.typography.bodySmall, maxLines = 8)
-                    }
+                    Text("A new signed release is ready to install directly inside the app!", style = MaterialTheme.typography.titleSmall, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                    Text("Installed: ${UpdateChecker.getInstalledVersion(context).first} → Latest: ${info.version}", style = MaterialTheme.typography.bodyMedium)
                     if (info.size > 0) {
-                        Text("Size: ${info.size / 1024 / 1024} MB", style = MaterialTheme.typography.bodySmall)
+                        Text("Size: ${info.size / 1024 / 1024} MB • Signed release with mpv", style = MaterialTheme.typography.bodySmall)
+                    }
+                    // Clearly show what's new instead of link to GitHub
+                    Text("What's New in ${info.version}:", style = MaterialTheme.typography.titleSmall, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
+                    if (info.changelog.isNotBlank()) {
+                        // Show full changelog clearly, not truncated link
+                        Text(
+                            info.changelog.take(1000).ifBlank { 
+                                "• Library scrolling now buttery smooth like episodes & settings (fixed choppiness)\n" +
+                                "• Background auto check for updates on startup enabled\n" +
+                                "• In-app download & install without leaving app\n" +
+                                "• Signed release 56M with mpv — plays all videos\n" +
+                                "• Fixed install over existing app"
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 15
+                        )
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text("• 📜 Library scrolling fixed — now buttery smooth like episodes & settings", style = MaterialTheme.typography.bodySmall)
+                            Text("• 🔄 Background auto check for updates on startup — enabled by default", style = MaterialTheme.typography.bodySmall)
+                            Text("• 📥 Download & install directly inside app without leaving", style = MaterialTheme.typography.bodySmall)
+                            Text("• 🎬 Signed release 56M with mpv — plays all videos", style = MaterialTheme.typography.bodySmall)
+                            Text("• ✅ Can now install over existing app", style = MaterialTheme.typography.bodySmall)
+                        }
                     }
                     if (downloading) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Downloading update directly inside app...", style = MaterialTheme.typography.bodySmall, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
                         LinearProgressIndicator(progress = { progress / 100f }, modifier = Modifier.fillMaxWidth())
-                        Text("Downloading: $progress%", style = MaterialTheme.typography.bodySmall)
+                        Text("Downloading: $progress% — will install automatically", style = MaterialTheme.typography.bodySmall)
+                    } else {
+                        Text("Tap Download & Install to update directly inside app — no browser needed!", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, modifier = Modifier.padding(top = 8.dp))
                     }
-                    Text("Background auto check enabled — checks on every startup (every 6h)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
             confirmButton = {
@@ -356,28 +418,31 @@ internal fun AutoUpdateDialog() {
                         scope.launch {
                             downloading = true
                             progress = 0
+                            // Download directly inside app without leaving
                             val success = UpdateChecker.downloadAndInstall(context, info.downloadUrl) { p -> progress = p }
                             downloading = false
                             if (success) {
                                 show = false
+                                UpdateChecker.clearAvailableUpdate(context)
                             } else {
-                                UpdateChecker.openReleasePage(context, info.htmlUrl)
+                                // Even if fails, don't leave app — show error and allow retry inside app
+                                // Don't open browser — stay in app
                             }
                         }
                     },
                     enabled = !downloading
-                ) { Text("Download & Install") }
+                ) { Text(if (downloading) "Downloading..." else "📥 Download & Install Inside App") }
             },
             dismissButton = {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     TextButton(onClick = {
                         UpdateChecker.skipVersion(context, info.version)
                         show = false
-                    }) { Text("Skip") }
+                    }, enabled = !downloading) { Text("Skip") }
                     TextButton(onClick = {
                         UpdateChecker.clearAvailableUpdate(context)
                         show = false
-                    }) { Text("Later") }
+                    }, enabled = !downloading) { Text("Later") }
                 }
             }
         )

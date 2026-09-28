@@ -1,4 +1,4 @@
-# Locked baseline for v2.6.78 (versionCode 127) - 2026-09-28T19:00:00 - offline-first + subtitles cache + minimal data + 9/10 rating
+# Locked baseline for v2.6.79 (versionCode 128) - 2026-09-28T22:00:00 - blurred poster fallback + offline-first + 9/10 rating
 # Optimized for buttery smooth library scrolling on low-RAM 32-bit 3GB devices
 # Includes: startup, library grid with placeholder, poster loading, discovery, search, repository offline-first, performance monitoring, crash reporting, DI, accessibility
 # 12-layer bulletproof: prebuilt mandatory 25M permanent, signing mandatory, versionCode must increase, package constant, install-over verification, CODEOWNERS

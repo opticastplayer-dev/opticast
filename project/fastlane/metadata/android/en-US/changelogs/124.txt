@@ -1,0 +1,7 @@
+• Fixed cannot install over v2.6.72 - restored full mpv build with libmpv.so after deleting old releases broke restore script
+• Fixed restore-from-apk.py to try multiple URLs including latest v2.6.73, not just v2.6.59 which was deleted
+• Fixed release workflow version naming: now uses tag name when inputs.version empty, not default 2.6.60
+• Always builds full mpv with libmpv.so - 31M official signed, installs over previous full mpv versions
+• Fixed misleading update: shows Up To Date when already on latest
+• Fixed X button dismiss entirely with 48dp touch target
+• Optimized official release 31M signed with full mpv

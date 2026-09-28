@@ -463,25 +463,40 @@ fun DetailScreen(
                                 modifier = Modifier.fillMaxSize(),
                             )
                         } else if (posterUrl != null) {
-                            // Blurred poster as background when no backdrop and no frame - never black
-                            // Offline-first: poster is cached, backdrop may not be (new movie, slow internet)
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(posterUrl)
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .blur(24.dp), // Blur poster for background effect
-                            )
-                            // Dark overlay to ensure text readability
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Black.copy(alpha = 0.4f))
-                            )
+                            // Poster as background when no backdrop and no frame - never black
+                            // Offline-first: poster is cached, backdrop may not be (new movie, slow internet 30KB/s)
+                            // Fix black background reported for Afterburn (2025) - use poster with dark overlay
+                            // Blur not available in this Compose version, use alpha + scale for background effect
+                            Box(Modifier.fillMaxSize()) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(posterUrl)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .graphicsLayer {
+                                            // Scale poster slightly for background effect
+                                            scaleX = 1.2f
+                                            scaleY = 1.2f
+                                            alpha = 0.6f
+                                        },
+                                )
+                                // Dark overlay to ensure text readability + blur effect simulation
+                                Box(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            Brush.verticalGradient(
+                                                0f to Color.Black.copy(alpha = 0.3f),
+                                                0.5f to Color.Black.copy(alpha = 0.6f),
+                                                1f to MaterialTheme.colorScheme.background.copy(alpha = 0.9f)
+                                            )
+                                        )
+                                )
+                            }
                         } else {
                             FallbackPoster(metadata?.displayTitle ?: video.parsed.title)
                         }

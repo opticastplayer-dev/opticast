@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://opticastplayer-dev.github.io/opticast/sitemap.xml

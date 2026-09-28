@@ -1,4 +1,4 @@
-# Locked baseline for v2.6.71 (versionCode 121) - 2026-09-28T09:58:28.576596 - optimized official release
+# Locked baseline for v2.6.73 (versionCode 123) - 2026-09-28T10:35:39.335524 - optimized official release - Google discoverable
 # This baseline locks performance for buttery smooth library scrolling on low-RAM 32-bit
 HSPLcom/opticast/player/OptiCastApplication;-><init>()V
 HSPLcom/opticast/player/OptiCastApplication;->onCreate()V

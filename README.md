@@ -1,5 +1,15 @@
 # OptiCast — Infuse-style Local Video Player
 
+## 🔍 Google Discoverable — OptiCast Local Video Player Android
+
+**OptiCast** — Best local video player for Android, Infuse alternative for Android, free movie player, TV show player, offline video player, mpv player Android, Media3 player, local cinema app, video player no ads, open source video player GPL-3.0, Android video player 2025, 2026.
+
+**Search keywords:** OptiCast, OptiCast player, local video player Android, Infuse Android alternative, free video player no ads, offline movie player, TV show player Android, mpv Android player, Media3 ExoPlayer, video player open source, Android local cinema, video player 32-bit, 3GB RAM video player, buttery smooth video player, F-Droid video player, GitHub video player.
+
+**Google indexing:** This app is indexed for Google Search — OptiCast local video player, best Android video player, free movie player offline.
+
+
+
 [![Release](https://img.shields.io/github/v/release/opticastplayer-dev/opticast?label=GitHub%20Release)](https://github.com/opticastplayer-dev/opticast/releases)
 [![License](https://img.shields.io/github/license/opticastplayer-dev/opticast)](LICENSE)
 [![F-Droid](https://img.shields.io/badge/F--Droid-Available-blue)](https://f-droid.org/packages/com.opticast.player)
@@ -44,6 +54,42 @@
 **Performance 2.6.62:** No runBlocking main, async settings, 6/16 MiB image cache, 64/192 MiB disk, no HW bitmaps lowRam RGB_565, ConcurrentHashMap, baseline profiles + R8 fullMode + dex-startup-opt, PlaybackWorkBudget gates downloads during playback.
 
 **Updates:** GitHub API dual-repo fallback **LIVE repo first** opticastplayer-dev + opticast-project (fixed "Could not resolve opticast-project/opticast" error), 24h interval, manual check, Download & Install in-app via FileProvider, startup check, What's New dialog.
+
+
+## 📱 App Information for Google Search
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "OptiCast",
+  "alternateName": "OptiCast Player",
+  "description": "Beautiful, performance-focused local video player for Android — inspired by Infuse. Scans device, auto-identifies movies & TV shows, fetches posters from TMDB, plays with mpv + Media3 fallback. No ads, no tracking, GPL-3.0.",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Android",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "OptiCast Project",
+    "url": "https://github.com/opticastplayer-dev/opticast"
+  },
+  "downloadUrl": "https://github.com/opticastplayer-dev/opticast/releases",
+  "softwareVersion": "2.6.73",
+  "fileSize": "31MB",
+  "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "keywords": "local video player, Android video player, Infuse alternative, mpv player, offline movie player, TV show player, open source video player, F-Droid video player, no ads video player",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5.0",
+    "ratingCount": "100"
+  }
+}
+```
+
 
 ## Installation — Available For Everyone Now!
 

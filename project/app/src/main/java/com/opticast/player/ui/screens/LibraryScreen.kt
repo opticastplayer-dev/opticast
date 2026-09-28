@@ -1774,6 +1774,7 @@ private fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
     }
 }
 }
+}
 
 @Composable
 private fun UpToDateCard(version: String) {

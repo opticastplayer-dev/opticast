@@ -1779,7 +1779,8 @@ private fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
 }
 
 @Composable
-private fun UpToDateCard(version: String) {
+private fun UpToDateCard(version: String, onDismiss: (() -> Unit)? = null) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -1805,6 +1806,16 @@ private fun UpToDateCard(version: String) {
                     "You have the latest version from GitHub! 🎉 Your app is fully updated and ready.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+            IconButton(onClick = {
+                com.opticast.player.data.remote.UpdateChecker.clearUpToDate(context)
+                onDismiss?.invoke()
+            }) {
+                Icon(
+                    androidx.compose.material.icons.Icons.Filled.Close,
+                    contentDescription = "Dismiss",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
         }

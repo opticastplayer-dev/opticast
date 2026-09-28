@@ -438,6 +438,10 @@ fun PlayerScreen(
     // ------------------------- state mirrored from the player -------------------------
     var isPlaying by remember { mutableStateOf(eventIsCurrent() && controller.isPlaying) }
     var buffering by remember { mutableStateOf(controller.playbackState == Player.STATE_BUFFERING) }
+    // Fix loading animation persisting when quickly jumping between videos - reset buffering on video change
+    LaunchedEffect(video.id) {
+        buffering = false
+    }
     var playbackEnded by remember { mutableStateOf(controller.playbackState == Player.STATE_ENDED) }
     // Errors and progress warnings are scoped to the currently requested movie.
     var engineError by remember(video.id) { mutableStateOf<String?>(null) }
@@ -881,7 +885,8 @@ fun PlayerScreen(
                         androidx.media3.common.PlaybackException.ERROR_CODE_UNSPECIFIED))
                     return
                 }
-                buffering = playbackState == Player.STATE_BUFFERING
+                if (!eventIsCurrent()) return
+                buffering = playbackState == Player.STATE_BUFFERING && samePlaybackItem(video.id, controller.currentMediaItem?.mediaId)
                 playbackEnded = playbackState == Player.STATE_ENDED && samePlaybackItem(video.id, controller.currentMediaItem?.mediaId)
                 if (playbackState == Player.STATE_ENDED && sleepAtEnd) {
                     sleepAtEnd = false
@@ -1791,7 +1796,29 @@ fun PlayerScreen(
         }
 
         // Loading feedback is independent of initially hidden transport controls.
-        if (buffering && engineError == null && !showDiagnostics) {
+        // Fix: Don't show loading persistently when quickly jumping - only if buffering and not playing and same video
+        var showLoading by remember { mutableStateOf(false) }
+        LaunchedEffect(buffering, isPlaying, video.id) {
+            if (buffering && !isPlaying) {
+                kotlinx.coroutines.delay(200) // Small delay to avoid flicker when quickly jumping
+                if (buffering && !isPlaying) {
+                    showLoading = true
+                }
+            } else {
+                showLoading = false
+            }
+        }
+        // Auto-hide loading after 5s if still showing to prevent persistent animation
+        LaunchedEffect(showLoading, video.id) {
+            if (showLoading) {
+                kotlinx.coroutines.delay(5000)
+                if (showLoading) {
+                    showLoading = false
+                    buffering = false
+                }
+            }
+        }
+        if (showLoading && buffering && engineError == null && !showDiagnostics) {
             androidx.compose.material3.LoadingIndicator(
                 modifier = Modifier.align(Alignment.Center).offset(y = if (controlsVisible) (-80).dp else 0.dp).size(64.dp),
                 color = MaterialTheme.colorScheme.primary,

@@ -145,14 +145,12 @@ object UpdateChecker {
 
             val tag = resolvedRelease.tag_name.removePrefix("v")
             val installed = getInstalledVersion(context)
-            val installedCode = installed.second
 
             // Parse version code from tag if possible, or compare version names
+            // Fix: Don't compare parsed remote code (20671) vs installed code (121) - different scales, causes false positive
+            // When installed is 2.6.71 (code 121) and latest is 2.6.71-optimized (parsed 20671), they are SAME, not newer
             val remoteCode = parseVersionCode(tag)
-            val isNewer = when {
-                remoteCode > 0 && installedCode > 0 -> remoteCode > installedCode
-                else -> isVersionNewer(tag, installed.first)
-            }
+            val isNewer = isVersionNewer(tag, installed.first) // Use normalized version name comparison only - fixes misleading update
 
             // Find APK asset
             val apkAsset = resolvedRelease.assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains("OptiCast", ignoreCase = true) }
@@ -444,14 +442,14 @@ object UpdateChecker {
 
     private fun parseVersionCode(version: String): Long {
         return try {
-            // Try to parse version like 2.6.58 -> 108 or 2.6.58 as code
-            // For simplicity, extract numbers and convert
-            val parts = version.split(".")
+            // Parse version like 2.6.71-optimized -> 2.6.71 -> code
+            // Normalize by removing -optimized suffix
+            val normalized = version.substringBefore("-optimized").substringBefore("-")
+            val parts = normalized.split(".")
             if (parts.size >= 3) {
                 val major = parts[0].toLongOrNull() ?: 0
                 val minor = parts[1].toLongOrNull() ?: 0
                 val patch = parts[2].substringBefore("-").toLongOrNull() ?: 0
-                // Rough conversion, but we also check version name comparison
                 major * 10000 + minor * 100 + patch
             } else {
                 0L
@@ -461,10 +459,22 @@ object UpdateChecker {
         }
     }
 
+    private fun normalizeVersion(version: String): String {
+        // Remove -optimized suffix and any other suffix for comparison
+        // 2.6.71-optimized -> 2.6.71, 2.6.71 -> 2.6.71
+        return version.substringBefore("-optimized").substringBefore("-").trim()
+    }
+
     private fun isVersionNewer(remote: String, installed: String): Boolean {
         return try {
-            val remoteParts = remote.split(".").map { it.substringBefore("-").toIntOrNull() ?: 0 }
-            val installedParts = installed.split(".").map { it.substringBefore("-").toIntOrNull() ?: 0 }
+            // Normalize both versions to compare - remove -optimized suffix
+            // When latest is 2.6.71-optimized and installed is 2.6.71, they are SAME, not newer
+            val remoteNorm = normalizeVersion(remote)
+            val installedNorm = normalizeVersion(installed)
+            if (remoteNorm == installedNorm) return false // Same version, not newer - fix misleading update
+
+            val remoteParts = remoteNorm.split(".").map { it.substringBefore("-").toIntOrNull() ?: 0 }
+            val installedParts = installedNorm.split(".").map { it.substringBefore("-").toIntOrNull() ?: 0 }
             for (i in 0 until maxOf(remoteParts.size, installedParts.size)) {
                 val r = remoteParts.getOrNull(i) ?: 0
                 val inst = installedParts.getOrNull(i) ?: 0
@@ -473,7 +483,8 @@ object UpdateChecker {
             }
             false
         } catch (_: Exception) {
-            remote != installed
+            // Fallback: compare normalized versions
+            normalizeVersion(remote) != normalizeVersion(installed) && remote != installed
         }
     }
 }

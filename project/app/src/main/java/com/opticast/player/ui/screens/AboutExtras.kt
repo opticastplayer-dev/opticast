@@ -133,20 +133,33 @@ internal fun UpdateCheckOption(version: String) {
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
             onDismissRequest = { show = false },
-            title = { Text(if (info.isNewer) "Update available: ${info.version}" else "Up to date") },
+            title = { Text(if (info.isNewer) "Update available: ${info.version}" else "✅ Up to date — ${info.version}") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Installed: $version")
                     Text("Latest: ${info.version} (code ${info.versionCode})")
-                    if (info.changelog.isNotBlank()) {
+                    if (!info.isNewer) {
+                        Text(
+                            "You are already on the latest version! 🎉 Your app is fully updated and ready.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    if (info.changelog.isNotBlank() && info.isNewer) {
                         Text("What's new:", style = MaterialTheme.typography.titleSmall)
                         Text(
                             info.changelog.take(800),
                             style = MaterialTheme.typography.bodySmall,
                             maxLines = 10
                         )
+                    } else if (info.changelog.isNotBlank() && !info.isNewer) {
+                        Text("Changelog:", style = MaterialTheme.typography.titleSmall)
+                        Text(
+                            "You have the latest version. No new updates available.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
-                    if (info.size > 0) {
+                    if (info.size > 0 && info.isNewer) {
                         Text("Size: ${info.size / 1024 / 1024} MB", style = MaterialTheme.typography.bodySmall)
                     }
                 }

@@ -340,6 +340,8 @@ class LibraryViewModel : ViewModel() {
     private suspend fun rebuild(rescan: Boolean, prefetch: Boolean = true): Boolean {
         val videos = if (rescan || cachedVideos.isEmpty()) {
             _uiState.update { it.copy(checkingFiles = true) }
+            // Delay scan slightly to let library first frame render for buttery smooth startup like settings
+            if (rescan) kotlinx.coroutines.delay(300)
             val result = kotlinx.coroutines.withContext(Dispatchers.IO) { runCatching { AppContainer.mediaScanner.scan() } }
             _uiState.update { it.copy(checkingFiles = false) }
             if (result.isFailure) {
@@ -348,12 +350,18 @@ class LibraryViewModel : ViewModel() {
             }
             result.getOrThrow().also { cachedVideos = it }
         } else cachedVideos
-        kotlinx.coroutines.withContext(Dispatchers.IO) { AppContainer.renameSuggestions.inspect(videos) }
+        // Inspect renames off main thread with delay for smooth scrolling during startup
+        kotlinx.coroutines.withContext(Dispatchers.IO) { 
+            kotlinx.coroutines.delay(200)
+            AppContainer.renameSuggestions.inspect(videos) 
+        }
         val entries = videos.map { LibraryEntry(it, AppContainer.metadataStore.get(it.id)) }
         _uiState.update { it.copy(entries = entries, scannedOnce = true, fileScanError = null) }
         if (prefetch) viewModelScope.launch(Dispatchers.IO) {
-            if (rescan) delay(900)
-            // Performance: only prefetch visible posters (first 60) to reduce I/O and memory pressure
+            // Increased delay 900->1500 to let library scroll be responsive during startup matching settings smoothness
+            if (rescan) delay(1500)
+            // Only prefetch when idle and not scrolling - critical for buttery smooth library during startup
+            com.opticast.player.data.PlaybackWorkBudget.awaitIdle()
             val visibleEntries = if (entries.size > 60) entries.take(60) else entries
             AppContainer.posterCache.prefetch(visibleEntries)
         }
@@ -915,6 +923,18 @@ fun LibraryScreen(
         ) {
             if (!searching) item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
+            }
+            // Show What's New card when app is fully updated - clearly shows what's new
+            if (!searching) {
+                val context = LocalContext.current
+                val whatsNewVersion = remember { com.opticast.player.data.remote.UpdateChecker.getWhatsNewVersion(context) }
+                if (whatsNewVersion != null) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        WhatsNewCard(version = whatsNewVersion, onDismiss = {
+                            com.opticast.player.data.remote.UpdateChecker.dismissWhatsNew(context)
+                        })
+                    }
+                }
             }
             if (searching) item(key = "focused-search-controls", span = { GridItemSpan(maxLineSpan) }) {
                 Column(Modifier.fillMaxWidth().padding(horizontal = DiscoveryGutterDp.dp)) {
@@ -1755,6 +1775,28 @@ private fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
     }
 }
 }
+}
+
+@Composable
+private fun WhatsNewCard(version: String, onDismiss: () -> Unit) {
+    val changelog = when {
+        version.contains("2.6.64") -> "• Library scrolling now buttery smooth like settings & episodes — fixed choppiness during startup\n• Grid change fixed — compact/medium/comfortable now works\n• Balanced for low-RAM 32-bit 3GB — fast like previous builds before GitHub\n• Background auto check for updates on startup enabled\n• In-app download & install without leaving app\n• Clearly shows what's new instead of GitHub link\n• Signed release 56M with mpv"
+        version.contains("2.6.63") -> "• Library scrolling responsiveness improved during startup\n• Grid change fixed\n• Optimized release build\n• In-app download without leaving\n• Clear what's new card"
+        version.contains("2.6.62") -> "• Fixed library scrolling choppiness\n• Settings fast but library choppy — fixed\n• Memory cache balanced for low-RAM 32-bit"
+        version.contains("2.6.61") -> "• Background auto check for updates on app startup allowed\n• Auto update dialog shows when new version available\n• Changed wording official signed full mpv → signed release"
+        version.contains("2.6.60") -> "• Signed release 56M with mpv — plays all videos\n• Background auto check for updates\n• Fixed YAML workflow"
+        else -> "• Performance improvements and bug fixes\n• Library now buttery smooth\n• Signed release with mpv"
+    }
+    Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.primaryContainer) {
+        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("🎉 What's New in $version", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, "Dismiss", tint = MaterialTheme.colorScheme.onPrimaryContainer) }
+            }
+            Text(changelog, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+            Text("This card shows when app is fully updated — clearly shows what's new!", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f))
+        }
+    }
 }
 
 @Composable

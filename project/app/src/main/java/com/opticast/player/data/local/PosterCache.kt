@@ -87,7 +87,9 @@ class PosterCache(context: Context) {
 
     suspend fun prefetch(entries: List<LibraryEntry>) {
         if (entries.isEmpty()) return
+        // Only prefetch when idle and not scrolling - critical for library scrolling responsiveness matching settings during startup
         com.opticast.player.data.PlaybackWorkBudget.awaitIdle()
+        kotlinx.coroutines.delay(500) // Small delay to let scroll settle for buttery smooth
         if (!AppContainer.isOnline()) return
 
         val targets = mutableListOf<Pair<String, String>>()

@@ -39,11 +39,17 @@ class LibraryRepositoryImpl(
     
     override suspend fun refresh() = withContext(Dispatchers.IO) {
         try {
-            val scanned = mediaScanner.scan()
+            val videos = mediaScanner.scan()
+            val entries = videos.map { video ->
+                com.opticast.player.data.model.LibraryEntry(
+                    video = video,
+                    metadata = metadataStore.get(video.id)
+                )
+            }
             // Update cache
-            entriesCache = scanned
-            entriesById = scanned.associateBy { it.video.id }
-            _entries.value = scanned
+            entriesCache = entries
+            entriesById = entries.associateBy { it.video.id }
+            _entries.value = entries
         } catch (e: Exception) {
             // Offline: keep cached data, don't show empty
             // Log error but don't crash

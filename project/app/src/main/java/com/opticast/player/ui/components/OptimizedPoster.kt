@@ -76,12 +76,14 @@ fun PosterPlaceholder(
     modifier: Modifier = Modifier,
     cornerRadius: Int = 12
 ) {
-    val shimmerBrush = remember {
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+    val surface = MaterialTheme.colorScheme.surface
+    val shimmerBrush = remember(surfaceVariant, surface) {
         Brush.linearGradient(
             colors = listOf(
-                MaterialTheme.colorScheme.surfaceVariant,
-                MaterialTheme.colorScheme.surface,
-                MaterialTheme.colorScheme.surfaceVariant
+                surfaceVariant,
+                surface,
+                surfaceVariant
             )
         )
     }

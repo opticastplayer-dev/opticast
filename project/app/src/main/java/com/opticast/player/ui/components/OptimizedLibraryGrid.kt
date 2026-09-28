@@ -94,10 +94,12 @@ private fun OptimizedPosterCard(
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
-    // This will use your existing poster card logic but with optimized poster
-    // Placeholder implementation - will be replaced with your actual card
+    // Use actual poster URL from cache
+    val posterUrl = remember(entry.video.id, entry.metadata?.posterPath) {
+        com.opticast.player.ui.components.posterUrlFor(entry)
+    }
     OptimizedPoster(
-        posterUrl = entry.metadata?.posterUrl,
+        posterUrl = posterUrl,
         contentDescription = entry.video.name
     )
 }

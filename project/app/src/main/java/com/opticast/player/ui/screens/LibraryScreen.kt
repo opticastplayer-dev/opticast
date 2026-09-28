@@ -928,6 +928,17 @@ fun LibraryScreen(
                     }
                 }
             }
+            // Always show Up To Date notification when installed version matches what's on GitHub
+            if (!searching) {
+                item(span = { GridItemSpan(maxLineSpan) }, contentType = "up-to-date") {
+                    val context = LocalContext.current
+                    val isUpToDate = remember { com.opticast.player.data.remote.UpdateChecker.isUpToDate(context) }
+                    val upToDateVersion = remember { com.opticast.player.data.remote.UpdateChecker.getUpToDateVersion(context) }
+                    if (isUpToDate && upToDateVersion != null) {
+                        UpToDateCard(version = upToDateVersion)
+                    }
+                }
+            }
             if (searching) item(key = "focused-search-controls", span = { GridItemSpan(maxLineSpan) }) {
                 Column(Modifier.fillMaxWidth().padding(horizontal = DiscoveryGutterDp.dp)) {
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1763,6 +1774,39 @@ private fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
     }
 }
 }
+}
+
+@Composable
+private fun UpToDateCard(version: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text("✅", style = MaterialTheme.typography.headlineSmall)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    "Up To Date — v$version",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    "You have the latest version from GitHub! 🎉 Your app is fully updated and ready.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+        }
+    }
 }
 
 @Composable

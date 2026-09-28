@@ -26,10 +26,41 @@ internal fun UpdateCheckOption(version: String) {
 
     var autoCheckEnabled by remember { mutableStateOf(UpdateChecker.isAutoCheckEnabled(context)) }
 
+    val upToDateVersion = remember { UpdateChecker.getUpToDateVersion(context) }
+    val isUpToDate = remember { UpdateChecker.isUpToDate(context) }
+    var lastCheck by remember { mutableStateOf(UpdateChecker.getLastUpToDateCheck(context)) }
+
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("App updates", style = MaterialTheme.typography.titleMedium)
+        // Always show Up To Date notification when installed matches GitHub
+        if (isUpToDate && upToDateVersion != null) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("✅", style = MaterialTheme.typography.titleMedium)
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Up To Date — ${upToDateVersion}",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            "You have the latest version from GitHub! 🎉",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+            }
+        }
         Text(
-            "Checks GitHub releases. Downloads and installs within the app when possible. Background auto check for updates on app startup is now allowed and enabled by default (checks every 6h in background).",
+            "Checks GitHub releases. Downloads and installs within the app when possible. Background auto check for updates on app startup is now allowed and enabled by default (checks every 6h in background). Always shows Up To Date notification when installed version matches GitHub latest.",
             style = MaterialTheme.typography.bodySmall
         )
         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -67,6 +98,11 @@ internal fun UpdateCheckOption(version: String) {
                             } else {
                                 updateInfo = info
                                 show = true
+                                // Update up-to-date status
+                                lastCheck = System.currentTimeMillis()
+                                if (!info.isNewer) {
+                                    // Up to date!
+                                }
                             }
                         } catch (e: Exception) {
                             error = "Failed to check: ${e.message}"

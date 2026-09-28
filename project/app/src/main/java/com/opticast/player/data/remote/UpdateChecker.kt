@@ -47,6 +47,8 @@ object UpdateChecker {
     private const val KEY_AUTO_CHECK_ENABLED = "auto_check_enabled"
     private const val KEY_AVAILABLE_UPDATE_JSON = "available_update_json"
     private const val KEY_BACKGROUND_CHECK = "background_check"
+    private const val KEY_UP_TO_DATE_VERSION = "up_to_date_version"
+    private const val KEY_UP_TO_DATE_TIME = "up_to_date_time"
     private const val CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000L // 6h for background auto check on startup (was 24h) - checks at most every 6h to allow background auto check
 
     private val client = OkHttpClient.Builder()
@@ -203,9 +205,24 @@ object UpdateChecker {
                     .apply()
                 // Store full update info as JSON for auto dialog
                 prefs(context).edit().putString("available_update_info", "${update.version}|${update.downloadUrl}|${update.htmlUrl}|${update.changelog.take(500)}|${update.size}").apply()
+            } else if (update != null && !update.isNewer) {
+                // Up to date - installed matches GitHub latest - store up-to-date status for notification
+                prefs(context).edit()
+                    .putString(KEY_UP_TO_DATE_VERSION, update.version)
+                    .putLong(KEY_UP_TO_DATE_TIME, System.currentTimeMillis())
+                    .remove("available_update")
+                    .remove("available_update_info")
+                    .remove(KEY_AVAILABLE_UPDATE_JSON)
+                    .apply()
             } else if (update == null || !update.isNewer) {
                 // No newer version - clear available update if same or older
                 // Don't clear if we haven't checked yet
+                // If we have installed version and checked GitHub, and no newer, mark as up-to-date
+                val installed = getInstalledVersion(context)
+                prefs(context).edit()
+                    .putString(KEY_UP_TO_DATE_VERSION, installed.first)
+                    .putLong(KEY_UP_TO_DATE_TIME, System.currentTimeMillis())
+                    .apply()
             }
 
             // Check if this is a new version install - show what's new
@@ -266,6 +283,53 @@ object UpdateChecker {
 
     fun dismissWhatsNew(context: Context) {
         prefs(context).edit().remove("whats_new_version").apply()
+    }
+
+    // Up To Date notification - always show when installed matches GitHub
+    fun getUpToDateVersion(context: Context): String? {
+        return prefs(context).getString(KEY_UP_TO_DATE_VERSION, null)
+    }
+
+    fun isUpToDate(context: Context): Boolean {
+        val upToDateVersion = prefs(context).getString(KEY_UP_TO_DATE_VERSION, null) ?: return false
+        val installed = getInstalledVersion(context).first
+        // Check if up-to-date version matches installed (or is recent within 24h)
+        val lastCheck = prefs(context).getLong(KEY_UP_TO_DATE_TIME, 0L)
+        val isRecent = System.currentTimeMillis() - lastCheck < 24 * 60 * 60 * 1000L
+        return upToDateVersion == installed || (isRecent && upToDateVersion.isNotBlank())
+    }
+
+    fun getLastUpToDateCheck(context: Context): Long {
+        return prefs(context).getLong(KEY_UP_TO_DATE_TIME, 0L)
+    }
+
+    fun clearUpToDate(context: Context) {
+        prefs(context).edit().remove(KEY_UP_TO_DATE_VERSION).remove(KEY_UP_TO_DATE_TIME).apply()
+    }
+
+    suspend fun checkIfUpToDate(context: Context, force: Boolean = false): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val update = checkForUpdate(context, force = force)
+            if (update != null) {
+                if (!update.isNewer) {
+                    // Up to date!
+                    prefs(context).edit()
+                        .putString(KEY_UP_TO_DATE_VERSION, update.version)
+                        .putLong(KEY_UP_TO_DATE_TIME, System.currentTimeMillis())
+                        .apply()
+                    return@withContext true
+                } else {
+                    // Newer available, not up to date
+                    prefs(context).edit().remove(KEY_UP_TO_DATE_VERSION).remove(KEY_UP_TO_DATE_TIME).apply()
+                    return@withContext false
+                }
+            }
+            // If no update info, assume up to date if we recently checked
+            val lastUpToDate = prefs(context).getLong(KEY_UP_TO_DATE_TIME, 0L)
+            return@withContext System.currentTimeMillis() - lastUpToDate < 24 * 60 * 60 * 1000L
+        } catch (_: Exception) {
+            false
+        }
     }
 
     fun skipVersion(context: Context, version: String) {

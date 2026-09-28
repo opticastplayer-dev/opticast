@@ -92,8 +92,12 @@ class PosterCache(context: Context) {
         kotlinx.coroutines.delay(500) // Small delay to let scroll settle for buttery smooth
         if (!AppContainer.isOnline()) return
 
+        // Prefetch only visible + 1 screen ahead (not 60) for low-RAM 32-bit smooth scrolling - previous fast builds did this
+        // Visible is first screen, +10 more for next screen, not 60 which caused I/O during scroll
+        val prefetchCount = if (AppContainer.lowRamMode) 20 else 30 // 20 for low-RAM 32-bit, 30 for normal - was 60 causing choppiness
+        val limitedEntries = if (entries.size > prefetchCount) entries.take(prefetchCount) else entries
         val targets = mutableListOf<Pair<String, String>>()
-        for (entry in entries) {
+        for (entry in limitedEntries) {
             val metadata = entry.metadata ?: continue
             val key = keyFor(entry.video.id, metadata) ?: continue
             val url = tmdbImageUrl(metadata.posterPath, posterSize()) ?: continue

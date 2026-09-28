@@ -247,7 +247,13 @@ fun rememberFrameArtwork(videoId: Long?): File? {
     }
     LaunchedEffect(videoId) {
         if (videoId == null || videoId <= 0L || artwork != null) return@LaunchedEffect
-        artwork = AppContainer.frameArtwork.generate(videoId)
+        // On-demand only - delay 1s and only when idle, not during fast scroll - critical for low-RAM 32-bit smooth scrolling
+        // Previous fast builds had this on-demand and were smooth
+        kotlinx.coroutines.delay(1000)
+        com.opticast.player.data.PlaybackWorkBudget.awaitIdle()
+        if (artwork == null) {
+            artwork = AppContainer.frameArtwork.generate(videoId)
+        }
     }
     return artwork
 }
@@ -413,14 +419,17 @@ fun rememberShowFrameArtwork(episodes: List<LibraryEntry>): File? {
     }
     LaunchedEffect(ids) {
         if (file != null) return@LaunchedEffect
+        // On-demand only for shows too - delay and idle for smooth scrolling
+        kotlinx.coroutines.delay(1000)
+        com.opticast.player.data.PlaybackWorkBudget.awaitIdle()
         for (id in ids) {
+            if (file != null) break
             val generated = AppContainer.frameArtwork.generate(id)
             if (generated != null) {
                 file = generated
                 break
             }
         }
-        // If none generated (all failed), still try first id for placeholder parity.
         if (file == null && ids.isNotEmpty()) {
             file = AppContainer.frameArtwork.cached(ids.first())
         }

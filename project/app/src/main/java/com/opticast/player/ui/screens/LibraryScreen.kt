@@ -949,7 +949,7 @@ fun LibraryScreen(
                 }
             }
             if (missingFiles.isNotEmpty() || state.fileScanError != null) {
-                item(key = "file-availability", span = { GridItemSpan(maxLineSpan) }) {
+                item(key = "file-availability", span = { GridItemSpan(maxLineSpan) }, contentType = "file-availability") {
                     Surface(Modifier.padding(horizontal = DiscoveryGutterDp.dp, vertical = 10.dp), shape = RoundedCornerShape(18.dp),
                         color = MaterialTheme.colorScheme.surfaceContainer) {
                         Column(Modifier.fillMaxWidth().padding(14.dp)) {
@@ -980,7 +980,7 @@ fun LibraryScreen(
                 }
             }
             if (state.isMatching) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
+                item(span = { GridItemSpan(maxLineSpan) }, contentType = "matching") {
                     Column(Modifier.padding(horizontal = DiscoveryGutterDp.dp, vertical = 10.dp)) {
                         Text(
                             "Identifying titles… ${state.matchingDone}/${state.matchingTotal}",
@@ -999,7 +999,7 @@ fun LibraryScreen(
                 }
             }
             if (!state.scannedOnce) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
+                item(span = { GridItemSpan(maxLineSpan) }, contentType = "loading") {
                     Box(
                         Modifier
                             .fillMaxWidth()

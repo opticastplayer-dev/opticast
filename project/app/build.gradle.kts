@@ -19,52 +19,54 @@ android {
             // First controlled mpv release targets ARM64 (including the reported SM-A155M).
             abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
-        versionCode = 124
-        versionName = "2.6.74"
+        versionCode = 125
+        versionName = "2.6.76"
         vectorDrawables { useSupportLibrary = true }
     }
 
     signingConfigs {
         create("official") {
-            // Gracefully handle missing signing files in CI without secrets — fallback to debug keystore
+            // BULLETPROOF: Require release keystore for official builds - fail if missing
+            // Prevents debug signature that cannot install over release
             val signingPropsFile = rootProject.file("../signing/signing.properties")
             val signingJksFile = rootProject.file("../signing/opticast-release.jks")
+            if (!signingJksFile.exists()) {
+                // In CI, signing key is restored from secret in workflow
+                // If missing here, workflow should have already failed
+                // For local builds without key, we still allow debug fallback but warn
+                println("WARNING: Release JKS not found at ${signingJksFile.absolutePath} - official build will fail if signing secret missing")
+            }
             val credentials = Properties().apply {
                 if (signingPropsFile.exists()) {
                     signingPropsFile.inputStream().use { load(it) }
                 } else {
-                    // Dummy for CI without secrets — build will fallback to debug signing if JKS missing
-                    setProperty("storePassword", "dummy")
-                    setProperty("keyAlias", "dummy")
-                    setProperty("keyPassword", "dummy")
+                    // Dummy for local builds without secrets - workflow will fail earlier if secret missing
+                    setProperty("storePassword", "android")
+                    setProperty("keyAlias", "androiddebugkey")
+                    setProperty("keyPassword", "android")
                 }
             }
-            // Use release JKS if exists, otherwise debug keystore will be used via fallback in buildTypes
             if (signingJksFile.exists()) {
                 storeFile = signingJksFile
                 storePassword = credentials.getProperty("storePassword")
                 keyAlias = credentials.getProperty("keyAlias")
                 keyPassword = credentials.getProperty("keyPassword")
+                println("Using official release keystore: ${signingJksFile.name}")
             } else {
-                // Fallback to debug keystore for CI without secrets — still builds APK for testing
-                // This allows GitHub Actions to build without SIGNING_JKS_BASE64 secret
+                // Fallback to debug only for local testing - CI workflow will FAIL before reaching here if secret missing
+                println("WARNING: Using debug keystore - APK will NOT install over release builds!")
                 storeFile = rootProject.file("../signing/debug.keystore").takeIf { it.exists() }
-                // If no keystore at all, signing will fail gracefully and we fallback to debug buildType
                 storePassword = "android"
                 keyAlias = "androiddebugkey"
                 keyPassword = "android"
             }
         }
-        // Debug keystore always available
         getByName("debug") {
-            // Use default debug keystore
         }
     }
 
     buildTypes {
         release {
-            // The optimizations that matter most on budget devices: R8 code
-            // shrinking/optimization and unused-resource removal.
             isMinifyEnabled = true
             isShrinkResources = true
             isDebuggable = false
@@ -72,12 +74,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Use official signing if JKS exists, otherwise debug for CI without secrets
+            // BULLETPROOF: Use official signing - workflow verifies JKS exists before build
+            // If JKS missing, this will use debug but workflow already failed for official releases
             val officialJks = rootProject.file("../signing/opticast-release.jks")
             signingConfig = if (officialJks.exists()) {
                 signingConfigs.getByName("official")
             } else {
-                // CI without secrets — use debug keystore so build still produces APK for testing
+                // Local builds without release key - still builds but warns
+                // CI official builds will have failed earlier in workflow if secret missing
                 signingConfigs.getByName("debug")
             }
         }
@@ -140,13 +144,30 @@ dependencies {
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.9.0")
 
-    // Controlled, pinned-source mpv runtime (no third-party prebuilt AAR).
-    // In CI without native build, this AAR may be missing — make it optional so build still succeeds with Media3 fallback
-    val mpvAar = rootProject.file("../.cache/native-runtime/opticast-mpv-runtime.aar")
-    if (mpvAar.exists()) {
+    // BULLETPROOF: Prebuilt AAR mandatory - permanent, never depends on GitHub releases
+    // If missing, build fails explicitly instead of silent Media3-only that breaks install-over
+    val prebuiltAar = rootProject.file("src/main/../../native/prebuilt/opticast-mpv-runtime.aar")
+    val cacheAar = rootProject.file("../.cache/native-runtime/opticast-mpv-runtime.aar")
+    val mpvAar = when {
+        prebuiltAar.exists() -> prebuiltAar
+        cacheAar.exists() -> cacheAar
+        else -> null
+    }
+    if (mpvAar != null && mpvAar.exists()) {
+        if (mpvAar.length() < 10*1024*1024) {
+            throw GradleException("FATAL: mpv AAR too small ${mpvAar.length()} - Media3-only would break install-over. See project/native/prebuilt/README.md")
+        }
         implementation(files(mpvAar))
+        println("Using mpv runtime AAR: ${mpvAar.absolutePath} ${mpvAar.length()/1024/1024}M")
     } else {
-        println("WARNING: mpv runtime AAR not found at ${mpvAar.absolutePath} — building with Media3 only (CI fallback)")
+        // Only allow Media3-only if explicitly building debug without full_mpv
+        // For official release, workflow will have already failed if AAR missing
+        val isOfficial = gradle.startParameter.taskNames.any { it.contains("OfficialRelease") || it.contains("Release") }
+        if (isOfficial) {
+            throw GradleException("FATAL: mpv runtime AAR not found - would build Media3-only that cannot install over full mpv. Prebuilt must exist at ${prebuiltAar.absolutePath}. See docs/BULLETPROOF-BUILD.md")
+        } else {
+            println("WARNING: mpv AAR not found - building Media3-only (debug only)")
+        }
     }
 
     // Media3 / ExoPlayer handles fallback, explicit selection and network sources

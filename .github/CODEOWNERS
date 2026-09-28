@@ -1,0 +1,18 @@
+# Protect critical files that break install-over if deleted
+# These files must never be deleted without review
+
+# Prebuilt AAR - permanent full mpv runtime, never depends on GitHub releases
+# If deleted, builds become Media3-only and cannot install over full mpv
+/project/native/prebuilt/ @opticastplayer-dev/opticast
+
+# Release workflow - handles version naming, verification, signing
+/.github/workflows/release.yml @opticastplayer-dev/opticast
+
+# Signing config - package name, versionCode, applicationId
+/project/app/build.gradle.kts @opticastplayer-dev/opticast
+
+# Restore script - bulletproof logic for full mpv
+/project/native/restore-from-apk.py @opticastplayer-dev/opticast
+
+# Native runtime manifest
+/project/native/runtime-manifest.json @opticastplayer-dev/opticast

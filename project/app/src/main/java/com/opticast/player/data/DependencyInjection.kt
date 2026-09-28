@@ -64,7 +64,7 @@ object ServiceLocator {
     }
     
     // Repository - single source of truth
-    val libraryRepository: LibraryRepository by lazy {
+    private val _libraryRepository: LibraryRepository by lazy {
         LibraryRepositoryImpl(
             mediaScanner = mediaScanner,
             metadataStore = metadataStore,
@@ -72,15 +72,14 @@ object ServiceLocator {
         )
     }
     
+    val libraryRepository: LibraryRepository
+        get() = testRepository ?: _libraryRepository
+    
     // For tests - allow replacing with fake
     private var testRepository: LibraryRepository? = null
     
     fun setTestRepository(repository: LibraryRepository) {
         testRepository = repository
-    }
-    
-    fun getLibraryRepository(): LibraryRepository {
-        return testRepository ?: libraryRepository
     }
     
     fun clear() {

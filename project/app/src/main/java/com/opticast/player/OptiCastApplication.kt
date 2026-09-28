@@ -80,24 +80,19 @@ class OptiCastApplication : Application() {
             } catch (_: Exception) { }
         }
 
-        // Background auto check for updates on app startup - delayed more to not affect library scrolling during startup
-        // Runs in background IO thread, non-blocking, low priority for buttery smooth library
+        // OFFLINE-FIRST: Check for updates once when internet detected, not every 6 hours, minimal data usage
+        // User priority: offline use, little data, check once when internet detected
+        // Only one check at startup, delayed to not affect library scrolling, checks only if online
+        // No second check at 12s - saves data, respects offline rule
         startupScope.launch {
             try {
-                // Increased delay 2s->4s to let library scroll be responsive during startup like settings
-                kotlinx.coroutines.delay(4000)
-                com.opticast.player.data.remote.UpdateChecker.checkAtStartup(this@OptiCastApplication)
-            } catch (_: Exception) { }
-        }
-
-        startupScope.launch {
-            try {
-                kotlinx.coroutines.delay(12000) // 10s->12s for even less startup jank
-                if (com.opticast.player.data.remote.UpdateChecker.getAvailableUpdate(this@OptiCastApplication) == null) {
-                    if (com.opticast.player.data.AppContainer.isOnline()) {
-                        com.opticast.player.data.remote.UpdateChecker.checkAtStartup(this@OptiCastApplication)
-                    }
+                // Delay 6s to let library be buttery smooth first, then check once if online
+                kotlinx.coroutines.delay(6000)
+                if (AppContainer.isOnline()) {
+                    com.opticast.player.data.remote.UpdateChecker.checkWhenInternetDetected(this@OptiCastApplication)
                 }
+                // Also run regular startup check which will handle what's new and version tracking
+                com.opticast.player.data.remote.UpdateChecker.checkAtStartup(this@OptiCastApplication)
             } catch (_: Exception) { }
         }
     }

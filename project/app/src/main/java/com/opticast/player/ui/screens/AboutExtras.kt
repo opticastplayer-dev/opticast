@@ -60,11 +60,11 @@ internal fun UpdateCheckOption(version: String) {
             }
         }
         Text(
-            "Checks GitHub releases. Downloads and installs within the app when possible. Background auto check for updates on app startup is now allowed and enabled by default (checks every 6h in background). Always shows Up To Date notification when installed version matches GitHub latest.",
+            "OFFLINE-FIRST: Checks GitHub only once when internet detected (not every 6h), minimal data usage. Downloads and installs within app. Up To Date card only in Settings, not library — respects offline use.",
             style = MaterialTheme.typography.bodySmall
         )
         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Background auto check on startup", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            Text("Check when internet detected", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
             Switch(
                 checked = autoCheckEnabled,
                 onCheckedChange = { enabled ->
@@ -73,7 +73,7 @@ internal fun UpdateCheckOption(version: String) {
                     if (enabled) {
                         scope.launch {
                             try {
-                                UpdateChecker.checkAtStartup(context)
+                                UpdateChecker.checkWhenInternetDetected(context)
                             } catch (_: Exception) { }
                         }
                     }
@@ -81,7 +81,7 @@ internal fun UpdateCheckOption(version: String) {
             )
         }
         Text(
-            if (autoCheckEnabled) "✅ Auto check enabled — will check in background on every app startup (every 6h)" else "❌ Auto check disabled — only manual checks",
+            if (autoCheckEnabled) "✅ Enabled — checks once when internet detected (24h min, 7 days max) — data sipping, offline-first" else "❌ Disabled — only manual checks",
             style = MaterialTheme.typography.bodySmall,
             color = if (autoCheckEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
         )

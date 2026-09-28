@@ -1,0 +1,6 @@
+• 🔋 OFFLINE-FIRST: Check for updates only once when internet detected, not every 6h — minimal data usage
+• 📵 Removed Up To Date card from library on every startup — only show real update available for download
+• 🌐 Check once when internet connection detected (24h min, 7 days max) — saves data, offline use priority #1
+• 📝 Always download subtitles during scan and cache them for offline playback
+• ✅ Baseline locked v2.6.78 with 54 entries, buttery smooth library
+• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 127, installs over existing

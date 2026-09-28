@@ -49,7 +49,10 @@ object UpdateChecker {
     private const val KEY_BACKGROUND_CHECK = "background_check"
     private const val KEY_UP_TO_DATE_VERSION = "up_to_date_version"
     private const val KEY_UP_TO_DATE_TIME = "up_to_date_time"
-    private const val CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000L // 6h for background auto check on startup (was 24h) - checks at most every 6h to allow background auto check
+    private const val KEY_LAST_CONNECTIVITY_CHECK = "last_connectivity_check"
+    private const val KEY_LAST_ONLINE_STATE = "last_online_state"
+    private const val CHECK_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000L // 7 days - OFFLINE-FIRST: check only once when internet detected, not every 6h, minimal data usage
+    private const val MIN_CONNECTIVITY_CHECK_INTERVAL = 24 * 60 * 60 * 1000L // 24h min between connectivity-triggered checks - data sipping for offline use
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
@@ -101,6 +104,48 @@ object UpdateChecker {
             versionName to versionCode
         } catch (_: Exception) {
             "unknown" to 0L
+        }
+    }
+
+    // OFFLINE-FIRST: Check only when internet detected, minimal data usage
+    suspend fun checkWhenInternetDetected(context: Context): UpdateInfo? = withContext(Dispatchers.IO) {
+        try {
+            if (!AppContainer.isOnline()) {
+                // Store offline state
+                prefs(context).edit().putBoolean(KEY_LAST_ONLINE_STATE, false).apply()
+                return@withContext null
+            }
+            val wasOffline = !prefs(context).getBoolean(KEY_LAST_ONLINE_STATE, false)
+            val lastConnectivityCheck = prefs(context).getLong(KEY_LAST_CONNECTIVITY_CHECK, 0L)
+            val now = System.currentTimeMillis()
+            
+            // Only check if:
+            // 1. We were offline and now online (connectivity change), OR
+            // 2. It's been more than 24h since last connectivity check AND we are online
+            // This ensures we check once when internet detected, not every 6h, data sipping
+            if (!wasOffline) {
+                // Already online before, check if enough time passed (24h min)
+                if (now - lastConnectivityCheck < MIN_CONNECTIVITY_CHECK_INTERVAL) {
+                    return@withContext null
+                }
+            }
+            
+            // Check if regular interval (7 days) passed for forced checks
+            val lastCheck = prefs(context).getLong(KEY_LAST_CHECK, 0L)
+            if (!wasOffline && now - lastCheck < CHECK_INTERVAL_MS) {
+                // Not enough time, but we were already online, so skip to save data
+                return@withContext null
+            }
+            
+            // We are online and either was offline or enough time passed - do check
+            prefs(context).edit()
+                .putBoolean(KEY_LAST_ONLINE_STATE, true)
+                .putLong(KEY_LAST_CONNECTIVITY_CHECK, now)
+                .apply()
+                
+            return@withContext checkForUpdate(context, force = false)
+        } catch (_: Exception) {
+            null
         }
     }
 
@@ -184,13 +229,18 @@ object UpdateChecker {
 
     suspend fun checkAtStartup(context: Context) = withContext(Dispatchers.IO) {
         try {
-            // Allow background auto check for updates on app startup - enabled by default
+            // OFFLINE-FIRST: Only check when internet detected, not every startup, minimal data usage
             if (!isAutoCheckEnabled(context)) return@withContext
+            if (!AppContainer.isOnline()) {
+                prefs(context).edit().putBoolean(KEY_LAST_ONLINE_STATE, false).apply()
+                return@withContext
+            }
 
-            // Check if we should skip due to interval, but allow background check
-            val update = checkForUpdate(context, force = false)
+            // Use connectivity-aware check - only checks once when internet detected, not every 6h
+            val update = checkWhenInternetDetected(context)
             if (update != null && update.isNewer && !isSkipped(context, update.version)) {
-                // Store that an update is available - UI can show badge/dialog on startup
+                // Real update available - store that an update is available for download
+                // OFFLINE-FIRST: Only show update when real update available, not Up To Date card
                 prefs(context).edit()
                     .putString("available_update", update.version)
                     .putString(KEY_AVAILABLE_UPDATE_JSON, json.encodeToString(GitHubRelease.serializer(), GitHubRelease(
@@ -203,8 +253,11 @@ object UpdateChecker {
                     .apply()
                 // Store full update info as JSON for auto dialog
                 prefs(context).edit().putString("available_update_info", "${update.version}|${update.downloadUrl}|${update.htmlUrl}|${update.changelog.take(500)}|${update.size}").apply()
+                // Clear up-to-date since newer available
+                prefs(context).edit().remove(KEY_UP_TO_DATE_VERSION).remove(KEY_UP_TO_DATE_TIME).apply()
             } else if (update != null && !update.isNewer) {
-                // Up to date - installed matches GitHub latest - store up-to-date status for notification
+                // Up to date - but DON'T show card in library on every startup (user request)
+                // Only store for Settings screen, not library - offline-first, no card spam
                 prefs(context).edit()
                     .putString(KEY_UP_TO_DATE_VERSION, update.version)
                     .putLong(KEY_UP_TO_DATE_TIME, System.currentTimeMillis())
@@ -212,22 +265,14 @@ object UpdateChecker {
                     .remove("available_update_info")
                     .remove(KEY_AVAILABLE_UPDATE_JSON)
                     .apply()
-            } else if (update == null || !update.isNewer) {
-                // No newer version - clear available update if same or older
-                // Don't clear if we haven't checked yet
-                // If we have installed version and checked GitHub, and no newer, mark as up-to-date
-                val installed = getInstalledVersion(context)
-                prefs(context).edit()
-                    .putString(KEY_UP_TO_DATE_VERSION, installed.first)
-                    .putLong(KEY_UP_TO_DATE_TIME, System.currentTimeMillis())
-                    .apply()
             }
+            // Don't mark as up-to-date when update == null (offline or interval) - save data, don't spam
 
-            // Check if this is a new version install - show what's new
+            // Check if this is a new version install - show what's new (only once after update)
             val installed = getInstalledVersion(context)
             val lastVersion = prefs(context).getString(KEY_LAST_VERSION, null)
             if (lastVersion != null && lastVersion != installed.first) {
-                // Version changed - mark to show what's new
+                // Version changed - mark to show what's new (once)
                 prefs(context).edit().putString("whats_new_version", installed.first).apply()
             }
             prefs(context).edit().putString(KEY_LAST_VERSION, installed.first).apply()

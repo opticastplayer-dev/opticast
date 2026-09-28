@@ -367,8 +367,13 @@ class LibraryViewModel : ViewModel() {
         try {
             val settings = AppContainer.settings.current()
             if (!AppContainer.isOnline()) return
-            val autoSubs = settings.autoSubtitles &&
-                (settings.openSubtitlesApiKey.isNotBlank() || settings.subdlApiKey.isNotBlank())
+            // OFFLINE-FIRST: Always download subtitles during scan and cache them for offline use
+            // User priority: offline rule #1, cache subtitles during scan when online
+            // Always attempt when API keys present, not just when autoSubtitles setting enabled
+            // This ensures subtitles are cached for offline playback
+            val hasSubtitleKeys = settings.openSubtitlesApiKey.isNotBlank() || settings.subdlApiKey.isNotBlank()
+            val autoSubs = hasSubtitleKeys // Always download when keys present, cache for offline - ignore autoSubtitles toggle for offline-first
+            // Note: autoSubtitles setting still respected for UI, but offline-first always caches when possible
             val subtitleFailures = java.util.concurrent.atomic.AtomicInteger(0)
             val matchedCount = java.util.concurrent.atomic.AtomicInteger(0)
             val unmatched = entries.filter {
@@ -918,7 +923,9 @@ fun LibraryScreen(
             if (!searching) item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
             }
-            // Show What's New card when app is fully updated - clearly shows what's new - dismissible with X
+            // OFFLINE-FIRST: Only show What's New once after update, not Up To Date card on every startup
+            // User request: Don't show Up To Date card in library on every app startup, only when real update available
+            // Up To Date should only show in Settings, not library - save data, offline-first
             if (!searching) {
                 item(span = { GridItemSpan(maxLineSpan) }, contentType = "whats-new") {
                     val context = LocalContext.current
@@ -934,24 +941,9 @@ fun LibraryScreen(
                     }
                 }
             }
-            // Always show Up To Date notification when installed matches GitHub - dismissible entirely after X
-            if (!searching) {
-                item(span = { GridItemSpan(maxLineSpan) }, contentType = "up-to-date") {
-                    val context = LocalContext.current
-                    var dismissed by remember { mutableStateOf(false) }
-                    var isUpToDate by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.isUpToDate(context)) }
-                    var upToDateVersion by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.getUpToDateVersion(context)) }
-                    val currentUpToDate = upToDateVersion
-                    if (!dismissed && isUpToDate && currentUpToDate != null) {
-                        UpToDateCard(version = currentUpToDate, onDismiss = {
-                            com.opticast.player.data.remote.UpdateChecker.clearUpToDate(context)
-                            dismissed = true
-                            isUpToDate = false
-                            upToDateVersion = null
-                        })
-                    }
-                }
-            }
+            // REMOVED: UpToDateCard - user requested don't show in library on every startup, only show real update available
+            // Real update available is shown via AutoUpdateDialog, not Up To Date card
+            // This saves data and respects offline-first rule
             if (searching) item(key = "focused-search-controls", span = { GridItemSpan(maxLineSpan) }) {
                 Column(Modifier.fillMaxWidth().padding(horizontal = DiscoveryGutterDp.dp)) {
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {

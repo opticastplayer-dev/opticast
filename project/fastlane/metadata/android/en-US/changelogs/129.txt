@@ -1,0 +1,7 @@
+• 🚀 Bump to v2.6.80 (129) — latest optimizations
+• 🎬 Blurred poster fallback for detail when no backdrop — fixes black background
+• ✅ Up To Date card shows installed version — matches real app version
+• 🔋 Offline-first: check once when internet detected, minimal data
+• 📝 Always cache subtitles during scan for offline
+• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 129
+• ✅ Baseline locked v2.6.80 with 54 entries, buttery smooth

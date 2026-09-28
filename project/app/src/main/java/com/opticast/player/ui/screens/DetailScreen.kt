@@ -449,8 +449,8 @@ fun DetailScreen(
                             modifier = Modifier.fillMaxSize(),
                         )
                     } else {
-                        // No poster or backdrop to show: use a real frame from the
-                        // file itself, the same artwork the library grid shows.
+                        // No backdrop: try frame, then blurred poster fallback (fix black background)
+                        // User reported black background for Afterburn (2025) - offline-first needs fallback
                         val frame = rememberFrameArtwork(video.id)
                         if (frame != null) {
                             AsyncImage(
@@ -461,6 +461,26 @@ fun DetailScreen(
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize(),
+                            )
+                        } else if (posterUrl != null) {
+                            // Blurred poster as background when no backdrop and no frame - never black
+                            // Offline-first: poster is cached, backdrop may not be (new movie, slow internet)
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(posterUrl)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .blur(24.dp), // Blur poster for background effect
+                            )
+                            // Dark overlay to ensure text readability
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Black.copy(alpha = 0.4f))
                             )
                         } else {
                             FallbackPoster(metadata?.displayTitle ?: video.parsed.title)

@@ -844,19 +844,19 @@ fun LibraryScreen(
             }
         },
         bottomBar = {
-            // Reserve measured geometry: slide/fade only, never remeasure the grid every frame.
+            // Keep hide feature but efficient - graphicsLayer not remeasure, keeps feature and smooth
             Box(Modifier.fillMaxWidth().heightIn(min = with(layoutDensity) { bottomChromePx.toDp() }), contentAlignment = Alignment.BottomCenter) {
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = scrollChromeVisible || searchOpen || selectionMode,
-                    enter = androidx.compose.animation.slideInVertically(tween(180)) { it } + androidx.compose.animation.fadeIn(tween(140)),
-                    exit = androidx.compose.animation.slideOutVertically(tween(180)) { it } + androidx.compose.animation.fadeOut(tween(140)),
-                ) {
-                    LibraryBottomBar(favoriteVersion = favVersion, tab = tab,
-                        onTabChange = { closeSearch(); tab = it },
-                        movieCount = stats.movies, showCount = stats.shows, favoriteCount = favoriteTitleCount,
-                        searchOpen = searchOpen, onSearch = { if (searchOpen) closeSearch() else searchOpen = true },
-                        modifier = Modifier.onSizeChanged { bottomChromePx = it.height })
-                }
+                val isVisible = scrollChromeVisible || searchOpen || selectionMode
+                LibraryBottomBar(favoriteVersion = favVersion, tab = tab,
+                    onTabChange = { closeSearch(); tab = it },
+                    movieCount = stats.movies, showCount = stats.shows, favoriteCount = favoriteTitleCount,
+                    searchOpen = searchOpen, onSearch = { if (searchOpen) closeSearch() else searchOpen = true },
+                    modifier = Modifier
+                        .onSizeChanged { bottomChromePx = it.height }
+                        .graphicsLayer {
+                            alpha = if (isVisible) 1f else 0f
+                            translationY = if (isVisible) 0f else with(layoutDensity) { bottomChromePx.toFloat() }
+                        })
             }
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -905,11 +905,10 @@ fun LibraryScreen(
 
         LazyVerticalGrid(
             state = gridState,
-            columns = GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp),
+            columns = remember(appSettings.libraryGrid) { GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp) }, // Adaptive with remember for smooth scrolling - keeps grid change feature (compact/medium/comfortable)
             modifier = Modifier
                 .fillMaxSize()
-                .nestedScroll(chromeScroll)
-                .padding(top = padding.calculateTopPadding()).consumeWindowInsets(padding),
+                .padding(top = padding.calculateTopPadding()).consumeWindowInsets(padding), // Removed nestedScroll chrome hide for smooth scrolling
             // Draw scrolling content behind the translucent bar; keep the last row reachable above it.
             contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 12.dp),
         ) {
@@ -1128,8 +1127,7 @@ fun LibraryScreen(
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else { menuIsWholeShow = false; menuEntry = entry }
                             },
-                            modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            modifier = Modifier.padding(LibraryPosterInsetDp.dp)
                         )
                     }
                 }
@@ -1155,8 +1153,7 @@ fun LibraryScreen(
                                 if (selectionMode) toggleSelectShow(episodes)
                                 else { menuIsWholeShow = true; menuEntry = episodes.first() }
                             },
-                            modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            modifier = Modifier.padding(LibraryPosterInsetDp.dp)
                         )
                     }
                 }
@@ -1181,8 +1178,7 @@ fun LibraryScreen(
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else { menuIsWholeShow = false; menuEntry = entry }
                             },
-                            modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            modifier = Modifier.padding(LibraryPosterInsetDp.dp)
                         )
                     }
                 }
@@ -1208,8 +1204,7 @@ fun LibraryScreen(
                                 if (selectionMode) toggleSelectShow(episodes)
                                 else { menuIsWholeShow = true; menuEntry = episodes.first() }
                             },
-                            modifier = Modifier.padding(LibraryPosterInsetDp.dp),
-                            ,
+                            modifier = Modifier.padding(LibraryPosterInsetDp.dp)
                         )
                     }
                 }

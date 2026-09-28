@@ -1,0 +1,4 @@
+• Fixed X button not dismissing What's New and Up To Date cards - now registers input and dismisses entirely
+• Up To Date header now dismissible - closes entirely after X, not always visible in library
+• Fixed loading animation persisting when quickly jumping between videos
+• Optimized official release 31M signed with full mpv

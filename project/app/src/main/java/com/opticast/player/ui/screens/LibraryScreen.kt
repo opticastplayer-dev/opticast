@@ -918,26 +918,35 @@ fun LibraryScreen(
             if (!searching) item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
             }
-            // Show What's New card when app is fully updated - clearly shows what's new (fixed composable context inside item)
+            // Show What's New card when app is fully updated - clearly shows what's new - dismissible with X
             if (!searching) {
                 item(span = { GridItemSpan(maxLineSpan) }, contentType = "whats-new") {
                     val context = LocalContext.current
-                    val whatsNewVersion = remember { com.opticast.player.data.remote.UpdateChecker.getWhatsNewVersion(context) }
-                    if (whatsNewVersion != null) {
+                    var dismissed by remember { mutableStateOf(false) }
+                    var whatsNewVersion by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.getWhatsNewVersion(context)) }
+                    if (!dismissed && whatsNewVersion != null) {
                         WhatsNewCard(version = whatsNewVersion, onDismiss = {
                             com.opticast.player.data.remote.UpdateChecker.dismissWhatsNew(context)
+                            dismissed = true
+                            whatsNewVersion = null
                         })
                     }
                 }
             }
-            // Always show Up To Date notification when installed version matches what's on GitHub
+            // Always show Up To Date notification when installed matches GitHub - dismissible entirely after X
             if (!searching) {
                 item(span = { GridItemSpan(maxLineSpan) }, contentType = "up-to-date") {
                     val context = LocalContext.current
-                    val isUpToDate = remember { com.opticast.player.data.remote.UpdateChecker.isUpToDate(context) }
-                    val upToDateVersion = remember { com.opticast.player.data.remote.UpdateChecker.getUpToDateVersion(context) }
-                    if (isUpToDate && upToDateVersion != null) {
-                        UpToDateCard(version = upToDateVersion)
+                    var dismissed by remember { mutableStateOf(false) }
+                    var isUpToDate by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.isUpToDate(context)) }
+                    var upToDateVersion by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.getUpToDateVersion(context)) }
+                    if (!dismissed && isUpToDate && upToDateVersion != null) {
+                        UpToDateCard(version = upToDateVersion, onDismiss = {
+                            com.opticast.player.data.remote.UpdateChecker.clearUpToDate(context)
+                            dismissed = true
+                            isUpToDate = false
+                            upToDateVersion = null
+                        })
                     }
                 }
             }
@@ -1808,14 +1817,19 @@ private fun UpToDateCard(version: String, onDismiss: (() -> Unit)? = null) {
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
-            IconButton(onClick = {
-                com.opticast.player.data.remote.UpdateChecker.clearUpToDate(context)
-                onDismiss?.invoke()
-            }) {
+            // Fix X button not registering input - ensure clickable with larger touch target and explicit onClick
+            IconButton(
+                onClick = {
+                    com.opticast.player.data.remote.UpdateChecker.clearUpToDate(context)
+                    onDismiss?.invoke()
+                },
+                modifier = Modifier.size(48.dp) // Larger touch target for dismiss
+            ) {
                 Icon(
                     androidx.compose.material.icons.Icons.Filled.Close,
                     contentDescription = "Dismiss",
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
@@ -1835,8 +1849,18 @@ private fun WhatsNewCard(version: String, onDismiss: () -> Unit) {
     Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.primaryContainer) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("🎉 What's New in $version", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, "Dismiss", tint = MaterialTheme.colorScheme.onPrimaryContainer) }
+                Text("🎉 What's New in $version", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.weight(1f))
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.size(48.dp) // Larger touch target - fix X not dismissing
+                ) {
+                    Icon(
+                        Icons.Filled.Close,
+                        "Dismiss",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
             Text(changelog, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
             Text("This card shows when app is fully updated — clearly shows what's new!", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f))

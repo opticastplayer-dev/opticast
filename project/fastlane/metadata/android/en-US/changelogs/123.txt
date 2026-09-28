@@ -1,8 +1,0 @@
-• Made app discoverable on Google Search - SEO keywords, structured data, sitemap, robots, GitHub Pages
-• Automatically deleted older versions from GitHub - only latest v2.6.73 kept
-• Locked new baseline v2.6.73 - updated all necessary files to new version
-• Fixed misleading update: shows Up To Date when already on latest, not Update available
-• Fixed X button not dismissing cards - now dismisses entirely with larger touch target
-• Fixed loading animation persisting when quickly jumping between videos
-• Cleaned unnecessary files, kept only latest optimized version
-• Optimized official release 31M signed with full mpv - complete source with mpv

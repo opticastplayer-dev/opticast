@@ -1,4 +1,0 @@
-• Fixed misleading update: when latest version already installed, now shows Up To Date instead of Update available
-• Fixed version comparison: 2.6.71 and 2.6.71-optimized now correctly detected as same version, not newer
-• Always shows app is already on latest version when installed matches GitHub latest
-• Optimized official release 31M signed with full mpv

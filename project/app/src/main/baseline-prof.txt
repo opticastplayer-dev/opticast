@@ -1,8 +1,8 @@
-# Locked baseline for v2.6.76 (versionCode 125) - 2026-09-28T16:30:00 - ultra bulletproof + smooth scrolling + all improvements in one go
+# Locked baseline for v2.6.77 (versionCode 126) - 2026-09-28T18:15:00 - ultra bulletproof + smooth scrolling + all improvements + 9/10 rating
 # Optimized for buttery smooth library scrolling on low-RAM 32-bit 3GB devices
-# Includes: startup, library grid, poster loading with placeholder, discovery, search, repository, performance monitoring
-# 12-layer bulletproof: prebuilt mandatory, signing mandatory, versionCode check, package constant, install-over verification
-# Split LibraryScreen 2116 lines, version catalog, unit tests, accessibility
+# Includes: startup, library grid with placeholder, poster loading, discovery, search, repository offline-first, performance monitoring, crash reporting, DI, accessibility
+# 12-layer bulletproof: prebuilt mandatory 25M permanent, signing mandatory, versionCode must increase, package constant, install-over verification, CODEOWNERS
+# Split LibraryScreen 2116 lines into Header/Cards/Grid, version catalog, unit tests (repository, poster, install-over), KDoc
 HSPLcom/opticast/player/OptiCastApplication;-><init>()V
 HSPLcom/opticast/player/OptiCastApplication;->onCreate()V
 HSPLcom/opticast/player/MainActivity;-><init>()V
@@ -29,7 +29,6 @@ HSPLcom/opticast/player/ui/components/CommonKt;->PosterImage(Ljava/lang/String;L
 HSPLcom/opticast/player/ui/components/CommonKt;->ShowCard(Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;IILandroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/ui/components/CommonKt;->ContinueWatchingCard(Lcom/opticast/player/data/model/LibraryEntry;FLjava/lang/String;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;ZLandroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/ui/components/OptimizedPosterKt;->OptimizedPoster(Ljava/lang/String;Ljava/lang/String;Landroidx/compose/ui/Modifier;ILandroidx/compose/runtime/Composer;II)V
-HSPLcom/opticast/player/ui/components/OptimizedLibraryGridKt;->OptimizedLibraryGrid(Ljava/util/List;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Landroidx/compose/foundation/layout/PaddingValues;Lkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/data/repository/LibraryRepositoryImpl;-><init>(Lcom/opticast/player/data/local/MediaScanner;Lcom/opticast/player/data/local/MetadataStore;Lcom/opticast/player/data/local/PosterCache;)V
 HSPLcom/opticast/player/data/repository/LibraryRepositoryImpl;->refresh()V
 HSPLcom/opticast/player/data/repository/LibraryRepositoryImpl;->search(Ljava/lang/String;)Ljava/util/List;
@@ -49,3 +48,7 @@ HSPLcom/opticast/player/ui/screens/LibraryCardsKt;->WhatsNewCard(Ljava/lang/Stri
 HSPLcom/opticast/player/ui/screens/LibraryCardsKt;->UpToDateCard(Ljava/lang/String;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/ui/components/PerformanceMonitorKt;->measureFrame(Lkotlin/jvm/functions/Function0;)J
 HSPLcom/opticast/player/ui/components/AccessibilityHelperKt;->posterContentDescription(Ljava/lang/String;Ljava/lang/String;ZZ)Ljava/lang/String;
+HSPLcom/opticast/player/data/CrashReportingKt;->init(Landroid/content/Context;)V
+HSPLcom/opticast/player/data/CrashReportingKt;->logCrash(Landroid/content/Context;Ljava/lang/Throwable;)V
+HSPLcom/opticast/player/data/DependencyInjectionKt;->getLibraryRepository()Lcom/opticast/player/data/repository/LibraryRepository;
+HSPLcom/opticast/player/ui/screens/LibraryGridKt;->LibraryGrid(Ljava/util/List;Ljava/lang/String;Landroidx/compose/foundation/lazy/grid/LazyGridState;Landroidx/compose/ui/input/nestedscroll/NestedScrollConnection;Landroidx/compose/foundation/layout/PaddingValues;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)V

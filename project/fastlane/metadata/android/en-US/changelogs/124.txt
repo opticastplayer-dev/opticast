@@ -1,8 +1,0 @@
-• Fixed cannot install over v2.6.72 - now full mpv 31M with libmpv.so, installs over previous full mpv
-• Fixed restore script: v2.6.59 deleted broke restore, now restores from v2.6.72 full mpv 31M with 24 .so files
-• Fixed GitHub release version naming: was defaulting to 2.6.60 causing misnamed APK
-• Always builds full mpv with libmpv.so 5.9M + libavcodec 12M - plays all videos
-• Fixed misleading update: shows Up To Date when already on latest, not Update available
-• Fixed X button dismiss entirely with 48dp touch target
-• Google discoverable with SEO, sitemap, topics, clean old releases
-• Locked baseline v2.6.74

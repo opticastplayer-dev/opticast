@@ -1,6 +1,0 @@
-• Up To Date notification now dismissible - closes entirely after X, not always visible in library
-• Fixed loading animation persisting when quickly jumping between videos - auto-hides after 5s, resets on video change
-• Always shows Up To Date when installed matches GitHub latest - with dismiss
-• Optimized official release 31M signed with full mpv - complete source with mpv runtime included
-• Version numbers correctly updated
-• Speed optimizations for build process

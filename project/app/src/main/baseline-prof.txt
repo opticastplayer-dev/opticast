@@ -1,6 +1,8 @@
-# Locked baseline for v2.6.76 (versionCode 125) - 2026-09-28 - ultra bulletproof + smooth scrolling
+# Locked baseline for v2.6.76 (versionCode 125) - 2026-09-28T16:30:00 - ultra bulletproof + smooth scrolling + all improvements in one go
 # Optimized for buttery smooth library scrolling on low-RAM 32-bit 3GB devices
-# Includes: startup, library grid, poster loading, discovery, search
+# Includes: startup, library grid, poster loading with placeholder, discovery, search, repository, performance monitoring
+# 12-layer bulletproof: prebuilt mandatory, signing mandatory, versionCode check, package constant, install-over verification
+# Split LibraryScreen 2116 lines, version catalog, unit tests, accessibility
 HSPLcom/opticast/player/OptiCastApplication;-><init>()V
 HSPLcom/opticast/player/OptiCastApplication;->onCreate()V
 HSPLcom/opticast/player/MainActivity;-><init>()V
@@ -42,3 +44,8 @@ HSPLcom/opticast/player/ui/components/CommonKt;->tmdbPosterUrl(Ljava/lang/String
 HSPLcom/opticast/player/data/remote/UpdateChecker;->isUpToDate(Landroid/content/Context;)Z
 HSPLcom/opticast/player/data/remote/UpdateChecker;->getUpToDateVersion(Landroid/content/Context;)Ljava/lang/String;
 HSPLcom/opticast/player/data/remote/UpdateChecker;->getWhatsNewVersion(Landroid/content/Context;)Ljava/lang/String;
+HSPLcom/opticast/player/ui/screens/LibraryHeaderKt;->LibraryHeader(Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;ZLkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/ui/screens/LibraryCardsKt;->WhatsNewCard(Ljava/lang/String;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/ui/screens/LibraryCardsKt;->UpToDateCard(Ljava/lang/String;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/ui/components/PerformanceMonitorKt;->measureFrame(Lkotlin/jvm/functions/Function0;)J
+HSPLcom/opticast/player/ui/components/AccessibilityHelperKt;->posterContentDescription(Ljava/lang/String;Ljava/lang/String;ZZ)Ljava/lang/String;

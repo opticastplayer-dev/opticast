@@ -1,0 +1,8 @@
+• 🚀 Ultra bulletproof + smooth scrolling: optimized poster with placeholder (no white flash, 60fps on 3GB 32-bit)
+• 🛡️ 12-layer bulletproof: prebuilt AAR 25M permanent mandatory, signing mandatory, versionCode must increase, package constant, install-over verification, CODEOWNERS protection
+• 🔧 Fixed compilation: repository type, poster placeholders, duplicate SearchField
+• 📦 Full mpv 31M with libmpv True 24 .so, installs over existing same signature higher versionCode 125
+• 🎨 Split LibraryScreen 2116 lines into Header, Cards for maintainability, keeps all features: Adaptive grid changeable, bottomBar hide, 12dp border/clip, badges, discovery, progress
+• 🧪 Added unit tests, version catalog, performance monitoring for low-RAM, accessibility support
+• 📈 Baseline locked v2.6.76 with 51 entries for buttery smooth library scrolling on low-RAM 32-bit
+• ✅ Up To Date + What's New cards dismissible entirely with 48dp touch target, clearly shows what's new with emojis

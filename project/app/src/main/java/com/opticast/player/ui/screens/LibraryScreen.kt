@@ -215,15 +215,15 @@ import androidx.compose.material.icons.filled.CheckCircle
 
 private data class ContinueItem(
     val entry: LibraryEntry,
-    val playback: PlaybackState,
-)
+    val playback: PlaybackState
+                        )
 
 private data class LibraryStats(
     val movies: Int,
     val shows: Int,
     val watched: Int,
-    val totalHours: Double,
-)
+    val totalHours: Double
+                        )
 
 private fun comparatorFor(sortBy: String): Comparator<LibraryEntry> = when (sortBy) {
     "title" -> compareBy { (it.metadata?.displayTitle ?: it.video.parsed.title).lowercase() }
@@ -240,8 +240,8 @@ class LibraryViewModel : ViewModel() {
         val matchingTotal: Int = 0,
         val scannedOnce: Boolean = false,
         val fileScanError: String? = null,
-        val checkingFiles: Boolean = false,
-    ) {
+        val checkingFiles: Boolean = false
+                        ) {
         val isMatching: Boolean get() = matchingTotal > 0 && matchingDone < matchingTotal
     }
 
@@ -402,8 +402,8 @@ class LibraryViewModel : ViewModel() {
                                                 fallbackQuery = metadata.displayTitle,
                                                 languages = settings.subtitleLanguages,
                                                 season = metadata.seasonNumber,
-                                                episode = metadata.episodeNumber,
-                                            )
+                                                episode = metadata.episodeNumber
+                        )
                                             results.firstOrNull()?.let {
                                                 AppContainer.subtitles.download(it, entry.video.id)
                                             }
@@ -438,7 +438,7 @@ class LibraryViewModel : ViewModel() {
                             fallbackQuery = md.displayTitle,
                             languages = settings.subtitleLanguages,
                             season = md.seasonNumber,
-                            episode = md.episodeNumber,
+                            episode = md.episodeNumber
                         )
                         results.firstOrNull()?.let {
                             AppContainer.subtitles.download(it, entry.video.id)
@@ -461,8 +461,8 @@ fun LibraryScreen(
     onOpenPlayer: (Long) -> Unit,
     onOpenMatch: (Long) -> Unit,
     onOpenShow: (String) -> Unit,
-    onOpenSettings: () -> Unit,
-) {
+    onOpenSettings: () -> Unit
+                        ) {
     val viewModel: LibraryViewModel = viewModel(factory = viewModelFactory { LibraryViewModel() })
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -478,8 +478,8 @@ fun LibraryScreen(
             launchExternal(
                 entry.video,
                 AppContainer.playbackState.state(entry.video.id)?.positionMs ?: 0L,
-                entry.metadata?.displayTitle ?: entry.video.parsed.title.ifBlank { entry.video.name },
-            )
+                entry.metadata?.displayTitle ?: entry.video.parsed.title.ifBlank { entry.video.name }
+                        )
         } else {
             onOpenPlayer(entry.video.id)
         }
@@ -554,16 +554,16 @@ fun LibraryScreen(
         val result = snackbarHostState.showSnackbar(
             message = "${unseen.size} new rename suggestion${if (unseen.size == 1) "" else "s"}",
             actionLabel = "Review", withDismissAction = true,
-            duration = androidx.compose.material3.SnackbarDuration.Short,
-        )
+            duration = androidx.compose.material3.SnackbarDuration.Short
+                        )
         if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) showRenameSuggestions = true
     }
     val inventoryVersion by AppContainer.mediaScanner.inventory.version.collectAsStateWithLifecycle()
     // Inventory reconciliation can hold its monitor while storage is being scanned.
     // Never wait for that monitor on the UI thread.
     val missingFiles by androidx.compose.runtime.produceState<List<com.opticast.player.data.model.LocalVideo>>(
-        initialValue = emptyList(), inventoryVersion, appSettings.excludedFolders,
-    ) {
+        initialValue = emptyList(), inventoryVersion, appSettings.excludedFolders
+                        ) {
         value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { AppContainer.mediaScanner.inventory.missing() }
     }
     var tab by rememberSaveable { mutableStateOf("movies") } // independent tab state
@@ -637,13 +637,13 @@ fun LibraryScreen(
     }
 
     val deleteLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult(),
-    ) { result ->
+        ActivityResultContracts.StartIntentSenderForResult()
+                        ) { result ->
         if (result.resultCode == Activity.RESULT_OK) viewModel.recheckFiles()
     }
     val writePermLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { granted ->
+        ActivityResultContracts.RequestPermission()
+                        ) { granted ->
         if (granted && pendingWriteDelete.isNotEmpty()) {
             pendingWriteDelete.mapNotNull { uriOf(it) }.forEach { uri ->
                 runCatching { context.contentResolver.delete(uri, null, null) }
@@ -688,8 +688,8 @@ fun LibraryScreen(
         } else {
             val granted = ContextCompat.checkSelfPermission(
                 context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            ) == PackageManager.PERMISSION_GRANTED
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ) == PackageManager.PERMISSION_GRANTED
             if (granted) {
                 uris.forEach { uri ->
                     runCatching { context.contentResolver.delete(uri, null, null) }
@@ -849,8 +849,8 @@ fun LibraryScreen(
                 androidx.compose.animation.AnimatedVisibility(
                     visible = scrollChromeVisible || searchOpen || selectionMode,
                     enter = androidx.compose.animation.slideInVertically(tween(180)) { it } + androidx.compose.animation.fadeIn(tween(140)),
-                    exit = androidx.compose.animation.slideOutVertically(tween(180)) { it } + androidx.compose.animation.fadeOut(tween(140)),
-                ) {
+                    exit = androidx.compose.animation.slideOutVertically(tween(180)) { it } + androidx.compose.animation.fadeOut(tween(140))
+                        ) {
                     LibraryBottomBar(favoriteVersion = favVersion, tab = tab,
                         onTabChange = { closeSearch(); tab = it },
                         movieCount = stats.movies, showCount = stats.shows, favoriteCount = favoriteTitleCount,
@@ -861,8 +861,8 @@ fun LibraryScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
         // Edge-to-edge: content scrolls under the status bar.
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-    ) { padding ->
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+                        ) { padding ->
         androidx.compose.runtime.key(tab) {
             val currentTab = tab
             val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
@@ -905,16 +905,28 @@ fun LibraryScreen(
 
         LazyVerticalGrid(
             state = gridState,
-            columns = GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp),
+            columns = remember(appSettings.libraryGrid) { GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp) }, // Adaptive with remember - keeps grid change feature
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(chromeScroll)
                 .padding(top = padding.calculateTopPadding()).consumeWindowInsets(padding),
             // Draw scrolling content behind the translucent bar; keep the last row reachable above it.
-            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 12.dp),
-        ) {
+            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 12.dp)
+                        ) {
             if (!searching) item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
+            }
+            // Show What's New card when app is fully updated - clearly shows what's new (fixed composable context inside item)
+            if (!searching) {
+                item(span = { GridItemSpan(maxLineSpan) }, contentType = "whats-new") {
+                    val context = LocalContext.current
+                    val whatsNewVersion = remember { com.opticast.player.data.remote.UpdateChecker.getWhatsNewVersion(context) }
+                    if (whatsNewVersion != null) {
+                        WhatsNewCard(version = whatsNewVersion, onDismiss = {
+                            com.opticast.player.data.remote.UpdateChecker.dismissWhatsNew(context)
+                        })
+                    }
+                }
             }
             if (searching) item(key = "focused-search-controls", span = { GridItemSpan(maxLineSpan) }) {
                 Column(Modifier.fillMaxWidth().padding(horizontal = DiscoveryGutterDp.dp)) {
@@ -963,8 +975,8 @@ fun LibraryScreen(
                         sortBy = sortBy,
                         onSortChange = { sortBy = it },
                         selectedGenre = selectedGenre,
-                        onGenreClick = { showGenrePicker = true },
-                    )
+                        onGenreClick = { showGenrePicker = true }
+                        )
                 }
             }
             if (state.isMatching) {
@@ -973,7 +985,7 @@ fun LibraryScreen(
                         Text(
                             "Identifying titles… ${state.matchingDone}/${state.matchingTotal}",
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(Modifier.height(8.dp))
                         com.opticast.player.ui.components.FastLoadingBar(
@@ -981,7 +993,7 @@ fun LibraryScreen(
                                 else state.matchingDone.toFloat() / state.matchingTotal,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(50)),
+                                .clip(RoundedCornerShape(50))
                         )
                     }
                 }
@@ -992,8 +1004,8 @@ fun LibraryScreen(
                         Modifier
                             .fillMaxWidth()
                             .padding(60.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
+                        contentAlignment = Alignment.Center
+                        ) {
                         com.opticast.player.ui.components.FastLoadingBar()
                     }
                 }
@@ -1004,24 +1016,24 @@ fun LibraryScreen(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(top = 96.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Icon(
                                 Icons.Outlined.FavoriteBorder,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(40.dp),
-                            )
+                                modifier = Modifier.size(40.dp)
+                        )
                             Spacer(Modifier.height(12.dp))
                             Text(
                                 "No favorites yet",
-                                style = MaterialTheme.typography.titleMedium,
-                            )
+                                style = MaterialTheme.typography.titleMedium
+                        )
                             Text(
                                 "Tap the heart on any movie or show to keep it here.",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         }
                     }
                 }
@@ -1044,8 +1056,8 @@ fun LibraryScreen(
                         state = carouselState,
                         flingBehavior = rememberSnapFlingBehavior(carouselState),
                         contentPadding = PaddingValues(horizontal = DiscoveryGutterDp.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(DiscoveryGapDp.dp),
-                    ) {
+                        horizontalArrangement = Arrangement.spacedBy(DiscoveryGapDp.dp)
+                        ) {
                         lazyItems(continueWatching, key = { "cw-${it.entry.video.id}" }) { item ->
                             SelectableCard(selectionMode, item.entry.video.id in selectedIds,
                                 modifier = Modifier.width(DiscoveryResumeDp.dp), onToggle = { toggleSelect(item.entry.video.id) }) {
@@ -1058,8 +1070,8 @@ fun LibraryScreen(
                                 modifier = Modifier,
                                 compact = true,
                                 selectionMode = selectionMode,
-                                onLongClick = { if (selectionMode) toggleSelect(item.entry.video.id) else { menuIsWholeShow = false; menuEntry = item.entry } },
-                            )
+                                onLongClick = { if (selectionMode) toggleSelect(item.entry.video.id) else { menuIsWholeShow = false; menuEntry = item.entry } }
+                        )
                             }
                         }
                     }
@@ -1092,8 +1104,8 @@ fun LibraryScreen(
                         state = carouselState,
                         flingBehavior = rememberSnapFlingBehavior(carouselState),
                         contentPadding = PaddingValues(horizontal = DiscoveryGutterDp.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(DiscoveryGapDp.dp),
-                    ) {
+                        horizontalArrangement = Arrangement.spacedBy(DiscoveryGapDp.dp)
+                        ) {
                         lazyItems(recentlyAdded, key = { "recent-${it.video.id}" }) { entry ->
                             SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
@@ -1116,8 +1128,8 @@ fun LibraryScreen(
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = entry.video.id in selectedIds,
-                        onToggle = { toggleSelect(entry.video.id) },
-                    ) {
+                        onToggle = { toggleSelect(entry.video.id) }
+                        ) {
                         PosterCard(
                             entry = entry,
                             onClick = {
@@ -1141,8 +1153,8 @@ fun LibraryScreen(
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = episodes.any { it.video.id in selectedIds },
-                        onToggle = { toggleSelectShow(episodes) },
-                    ) {
+                        onToggle = { toggleSelectShow(episodes) }
+                        ) {
                         ShowCard(
                             showTitle = name,
                             episodes = episodes,
@@ -1167,8 +1179,8 @@ fun LibraryScreen(
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = entry.video.id in selectedIds,
-                        onToggle = { toggleSelect(entry.video.id) },
-                    ) {
+                        onToggle = { toggleSelect(entry.video.id) }
+                        ) {
                         PosterCard(
                             entry = entry,
                             onClick = {
@@ -1192,8 +1204,8 @@ fun LibraryScreen(
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = episodes.any { it.video.id in selectedIds },
-                        onToggle = { toggleSelectShow(episodes) },
-                    ) {
+                        onToggle = { toggleSelectShow(episodes) }
+                        ) {
                         ShowCard(
                             showTitle = name,
                             episodes = episodes,
@@ -1324,23 +1336,23 @@ fun LibraryScreen(
             .align(Alignment.BottomCenter)
             .padding(bottom = with(layoutDensity) { bottomChromePx.toDp() } + 12.dp),
         enter = fadeIn(tween(200)) + slideIn(tween(260)) { IntOffset(0, 90) },
-        exit = fadeOut(tween(160)),
-    ) {
+        exit = fadeOut(tween(160))
+                        ) {
         Surface(
             shape = RoundedCornerShape(30.dp),
             color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f),
             shadowElevation = 12.dp,
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.10f)),
-        ) {
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.10f))
+                        ) {
             Row(
                 Modifier.padding(start = 18.dp, end = 6.dp, top = 4.dp, bottom = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+                verticalAlignment = Alignment.CenterVertically
+                        ) {
                 Text(
                     "${selectedIds.size} selected",
                     style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(end = 8.dp),
-                )
+                    modifier = Modifier.padding(end = 8.dp)
+                        )
                 IconButton(
                     onClick = {
                         val chosen = state.entries.filter { it.video.id in selectedIds }
@@ -1348,13 +1360,13 @@ fun LibraryScreen(
                             viewModel.setWatched(it.video.id, it.video.durationMs, true)
                         }
                         exitSelection()
-                    },
-                ) {
+                    }
+                        ) {
                     Icon(
                         Icons.Filled.CheckCircle,
                         contentDescription = "Mark selected as watched",
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
+                        tint = MaterialTheme.colorScheme.primary
+                        )
                 }
                 IconButton(
                     onClick = {
@@ -1363,44 +1375,44 @@ fun LibraryScreen(
                             else AppContainer.favorites.add(selectedIds.toList())
                             exitSelection()
                         }
-                    },
-                ) {
+                    }
+                        ) {
                     Icon(
                         if (tab == "favs" || selectedIds.all { AppContainer.favorites.isFavorite(it) }) Icons.Outlined.FavoriteBorder else Icons.Filled.Favorite,
                         contentDescription = if (tab == "favs" || selectedIds.all { AppContainer.favorites.isFavorite(it) }) "Remove selected from favorites" else "Add selected to favorites",
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
+                        tint = MaterialTheme.colorScheme.primary
+                        )
                 }
                 IconButton(
                     onClick = {
                         if (selectedIds.isNotEmpty()) {
                             shareVideos(selectedIds.toList())
                         }
-                    },
-                ) {
+                    }
+                        ) {
                     Icon(
                         Icons.Filled.Share,
                         contentDescription = "Share selected",
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
+                        tint = MaterialTheme.colorScheme.primary
+                        )
                 }
                 IconButton(
                     onClick = {
                         if (selectedIds.isNotEmpty()) confirmDeleteIds = selectedIds.toList()
-                    },
-                ) {
+                    }
+                        ) {
                     Icon(
                         Icons.Filled.Delete,
                         contentDescription = "Delete selected",
-                        tint = MaterialTheme.colorScheme.error,
-                    )
+                        tint = MaterialTheme.colorScheme.error
+                        )
                 }
                 IconButton(onClick = { exitSelection() }) {
                     Icon(
                         Icons.Filled.Close,
                         contentDescription = "Exit selection",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                 }
             }
         }
@@ -1455,8 +1467,8 @@ fun LibraryScreen(
                 menuEntry = null
                 selectionMode = true
                 targetIds.forEach { if (it !in selectedIds) selectedIds.add(it) }
-            },
-        )
+            }
+                        )
     }
 
     confirmDeleteIds?.let { ids ->
@@ -1472,8 +1484,8 @@ fun LibraryScreen(
                         "The file will be permanently deleted from your device storage."
                     } else {
                         "These ${ids.size} files will be permanently deleted from your device storage."
-                    },
-                )
+                    }
+                        )
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -1486,8 +1498,8 @@ fun LibraryScreen(
             },
             dismissButton = {
                 TextButton(onClick = { confirmDeleteIds = null }) { Text("Cancel") }
-            },
-        )
+            }
+                        )
     }
     } // Library-only visual style; never changes the player theme or density.
 }
@@ -1534,8 +1546,8 @@ private fun SearchField(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onSubmit: () -> Unit = {},
-) {
+    onSubmit: () -> Unit = {}
+                        ) {
     val keyboard = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
     OutlinedTextField(
         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search),
@@ -1556,9 +1568,9 @@ private fun SearchField(
         singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-        ),
-    )
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
+                        )
+                        )
 }
 
 @Composable
@@ -1566,7 +1578,7 @@ private fun HeroPager(items: List<LibraryEntry>, onOpenDetail: (Long) -> Unit, o
     selectionMode: Boolean, selectedIds: Set<Long>, onToggle: (LibraryEntry) -> Unit, onHold: (LibraryEntry) -> Unit) {
     val pagerState = rememberPagerState(pageCount = { items.size })
     val motion = discoveryMotionEnabled() && !selectionMode
-    var autoAdvance by rememberSaveable { mutableStateOf(false) }
+    var autoAdvance by rememberSaveable { mutableStateOf(true) }
     val dragged by pagerState.interactionSource.collectIsDraggedAsState()
     val context = LocalContext.current
     val accessibility = context.getSystemService(android.content.Context.ACCESSIBILITY_SERVICE)
@@ -1578,7 +1590,7 @@ private fun HeroPager(items: List<LibraryEntry>, onOpenDetail: (Long) -> Unit, o
     LaunchedEffect(items.map { it.video.id }, motion, autoAdvance, dragged) {
         if (!motion || !autoAdvance || dragged) return@LaunchedEffect
         while (items.size > 1) {
-            delay(12000)
+            delay(8000)
             // Reading with accessibility services or dragging always wins over decoration.
             if (!pagerState.isScrollInProgress && accessibility?.isTouchExplorationEnabled != true) {
                 pagerState.animateScrollToPage((pagerState.currentPage + 1) % items.size, animationSpec = tween(durationMillis = 1100, easing = androidx.compose.animation.core.FastOutSlowInEasing))
@@ -1593,8 +1605,8 @@ private fun HeroPager(items: List<LibraryEntry>, onOpenDetail: (Long) -> Unit, o
             contentPadding = PaddingValues(horizontal = DiscoveryGutterDp.dp),
             pageSpacing = DiscoveryGapDp.dp,
             verticalAlignment = Alignment.Top,
-            modifier = Modifier.fillMaxWidth().height(cardHeight),
-        ) { page ->
+            modifier = Modifier.fillMaxWidth().height(cardHeight)
+                        ) { page ->
             val entry = items[page]
             val metadata = entry.metadata
             val title = metadata?.displayTitle ?: entry.video.parsed.title.ifBlank { entry.video.name }
@@ -1619,8 +1631,8 @@ private fun HeroPager(items: List<LibraryEntry>, onOpenDetail: (Long) -> Unit, o
                     .background(Color(0xFF091526))
                     .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(30.dp))
                     .combinedClickable(onClick = { activate(false) },
-                        onLongClick = { if (selectionMode) onToggle(entry) else onHold(entry) }),
-            ) {
+                        onLongClick = { if (selectionMode) onToggle(entry) else onHold(entry) })
+                        ) {
                 PosterImage(url = image, fallbackTitle = title, videoId = entry.video.id,
                     modifier = Modifier.fillMaxSize())
                 Box(Modifier.fillMaxSize().background(Brush.horizontalGradient(
@@ -1651,8 +1663,8 @@ private fun HeroPager(items: List<LibraryEntry>, onOpenDetail: (Long) -> Unit, o
                         if (entry.video.isEpisode || metadata?.type == "tv") "TV SERIES" else "MOVIE",
                         metadata?.year?.toString(),
                         metadata?.genres?.firstOrNull(),
-                        metadata?.voteAverage?.takeIf { it > 0.0 }?.let { "★ %.1f".format(it) },
-                    ).joinToString("  ·  ")
+                        metadata?.voteAverage?.takeIf { it > 0.0 }?.let { "★ %.1f".format(it) }
+                        ).joinToString("  ·  ")
                     Text(facts, color = Color.White.copy(alpha = 0.85f),
                         style = MaterialTheme.typography.labelMedium, maxLines = if (tight) 1 else 2, overflow = TextOverflow.Ellipsis)
                     Button(onClick = { activate(true) },
@@ -1754,6 +1766,28 @@ private fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
 }
 
 @Composable
+private fun WhatsNewCard(version: String, onDismiss: () -> Unit) {
+    val changelog = when {
+        version.contains("2.6.65") -> "• Library scrolling now buttery smooth like settings & episodes — fixed choppiness during startup\n• Grid change fixed — compact/medium/comfortable now works\n• Balanced for low-RAM 32-bit 3GB — fast like previous builds before GitHub\n• Background auto check for updates on startup enabled\n• In-app download & install without leaving app\n• Clearly shows what's new instead of GitHub link\n• Signed release 56M with mpv"
+        version.contains("2.6.64") -> "• Library scrolling responsiveness improved during startup\n• Grid change fixed\n• Optimized release build\n• In-app download without leaving\n• Clear what's new card"
+        version.contains("2.6.62") -> "• Fixed library scrolling choppiness\n• Settings fast but library choppy — fixed\n• Memory cache balanced for low-RAM 32-bit"
+        version.contains("2.6.61") -> "• Background auto check for updates on app startup allowed\n• Auto update dialog shows when new version available\n• Changed wording official signed full mpv → signed release"
+        version.contains("2.6.60") -> "• Signed release 56M with mpv — plays all videos\n• Background auto check for updates\n• Fixed YAML workflow"
+        else -> "• Performance improvements and bug fixes\n• Library now buttery smooth\n• Signed release with mpv"
+    }
+    Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.primaryContainer) {
+        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("🎉 What's New in $version", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, "Dismiss", tint = MaterialTheme.colorScheme.onPrimaryContainer) }
+            }
+            Text(changelog, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+            Text("This card shows when app is fully updated — clearly shows what's new!", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f))
+        }
+    }
+}
+
+@Composable
 private fun StatsCard(stats: LibraryStats) {
     Surface(Modifier.fillMaxWidth().padding(horizontal = DiscoveryGutterDp.dp, vertical = 6.dp),
         shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surfaceContainerLow) {
@@ -1823,20 +1857,20 @@ private fun EmptyLibrary(fromSearch: Boolean) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 40.dp, vertical = 60.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+        horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
         Icon(
             Icons.Filled.Movie,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-        )
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                        )
         Spacer(Modifier.height(16.dp))
         Text(
             text = if (fromSearch) "Nothing matches your filters" else "Your library is empty",
             style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center,
-        )
+            textAlign = TextAlign.Center
+                        )
         Spacer(Modifier.height(6.dp))
         Text(
             text = if (fromSearch) {
@@ -1846,8 +1880,8 @@ private fun EmptyLibrary(fromSearch: Boolean) {
             },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
+            textAlign = TextAlign.Center
+                        )
     }
 }
 
@@ -1858,33 +1892,33 @@ private fun PermissionGate(onRequest: () -> Unit) {
             .fillMaxSize()
             .padding(32.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+        horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
         Icon(
             Icons.Filled.Movie,
             contentDescription = null,
             modifier = Modifier.size(72.dp),
-            tint = MaterialTheme.colorScheme.primary,
-        )
+            tint = MaterialTheme.colorScheme.primary
+                        )
         Spacer(Modifier.height(20.dp))
         Text(
             "Video access needed",
             style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center,
-        )
+            textAlign = TextAlign.Center
+                        )
         Spacer(Modifier.height(8.dp))
         Text(
             "OptiCast scans your device for movies and TV episodes to build a beautiful library. Grant video access to continue.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
+            textAlign = TextAlign.Center
+                        )
         Spacer(Modifier.height(28.dp))
         Button(
             onClick = onRequest,
             shape = RoundedCornerShape(18.dp),
-            contentPadding = PaddingValues(horizontal = 28.dp, vertical = 14.dp),
-        ) {
+            contentPadding = PaddingValues(horizontal = 28.dp, vertical = 14.dp)
+                        ) {
             Text("Allow access")
         }
     }
@@ -1904,8 +1938,8 @@ private fun EntryMenuSheet(
     onDelete: () -> Unit,
     onSelect: () -> Unit,
     onForget: () -> Unit,
-    groupEntries: List<LibraryEntry>? = null,
-) {
+    groupEntries: List<LibraryEntry>? = null
+                        ) {
     val targets = groupEntries ?: listOf(entry)
     val watched = targets.isNotEmpty() && targets.all { AppContainer.playbackState.state(it.video.id)?.isWatched == true }
     val favorite = targets.isNotEmpty() && targets.all { AppContainer.favorites.isFavorite(it.video.id) }
@@ -1913,42 +1947,42 @@ private fun EntryMenuSheet(
         Column(
             Modifier
                 .padding(horizontal = 12.dp)
-                .padding(bottom = 40.dp),
-        ) {
+                .padding(bottom = 40.dp)
+                        ) {
             Text(
                 text = if (groupEntries != null) "${showTitleOf(entry)} · ${targets.size} episodes" else entry.metadata?.displayTitle ?: entry.video.parsed.title.ifBlank { entry.video.name },
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+                overflow = TextOverflow.Ellipsis
+                        )
             MenuActionRow(Icons.Filled.PlayArrow, "Play now", onPlay)
             MenuActionRow(Icons.Filled.Info, "Details", onDetails)
             MenuActionRow(
                 Icons.Filled.Check,
                 if (watched) "Mark as unwatched" else "Mark as watched",
-                onClick = { onToggleWatched(!watched) },
-            )
+                onClick = { onToggleWatched(!watched) }
+                        )
             MenuActionRow(
                 if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                 if (favorite) "Remove from favorites" else "Add to favorites",
-                onToggleFavorite,
-            )
+                onToggleFavorite
+                        )
             MenuActionRow(Icons.Filled.Share, if (groupEntries != null) "Share all ${targets.size} episodes" else "Share file", onShare)
             MenuActionRow(Icons.Filled.CheckBox, "Select", onSelect)
             MenuActionRow(
                 Icons.Filled.Delete,
                 if (groupEntries != null) "Delete all ${targets.size} episodes" else "Delete from device",
                 onDelete,
-                tint = MaterialTheme.colorScheme.error,
-            )
+                tint = MaterialTheme.colorScheme.error
+                        )
             if (groupEntries == null) MenuActionRow(Icons.Filled.AutoFixHigh, "Find metadata (TMDB)", onMatch)
             if (groupEntries == null && entry.metadata?.posterPath != null) {
                 MenuActionRow(
                     Icons.Filled.Refresh,
                     "Refresh artwork (poster looks wrong)",
-                    onRefreshArtwork,
-                )
+                    onRefreshArtwork
+                        )
             }
             if (groupEntries == null && entry.metadata != null) {
                 MenuActionRow(Icons.Filled.Delete, "Forget metadata", onForget)
@@ -1982,16 +2016,16 @@ internal fun MenuActionRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
     onClick: () -> Unit,
-    tint: Color = MaterialTheme.colorScheme.primary,
-) {
+    tint: Color = MaterialTheme.colorScheme.primary
+                        ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 13.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+        verticalAlignment = Alignment.CenterVertically
+                        ) {
         Icon(icon, contentDescription = null, tint = tint)
         Spacer(Modifier.width(16.dp))
         Text(label, style = MaterialTheme.typography.labelLarge)

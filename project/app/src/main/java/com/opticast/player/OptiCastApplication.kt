@@ -71,24 +71,28 @@ class OptiCastApplication : Application() {
         // Build poster index off main thread - first fling never waits on FS stats
         startupScope.launch { AppContainer.posterCache.warmUp() }
 
-        // Background auto check for updates on app startup - allowed and enabled by default
-        // Runs in background IO thread, non-blocking, checks GitHub releases
-        // - Checks at most every 6h to avoid spam
-        // - Stores available update for auto dialog in MainActivity
-        // - User can disable in Settings > Check for updates
+        // Build poster index off main thread with delay for smooth startup - critical for library scrolling responsiveness matching settings
         startupScope.launch {
             try {
-                // Small delay to let app start quickly (2s) - background auto check shouldn't block startup
-                kotlinx.coroutines.delay(2000)
+                // Delay warmUp to let library first frame render - settings smooth because no warmUp needed
+                kotlinx.coroutines.delay(1500)
+                AppContainer.posterCache.warmUp()
+            } catch (_: Exception) { }
+        }
+
+        // Background auto check for updates on app startup - delayed more to not affect library scrolling during startup
+        // Runs in background IO thread, non-blocking, low priority for buttery smooth library
+        startupScope.launch {
+            try {
+                // Increased delay 2s->4s to let library scroll be responsive during startup like settings
+                kotlinx.coroutines.delay(4000)
                 com.opticast.player.data.remote.UpdateChecker.checkAtStartup(this@OptiCastApplication)
             } catch (_: Exception) { }
         }
 
-        // Also schedule a second check after 10s if first failed (e.g. no internet at startup)
         startupScope.launch {
             try {
-                kotlinx.coroutines.delay(10000)
-                // If no update info yet and online, try again - handles slow network on startup
+                kotlinx.coroutines.delay(12000) // 10s->12s for even less startup jank
                 if (com.opticast.player.data.remote.UpdateChecker.getAvailableUpdate(this@OptiCastApplication) == null) {
                     if (com.opticast.player.data.AppContainer.isOnline()) {
                         com.opticast.player.data.remote.UpdateChecker.checkAtStartup(this@OptiCastApplication)

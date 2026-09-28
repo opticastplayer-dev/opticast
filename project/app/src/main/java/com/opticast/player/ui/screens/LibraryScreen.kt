@@ -916,12 +916,12 @@ fun LibraryScreen(
             if (!searching) item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
             }
-            // Show What's New card when app is fully updated - clearly shows what's new
+            // Show What's New card when app is fully updated - clearly shows what's new (fixed composable context inside item)
             if (!searching) {
-                val context = LocalContext.current
-                val whatsNewVersion = remember { com.opticast.player.data.remote.UpdateChecker.getWhatsNewVersion(context) }
-                if (whatsNewVersion != null) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
+                item(span = { GridItemSpan(maxLineSpan) }, contentType = "whats-new") {
+                    val context = LocalContext.current
+                    val whatsNewVersion = remember { com.opticast.player.data.remote.UpdateChecker.getWhatsNewVersion(context) }
+                    if (whatsNewVersion != null) {
                         WhatsNewCard(version = whatsNewVersion, onDismiss = {
                             com.opticast.player.data.remote.UpdateChecker.dismissWhatsNew(context)
                         })

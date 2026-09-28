@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version (e.g. 2.6.60)'
+        description: 'Version (e.g. 2.6.74-optimized)'
         required: true
-        default: '2.6.60'
+        default: '2.6.74-optimized'
       full_mpv:
         description: 'Build full with mpv (true) or Media3-only (false)'
         required: false
@@ -75,21 +75,60 @@ jobs:
           fi
           chmod +x gradlew || true
 
-      - name: Restore native runtime AAR for full mpv
+      - name: Restore native runtime AAR for full mpv (BULLETPROOF)
         if: ${{ inputs.full_mpv == 'true' || inputs.full_mpv == '' }}
         run: |
+          echo "=== Checking for prebuilt AAR (permanent, never depends on releases) ==="
+          ls -lh project/native/prebuilt/ || echo "No prebuilt dir"
+          ls -lh .cache/native-runtime/ || echo "No cache dir"
           mkdir -p .cache/native-runtime
-          python3 project/native/restore-from-apk.py || echo "Restore failed"
+          mkdir -p project/native/prebuilt
+          if [ -f "project/native/prebuilt/opticast-mpv-runtime.aar" ]; then
+            echo "Prebuilt AAR exists, copying to cache"
+            cp project/native/prebuilt/opticast-mpv-runtime.aar .cache/native-runtime/
+            ls -lh .cache/native-runtime/
+            if unzip -l .cache/native-runtime/opticast-mpv-runtime.aar | grep -q libmpv; then
+              echo "Prebuilt AAR verified has libmpv"
+            else
+              echo "ERROR: Prebuilt AAR missing libmpv!"
+              exit 1
+            fi
+          fi
+          python3 project/native/restore-from-apk.py
+          RESTORE_EXIT=$?
+          if [ $RESTORE_EXIT -ne 0 ]; then
+            echo "FATAL: Restore failed - refusing Media3-only build that breaks install-over"
+            exit 1
+          fi
           ls -lh .cache/native-runtime/ || true
+          if [ -f ".cache/native-runtime/opticast-mpv-runtime.aar" ]; then
+            if unzip -l .cache/native-runtime/opticast-mpv-runtime.aar | grep -q libmpv; then
+              echo "AAR has libmpv - OK"
+            else
+              echo "FATAL: AAR missing libmpv"
+              exit 1
+            fi
+          else
+            echo "FATAL: AAR missing after restore"
+            exit 1
+          fi
 
       - name: Build APK
         run: |
           cd project
-          if [ -f "../.cache/native-runtime/opticast-mpv-runtime.aar" ]; then
+          if [ -f "../.cache/native-runtime/opticast-mpv-runtime.aar" ] || [ -f "native/prebuilt/opticast-mpv-runtime.aar" ]; then
             echo "Building FULL with mpv"
-            ./gradlew assembleOfficialRelease --stacktrace --no-daemon || ./gradlew assembleRelease --stacktrace --no-daemon || ./gradlew assembleDebug --stacktrace --no-daemon
+            if [ -f "native/prebuilt/opticast-mpv-runtime.aar" ] && [ ! -f "../.cache/native-runtime/opticast-mpv-runtime.aar" ]; then
+              mkdir -p ../.cache/native-runtime
+              cp native/prebuilt/opticast-mpv-runtime.aar ../.cache/native-runtime/
+            fi
+            ./gradlew assembleOfficialRelease --stacktrace --no-daemon || ./gradlew assembleRelease --stacktrace --no-daemon
           else
-            echo "Building Media3-only"
+            echo "No AAR found"
+            if [ "${{ inputs.full_mpv }}" == "true" ] || [ -z "${{ inputs.full_mpv }}" ]; then
+              echo "FATAL: full_mpv=true but no AAR"
+              exit 1
+            fi
             ./gradlew assembleDebug --stacktrace --no-daemon
           fi
 
@@ -97,31 +136,53 @@ jobs:
         run: |
           find project/app/build/outputs -name "*.apk" -type f -exec ls -lh {} \;
 
+      - name: Verify APK is full mpv
+        if: ${{ inputs.full_mpv == 'true' || inputs.full_mpv == '' }}
+        run: |
+          APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | grep -E "official|release" | head -1)
+          if [ -z "$APK" ]; then
+            APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | head -1)
+          fi
+          echo "Verifying $APK"
+          if [ ! -f "$APK" ]; then exit 1; fi
+          SIZE=$(stat -c%s "$APK" || stat -f%z "$APK")
+          echo "Size $SIZE"
+          if [ "$SIZE" -lt 20000000 ]; then
+            echo "FATAL: APK too small, Media3-only"
+            exit 1
+          fi
+          if unzip -l "$APK" | grep -q "libmpv"; then
+            echo "SUCCESS full mpv"
+          else
+            echo "FATAL missing libmpv"
+            exit 1
+          fi
+
       - name: Package
         run: |
           VERSION="${{ github.event.inputs.version }}"
           if [ -z "$VERSION" ]; then
-            VERSION="2.6.60"
+            VERSION="${{ github.ref_name }}"
+          fi
+          if [ -z "$VERSION" ]; then
+            VERSION="2.6.74-optimized"
           fi
           VERSION=${VERSION#v}
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION $VERSION"
           mkdir -p releases
           APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | grep -E "official|release" | head -1)
           if [ -z "$APK" ]; then
             APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | head -1)
           fi
-          echo "APK=$APK"
+          echo "APK $APK"
           if [ -f "$APK" ]; then
             cp "$APK" "releases/OptiCast-v${VERSION}.apk"
-            if unzip -l "$APK" | grep -q "libmpv"; then
-              echo "FULL-mpv"
-            else
-              echo "Media3-only"
-            fi
+            ls -lh "releases/OptiCast-v${VERSION}.apk"
+            if unzip -l "$APK" | grep -q "libmpv"; then echo "FULL"; else echo "Media3"; fi
             sha256sum "releases/OptiCast-v${VERSION}.apk" > "releases/SHA256SUMS-v${VERSION}.txt"
           else
-            echo "No APK"
-            exit 1
+            echo "No APK"; exit 1
           fi
           git archive --format=zip -o "releases/OptiCast-v${VERSION}-complete-source.zip" HEAD || true
 

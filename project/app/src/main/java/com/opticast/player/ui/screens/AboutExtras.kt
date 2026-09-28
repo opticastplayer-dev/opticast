@@ -27,12 +27,13 @@ internal fun UpdateCheckOption(version: String) {
     var autoCheckEnabled by remember { mutableStateOf(UpdateChecker.isAutoCheckEnabled(context)) }
 
     val upToDateVersion = remember { UpdateChecker.getUpToDateVersion(context) }
+    val installedVersion = remember { UpdateChecker.getInstalledVersion(context).first }
     val isUpToDate = remember { UpdateChecker.isUpToDate(context) }
     var lastCheck by remember { mutableStateOf(UpdateChecker.getLastUpToDateCheck(context)) }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("App updates", style = MaterialTheme.typography.titleMedium)
-        // Always show Up To Date notification when installed matches GitHub
+        // Always show Up To Date notification when installed matches GitHub - FIX: show installed version 2.6.78 not old GitHub 2.6.77
         if (isUpToDate && upToDateVersion != null) {
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -46,7 +47,7 @@ internal fun UpdateCheckOption(version: String) {
                     Text("✅", style = MaterialTheme.typography.titleMedium)
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            "Up To Date — ${upToDateVersion}",
+                            "Up To Date — ${installedVersion}",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )

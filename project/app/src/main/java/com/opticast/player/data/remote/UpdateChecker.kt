@@ -256,15 +256,30 @@ object UpdateChecker {
                 // Clear up-to-date since newer available
                 prefs(context).edit().remove(KEY_UP_TO_DATE_VERSION).remove(KEY_UP_TO_DATE_TIME).apply()
             } else if (update != null && !update.isNewer) {
-                // Up to date - but DON'T show card in library on every startup (user request)
+                // Up to date - FIX: Show installed version, not GitHub version, when installed >= GitHub
+                // User reported: card shows 2.6.77 but app is 2.6.78 - should show installed 2.6.78
                 // Only store for Settings screen, not library - offline-first, no card spam
+                val installed = getInstalledVersion(context)
+                // Always store installed version as up-to-date, not remote, to match real app version
                 prefs(context).edit()
-                    .putString(KEY_UP_TO_DATE_VERSION, update.version)
+                    .putString(KEY_UP_TO_DATE_VERSION, installed.first)
                     .putLong(KEY_UP_TO_DATE_TIME, System.currentTimeMillis())
                     .remove("available_update")
                     .remove("available_update_info")
                     .remove(KEY_AVAILABLE_UPDATE_JSON)
                     .apply()
+            } else if (update == null) {
+                // Offline or interval not passed - still mark as up-to-date with installed version if we have checked before
+                // This ensures card shows installed version 2.6.78, not old GitHub 2.6.77
+                val installed = getInstalledVersion(context)
+                val lastUpToDate = prefs(context).getString(KEY_UP_TO_DATE_VERSION, null)
+                // If no up-to-date stored yet, store installed as up-to-date (offline-first)
+                if (lastUpToDate == null) {
+                    prefs(context).edit()
+                        .putString(KEY_UP_TO_DATE_VERSION, installed.first)
+                        .putLong(KEY_UP_TO_DATE_TIME, System.currentTimeMillis())
+                        .apply()
+                }
             }
             // Don't mark as up-to-date when update == null (offline or interval) - save data, don't spam
 

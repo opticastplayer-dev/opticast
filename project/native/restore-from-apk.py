@@ -25,6 +25,33 @@ APK_URLS = [
 APK_PATH = ROOT / ".cache" / "OptiCast-restore.apk"
 
 def download_apk():
+    # If AAR already exists with full mpv (has libmpv), skip download - fixed for install over issue
+    aar_path = CACHE / "opticast-mpv-runtime.aar"
+    if aar_path.exists() and aar_path.stat().st_size > 10*1024*1024:
+        try:
+            import zipfile
+            with zipfile.ZipFile(aar_path, 'r') as z:
+                if any('libmpv' in n for n in z.namelist()):
+                    print(f"AAR already exists with full mpv: {aar_path} {aar_path.stat().st_size}, skipping APK download")
+                    # Return a dummy APK path that will be ignored, but we have AAR
+                    # For compatibility, return existing APK if exists, otherwise return AAR path to trigger extraction skip
+                    # Actually, we should directly return None and handle in main, but for now return APK_PATH if exists
+                    # Check if we have any APK with mpv in cache
+                    for apk_file in CACHE.parent.rglob("*.apk"):
+                        if apk_file.stat().st_size > 10*1024*1024:
+                            try:
+                                with zipfile.ZipFile(apk_file, 'r') as az:
+                                    if any('libmpv' in n for n in az.namelist()):
+                                        print(f"Found existing APK with mpv: {apk_file}")
+                                        return apk_file
+                            except:
+                                pass
+                    # If AAR exists with mpv, we can skip download and return a marker
+                    print(f"AAR with mpv already exists, no need to download APK")
+                    return None
+        except Exception as e:
+            print(f"AAR check failed: {e}, proceeding to download APK")
+
     if APK_PATH.exists() and APK_PATH.stat().st_size > 10*1024*1024:
         print(f"APK already exists: {APK_PATH} {APK_PATH.stat().st_size}")
         return APK_PATH
@@ -111,6 +138,15 @@ def extract_so_to_aar(apk_path: Path):
 if __name__ == "__main__":
     try:
         apk = download_apk()
+        if apk is None:
+            # AAR already exists with full mpv, no need to restore
+            aar_path = CACHE / "opticast-mpv-runtime.aar"
+            if aar_path.exists() and aar_path.stat().st_size > 10*1024*1024:
+                print(f"SUCCESS: AAR already exists with full mpv {aar_path}")
+                sys.exit(0)
+            else:
+                print("FAILED: AAR doesn't exist and no APK to restore from")
+                sys.exit(1)
         aar = extract_so_to_aar(apk)
         if aar and aar.exists():
             print(f"SUCCESS: Restored {aar}")

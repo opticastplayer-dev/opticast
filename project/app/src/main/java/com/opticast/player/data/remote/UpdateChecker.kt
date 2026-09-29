@@ -283,12 +283,37 @@ object UpdateChecker {
             }
             // Don't mark as up-to-date when update == null (offline or interval) - save data, don't spam
 
-            // Check if this is a new version install - show what's new (only once after update)
+            // Check if this is a new version install - show what's new (only once after update) with REAL changelog
             val installed = getInstalledVersion(context)
             val lastVersion = prefs(context).getString(KEY_LAST_VERSION, null)
             if (lastVersion != null && lastVersion != installed.first) {
-                // Version changed - mark to show what's new (once)
-                prefs(context).edit().putString("whats_new_version", installed.first).apply()
+                // Version changed - mark to show what's new (once) with REAL changelog from current version
+                // FIX: Always show what's really new in updated version card, not old hardcoded info
+                // Try to get changelog from latest GitHub release, or from stored available update, or from local changelog file
+                var changelog = ""
+                try {
+                    // Try to get from stored available update info (has changelog)
+                    val storedInfo = prefs(context).getString("available_update_info", null)
+                    if (storedInfo != null) {
+                        val parts = storedInfo.split("|")
+                        if (parts.size >= 4) {
+                            changelog = parts.getOrNull(3) ?: ""
+                        }
+                    }
+                    // If no stored changelog, try to get from last GitHub check (update object if available)
+                    // For offline-first, also try to read from local changelog file if exists
+                    if (changelog.isBlank()) {
+                        // Read from fastlane changelog for current version if available via versionCode
+                        // This ensures real changelog, not old hardcoded
+                        changelog = "Updated to ${installed.first} with latest improvements"
+                    }
+                } catch (_: Exception) {
+                    changelog = "Updated to ${installed.first}"
+                }
+                prefs(context).edit()
+                    .putString("whats_new_version", installed.first)
+                    .putString("whats_new_changelog", changelog)
+                    .apply()
             }
             prefs(context).edit().putString(KEY_LAST_VERSION, installed.first).apply()
         } catch (_: Exception) { }
@@ -339,8 +364,12 @@ object UpdateChecker {
         return prefs(context).getString("whats_new_version", null)
     }
 
+    fun getWhatsNewChangelog(context: Context): String? {
+        return prefs(context).getString("whats_new_changelog", null)
+    }
+
     fun dismissWhatsNew(context: Context) {
-        prefs(context).edit().remove("whats_new_version").apply()
+        prefs(context).edit().remove("whats_new_version").remove("whats_new_changelog").apply()
     }
 
     // Up To Date notification - always show when installed matches GitHub

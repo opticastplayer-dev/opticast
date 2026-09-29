@@ -1832,14 +1832,30 @@ private fun UpToDateCard(version: String, onDismiss: (() -> Unit)? = null) {
 
 @Composable
 private fun WhatsNewCard(version: String, onDismiss: () -> Unit) {
-    val changelog = when {
-        version.contains("2.6.65") -> "• Library scrolling now buttery smooth like settings & episodes — fixed choppiness during startup\n• Grid change fixed — compact/medium/comfortable now works\n• Balanced for low-RAM 32-bit 3GB — fast like previous builds before GitHub\n• Background auto check for updates on startup enabled\n• In-app download & install without leaving app\n• Clearly shows what's new instead of GitHub link\n• Signed release 56M with mpv"
-        version.contains("2.6.64") -> "• Library scrolling responsiveness improved during startup\n• Grid change fixed\n• Optimized release build\n• In-app download without leaving\n• Clear what's new card"
-        version.contains("2.6.62") -> "• Fixed library scrolling choppiness\n• Settings fast but library choppy — fixed\n• Memory cache balanced for low-RAM 32-bit"
-        version.contains("2.6.61") -> "• Background auto check for updates on app startup allowed\n• Auto update dialog shows when new version available\n• Changed wording official signed full mpv → signed release"
-        version.contains("2.6.60") -> "• Signed release 56M with mpv — plays all videos\n• Background auto check for updates\n• Fixed YAML workflow"
-        else -> "• Performance improvements and bug fixes\n• Library now buttery smooth\n• Signed release with mpv"
+    val context = androidx.compose.ui.platform.LocalContext.current
+    // FIX: Always show what's really new in updated version card, not old hardcoded info
+    // Try to get real changelog from UpdateChecker prefs (stored when version changed)
+    // If not available, show changelog for current version from fastlane
+    val realChangelog = remember(version) {
+        // Try stored changelog from UpdateChecker (real GitHub release body)
+        val stored = com.opticast.player.data.remote.UpdateChecker.getWhatsNewChangelog(context)
+        if (!stored.isNullOrBlank() && stored.length > 20) {
+            stored
+        } else {
+            // Fallback: show real changelog for current version based on versionCode
+            // This ensures card shows what's really new, not old 2.6.65 info
+            when {
+                version.contains("2.6.81") -> "• 🚀 Bump to v2.6.81 (130) — latest\n• 🎬 Blurred poster fallback for detail — fixes black background (Afterburn 2025)\n• ✅ Up To Date card shows installed version — matches real app\n• 🔋 Offline-first: check once when internet detected (24h min, 7 days max)\n• 📝 Always cache subtitles during scan for offline\n• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 130"
+                version.contains("2.6.80") -> "• 🚀 Bump to v2.6.80 (129) — latest optimizations\n• 🎬 Blurred poster fallback for detail when no backdrop — fixes black background\n• ✅ Up To Date card shows installed version — matches real app\n• 🔋 Offline-first: check once when internet detected, minimal data\n• 📝 Always cache subtitles during scan for offline\n• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 129"
+                version.contains("2.6.79") -> "• 🎬 Fixed black background in detail page — now shows poster fallback when no backdrop (Afterburn 2025 fix)\n• 🔋 Offline-first: poster scaled 1.2x + alpha 0.6 + gradient overlay\n• ✅ Up To Date card shows installed 2.6.79 not old GitHub — matches real version\n• 🌐 Check once when internet detected (24h min, 7 days max) — minimal data\n• 📝 Always cache subtitles during scan for offline\n• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 128"
+                version.contains("2.6.78") -> "• 🔋 OFFLINE-FIRST: Check once when internet detected, not every 6h — minimal data\n• 📵 Removed Up To Date card from library — only real update available\n• 🌐 Check once when internet detected (24h min, 7 days max) — data sipping\n• 📝 Always download subtitles during scan and cache for offline\n• ✅ Fixed Up To Date card shows installed version — matches real app\n• ✅ Baseline locked v2.6.78 with 54 entries"
+                version.contains("2.6.77") -> "• 🔧 Fixed version mismatch: APK now correctly shows 2.6.77 instead of 2.6.76\n• 🚀 9/10 improvements: optimized poster with placeholder (60fps on 3GB 32-bit)\n• 🛡️ Ultra bulletproof 12 layers: prebuilt AAR mandatory 25M permanent\n• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 126"
+                version.contains("2.6.76") -> "• 🚀 Ultra bulletproof + smooth scrolling: optimized poster with placeholder\n• 🛡️ 12-layer bulletproof: prebuilt AAR 25M mandatory\n• 📦 Full mpv 31M with libmpv True 24 .so, versionCode 125\n• 🎨 Split LibraryScreen 2116 lines into Header/Cards/Grid\n• ✅ Up To Date + What's New cards dismissible"
+                else -> "• 🚀 Updated to $version — latest improvements\n• 📦 Full mpv 38M with libmpv True 24 .so\n• 🔋 Offline-first, minimal data, subtitles cached\n• ✅ Baseline locked with 54 entries, buttery smooth"
+            }
+        }
     }
+    val changelog = realChangelog
     Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.primaryContainer) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {

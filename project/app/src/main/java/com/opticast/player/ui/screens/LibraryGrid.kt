@@ -17,8 +17,12 @@ import com.opticast.player.data.model.LibraryEntry
 import com.opticast.player.ui.components.PosterCard
 
 /**
- * Optimized library grid - extracted for 9/10 rating
- * FIX: Grid changeable - ensure remember correctly triggers recomposition
+ * Optimized library grid — smooth like settings, fast startup
+ * - Grid changeable: remember outside LazyVerticalGrid triggers recomposition
+ * - Stable keys: video.id prevents reordering jank
+ * - ContentType: helps Compose skip recomposition
+ * - AnimateItem: smooth animations when grid changes
+ * - Offline-first: uses cached posters, no network while scrolling
  */
 @Composable
 fun LibraryGrid(
@@ -35,7 +39,8 @@ fun LibraryGrid(
     statsContent: @Composable () -> Unit = {},
     discoveryContent: @Composable () -> Unit = {}
 ) {
-    // FIX WEAKNESS: Ensure grid changeable works - compute outside and use key
+    // Stability: Ensure grid changeable works — compute outside and use key
+    // Remember libraryGrid to trigger recomposition when user changes grid in settings
     val gridCells = remember(libraryGrid) {
         GridCells.Adaptive(libraryPosterMinimumDp(libraryGrid).dp)
     }
@@ -46,12 +51,22 @@ fun LibraryGrid(
         modifier = modifier.fillMaxSize().nestedScroll(chromeScroll),
         contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 12.dp)
     ) {
-        item(span = { GridItemSpan(maxLineSpan) }, contentType = "header") { headerContent() }
-        item(span = { GridItemSpan(maxLineSpan) }, contentType = "search") { filterContent() }
-        item(span = { GridItemSpan(maxLineSpan) }, contentType = "stats") { statsContent() }
-        item(span = { GridItemSpan(maxLineSpan) }, contentType = "discovery") { discoveryContent() }
-        items(items = entries, key = { it.video.id }, contentType = { "poster" }) { entry ->
-            PosterCard(entry = entry, onClick = { onPosterClick(entry) }, onLongClick = { onPosterLongClick(entry) })
+        item(span = { GridItemSpan(maxLineSpan) }, key = "header", contentType = "header") { headerContent() }
+        item(span = { GridItemSpan(maxLineSpan) }, key = "search", contentType = "search") { filterContent() }
+        item(span = { GridItemSpan(maxLineSpan) }, key = "stats", contentType = "stats") { statsContent() }
+        item(span = { GridItemSpan(maxLineSpan) }, key = "discovery", contentType = "discovery") { discoveryContent() }
+        items(
+            items = entries,
+            key = { it.video.id },
+            contentType = { "poster" }
+        ) { entry ->
+            // Stability: animateItem for smooth grid changes, stable key prevents jank
+            PosterCard(
+                entry = entry,
+                onClick = { onPosterClick(entry) },
+                onLongClick = { onPosterLongClick(entry) },
+                modifier = Modifier.animateItem()
+            )
         }
     }
 }

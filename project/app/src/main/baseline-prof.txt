@@ -1,35 +1,43 @@
-# Locked baseline for v2.6.85 (versionCode 134) - 2026-09-29T09:15:00 - LOCKED universal language easy to understand, mobile only, offline-first, no ads
-# Fixed weaknesses: docs meta v2.6.78->2.6.82, baseline date, library grid changeable
-# Optimized for buttery smooth library scrolling on low-RAM 32-bit 3GB devices
-# Includes: startup, library grid with placeholder, poster loading, discovery, search, repository offline-first, performance monitoring, crash reporting, DI, accessibility
+# Locked baseline for v2.6.86 (versionCode 135) - 2026-09-29T10:00:00 - LOCKED stability reliability performance, library buttery smooth, scan crash stability, baseline 65, offline data sipping, playback stability, universal language
+# Stability improvements: library grid buttery smooth like settings, scan corrupted skip per file try/catch, crash log filesDir/crashes keep 5, baseline 65 entries, offline data sipping w185 on metered, prefetch only when idle, playback loading fix keyed to video.id auto-hide 3s
+# Includes: startup, library grid with placeholder + animateItem + contentType + stable keys, poster loading offline-first, discovery, search, repository offline-first, performance monitoring, crash reporting, DI, accessibility, memory budget, playback work budget
 # 12-layer bulletproof: prebuilt mandatory 25M permanent, signing mandatory, versionCode must increase, package constant, install-over verification, CODEOWNERS
-# Split LibraryScreen 2116 lines into Header/Cards/Grid, version catalog, unit tests (repository, poster, install-over), KDoc
+# Mobile only, offline-first priority #1, no ads, open source, universal language easy to understand
 HSPLcom/opticast/player/OptiCastApplication;-><init>()V
 HSPLcom/opticast/player/OptiCastApplication;->onCreate()V
 HSPLcom/opticast/player/MainActivity;-><init>()V
 HSPLcom/opticast/player/MainActivity;->onCreate(Landroid/os/Bundle;)V
 HSPLcom/opticast/player/data/AppContainer;-><clinit>()V
 HSPLcom/opticast/player/data/AppContainer;->init(Landroid/app/Application;)V
+HSPLcom/opticast/player/data/AppContainer;->isMeteredNetwork()Z
+HSPLcom/opticast/player/data/AppContainer;->prefetchArtworkOnce(JLjava/util/List;)V
 HSPLcom/opticast/player/data/MemoryBudgetPolicyKt;->imageMemoryBudgetBytes(Z)I
+HSPLcom/opticast/player/data/MemoryBudgetPolicyKt;->imageDiskBudgetBytes(Z)J
+HSPLcom/opticast/player/data/MemoryBudgetPolicyKt;->posterDownloadConcurrency(Z)I
 HSPLcom/opticast/player/data/local/MediaScanner;-><init>(Landroid/content/Context;)V
 HSPLcom/opticast/player/data/local/MediaScanner;->scan(J)Ljava/util/List;
+HSPLcom/opticast/player/data/local/MediaScanner;->byId(J)Lcom/opticast/player/data/model/LocalVideo;
 HSPLcom/opticast/player/data/local/PosterCache;-><init>(Landroid/content/Context;)V
 HSPLcom/opticast/player/data/local/PosterCache;->warmUp()V
 HSPLcom/opticast/player/data/local/PosterCache;->localUrl(JLcom/opticast/player/data/model/Metadata;)Ljava/lang/String;
 HSPLcom/opticast/player/data/local/PosterCache;->prefetch(Ljava/util/List;)V
+HSPLcom/opticast/player/data/local/PosterCache;->keyFor(Lcom/opticast/player/data/model/LibraryEntry;)Ljava/lang/String;
 HSPLcom/opticast/player/ui/screens/LibraryScreenKt;->LibraryScreen(Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;I)V
 HSPLcom/opticast/player/ui/screens/LibraryViewModel;-><init>()V
 HSPLcom/opticast/player/ui/screens/LibraryViewModel;->scan(Z)V
+HSPLcom/opticast/player/ui/screens/LibraryViewModel;->recheckFiles()V
 HSPLcom/opticast/player/data/SettingsRepository;-><init>(Landroid/content/Context;)V
 HSPLcom/opticast/player/data/model/LibraryEntry;-><init>(Lcom/opticast/player/data/model/LocalVideo;Lcom/opticast/player/data/model/Metadata;)V
 HSPLcom/opticast/player/data/local/MetadataStore;-><init>(Landroid/content/Context;)V
 HSPLcom/opticast/player/data/local/PlaybackStateStore;-><init>(Landroid/content/Context;)V
 HSPLcom/opticast/player/data/local/PlaybackStateStore;->progressOf(J)Lcom/opticast/player/data/local/PlaybackState;
+HSPLcom/opticast/player/data/local/PlaybackStateStore;->state(J)Lcom/opticast/player/data/local/PlaybackState;
 HSPLcom/opticast/player/ui/components/CommonKt;->PosterCard(Lcom/opticast/player/data/model/LibraryEntry;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;IILandroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/ui/components/CommonKt;->PosterImage(Ljava/lang/String;Ljava/lang/String;Landroidx/compose/ui/Modifier;ILjava/lang/String;Ljava/lang/Long;Landroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/ui/components/CommonKt;->ShowCard(Ljava/lang/String;Ljava/util/List;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;IILandroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/ui/components/CommonKt;->ContinueWatchingCard(Lcom/opticast/player/data/model/LibraryEntry;FLjava/lang/String;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;ZLandroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/ui/components/OptimizedPosterKt;->OptimizedPoster(Ljava/lang/String;Ljava/lang/String;Landroidx/compose/ui/Modifier;ILandroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/ui/components/OptimizedPosterKt;->OptimizedPosterWithContentType(Ljava/lang/String;Ljava/lang/String;Landroidx/compose/ui/Modifier;ILandroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/data/repository/LibraryRepositoryImpl;-><init>(Lcom/opticast/player/data/local/MediaScanner;Lcom/opticast/player/data/local/MetadataStore;Lcom/opticast/player/data/local/PosterCache;)V
 HSPLcom/opticast/player/data/repository/LibraryRepositoryImpl;->refresh()V
 HSPLcom/opticast/player/data/repository/LibraryRepositoryImpl;->search(Ljava/lang/String;)Ljava/util/List;
@@ -44,6 +52,7 @@ HSPLcom/opticast/player/ui/components/CommonKt;->tmdbPosterUrl(Ljava/lang/String
 HSPLcom/opticast/player/data/remote/UpdateChecker;->isUpToDate(Landroid/content/Context;)Z
 HSPLcom/opticast/player/data/remote/UpdateChecker;->getUpToDateVersion(Landroid/content/Context;)Ljava/lang/String;
 HSPLcom/opticast/player/data/remote/UpdateChecker;->getWhatsNewVersion(Landroid/content/Context;)Ljava/lang/String;
+HSPLcom/opticast/player/data/remote/UpdateChecker;->getWhatsNewChangelog(Landroid/content/Context;)Ljava/lang/String;
 HSPLcom/opticast/player/ui/screens/LibraryHeaderKt;->LibraryHeader(Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;ZLkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/ui/screens/LibraryCardsKt;->WhatsNewCard(Ljava/lang/String;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
 HSPLcom/opticast/player/ui/screens/LibraryCardsKt;->UpToDateCard(Ljava/lang/String;Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;II)V
@@ -51,5 +60,16 @@ HSPLcom/opticast/player/ui/components/PerformanceMonitorKt;->measureFrame(Lkotli
 HSPLcom/opticast/player/ui/components/AccessibilityHelperKt;->posterContentDescription(Ljava/lang/String;Ljava/lang/String;ZZ)Ljava/lang/String;
 HSPLcom/opticast/player/data/CrashReportingKt;->init(Landroid/content/Context;)V
 HSPLcom/opticast/player/data/CrashReportingKt;->logCrash(Landroid/content/Context;Ljava/lang/Throwable;)V
+HSPLcom/opticast/player/data/CrashReportingKt;->logError(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+HSPLcom/opticast/player/data/CrashReportingKt;->getCrashReports(Landroid/content/Context;)Ljava/util/List;
 HSPLcom/opticast/player/data/DependencyInjectionKt;->getLibraryRepository()Lcom/opticast/player/data/repository/LibraryRepository;
 HSPLcom/opticast/player/ui/screens/LibraryGridKt;->LibraryGrid(Ljava/util/List;Ljava/lang/String;Landroidx/compose/foundation/lazy/grid/LazyGridState;Landroidx/compose/ui/input/nestedscroll/NestedScrollConnection;Landroidx/compose/foundation/layout/PaddingValues;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)V
+HSPLcom/opticast/player/data/PlaybackWorkBudget;->setSessionActive(Z)V
+HSPLcom/opticast/player/data/PlaybackWorkBudget;->awaitIdle()V
+HSPLcom/opticast/player/data/PlaybackWorkBudget;->awaitIdleOrPriority(Lkotlinx/coroutines/flow/StateFlow;)V
+HSPLcom/opticast/player/data/local/OfflineLibrary;->needsMatch(Lcom/opticast/player/data/model/LocalVideo;Lcom/opticast/player/data/model/Metadata;Ljava/lang/String;Z)Z
+HSPLcom/opticast/player/data/local/OfflineLibrary;->match(Lcom/opticast/player/data/model/LocalVideo;Lcom/opticast/player/data/model/Metadata;Z)Lcom/opticast/player/data/model/Metadata;
+HSPLcom/opticast/player/ui/screens/DetailScreenKt;->DetailScreen(JLkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/runtime/Composer;I)V
+HSPLcom/opticast/player/data/local/DetailCache;->clear(J)V
+HSPLcom/opticast/player/data/local/FileInventory;->reconcile(Ljava/util/List;)Ljava/util/List;
+HSPLcom/opticast/player/data/local/FolderExclusions;->isExcluded(Ljava/lang/String;)Z

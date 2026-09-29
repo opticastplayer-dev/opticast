@@ -8,28 +8,29 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Crash reporting for 9/10 rating - structure for Firebase Crashlytics or custom
- * - Logs crashes to file for debugging
- * - No internet required for basic reporting
- * - Can be extended to Firebase
+ * Crash reporting — saves crash info for debugging, works offline
+ * - Saves crashes to file, no internet needed
+ * - Keeps last 5 crashes to save space
+ * - Helps fix stability issues quickly
+ * - Private: stays on your device, not sent anywhere
  */
 object CrashReporting {
     private const val TAG = "OptiCastCrash"
     private const val CRASH_DIR = "crashes"
     
     fun init(context: Context) {
-        // Set up uncaught exception handler
+        // Save crashes to file when app crashes — helps fix bugs
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             try {
                 logCrash(context, throwable)
             } catch (e: Exception) {
-                Log.e(TAG, "Failed to log crash", e)
+                Log.e(TAG, "Failed to save crash info", e)
             }
-            // Call default handler
+            // Let system handle crash normally
             defaultHandler?.uncaughtException(thread, throwable)
         }
-        Log.i(TAG, "Crash reporting initialized")
+        Log.i(TAG, "Crash reporting ready")
     }
     
     fun logCrash(context: Context, throwable: Throwable) {
@@ -47,37 +48,54 @@ object CrashReporting {
                 OS: Android ${android.os.Build.VERSION.RELEASE} (API ${android.os.Build.VERSION.SDK_INT})
                 Device: ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}
                 Low RAM: ${isLowRamDevice(context)}
+                Data Saver: ${isDataSaver(context)}
                 
-                Stacktrace:
+                What happened:
                 $stackTrace
             """.trimIndent()
             
             crashFile.writeText(deviceInfo)
-            Log.e(TAG, "Crash logged to ${crashFile.absolutePath}")
+            Log.e(TAG, "Crash saved to ${crashFile.absolutePath}")
             
-            // Keep only last 5 crashes to save storage
+            // Keep only last 5 crashes to save space — stability
             val crashes = crashDir.listFiles()?.sortedByDescending { it.lastModified() } ?: emptyList()
             if (crashes.size > 5) {
-                crashes.drop(5).forEach { it.delete() }
+                crashes.drop(5).forEach {
+                    try { it.delete() } catch (_: Exception) {}
+                }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to log crash", e)
+            Log.e(TAG, "Failed to save crash", e)
         }
     }
     
     fun logError(tag: String, message: String, throwable: Throwable? = null) {
-        Log.e(tag, message, throwable)
-        // Could also log to file for non-fatal errors
+        try {
+            Log.e(tag, message, throwable)
+            // Could also save non-fatal errors to file for debugging
+        } catch (_: Exception) {
+            // Stability: Don't crash while logging error
+        }
     }
     
     fun getCrashReports(context: Context): List<File> {
-        val crashDir = File(context.filesDir, CRASH_DIR)
-        return crashDir.listFiles()?.sortedByDescending { it.lastModified() } ?: emptyList()
+        return try {
+            val crashDir = File(context.filesDir, CRASH_DIR)
+            crashDir.listFiles()?.sortedByDescending { it.lastModified() } ?: emptyList()
+        } catch (_: Exception) {
+            emptyList()
+        }
     }
     
     fun clearCrashes(context: Context) {
-        val crashDir = File(context.filesDir, CRASH_DIR)
-        crashDir.listFiles()?.forEach { it.delete() }
+        try {
+            val crashDir = File(context.filesDir, CRASH_DIR)
+            crashDir.listFiles()?.forEach {
+                try { it.delete() } catch (_: Exception) {}
+            }
+        } catch (_: Exception) {
+            // Stability: Don't crash while clearing
+        }
     }
     
     private fun getAppVersion(context: Context): String {
@@ -90,7 +108,19 @@ object CrashReporting {
     }
     
     private fun isLowRamDevice(context: Context): Boolean {
-        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
-        return activityManager.isLowRamDevice
+        return try {
+            val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+            activityManager.isLowRamDevice
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun isDataSaver(context: Context): Boolean {
+        return try {
+            AppContainer.dataSaver
+        } catch (_: Exception) {
+            false
+        }
     }
 }

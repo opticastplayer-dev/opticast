@@ -1,63 +1,60 @@
 # Privacy Policy — OptiCast Video Player
 
-**Version:** v2.6.84 (build 133) — Mobile Only, Offline-First, No Ads, No Tracking
+**Version:** v2.6.84 — No Ads, No Tracking, Open Source
 
 **Last updated:** 2026-09-29
 
 ### Summary
-OptiCast is **100% offline-first, privacy-focused, no ads, no tracking, GPL-3.0 open source**. Your local cinema — plays your own media, no movies or streaming accounts supplied.
+OptiCast is **100% private, no ads, no tracking, open source**. Your local cinema — plays your own videos, no movies or accounts included.
 
-### Data Collection
-**We collect nothing.** No analytics, no crash reporting to servers, no ads SDK, no tracking.
+### What We Collect
+**Nothing.** No analytics, no tracking, no ads.
 
-- **Local only:** Library scan via MediaStore, metadata from TMDB (only when you add API key), subtitles from OpenSubtitles/SubDL (only when you search with API keys)
-- **No internet required:** Works fully offline after initial metadata/subtitle caching
-- **Update check:** Once when internet detected (24h min, 7 days max), queries GitHub Releases API `api.github.com/repos/opticastplayer-dev/opticast/releases/latest` — minimal data, no personal info sent, only version check
-- **No accounts:** No login, no Trakt, no Plex, no iCloud sync (mobile only, not TV)
+- **Your videos stay on your device:** Finds videos on your phone, fetches movie info only if you want it, subtitles only when you search
+- **Works offline:** Works fully without internet after saving posters and subtitles
+- **Update check:** Only checks for updates when you have internet, uses minimal data, only checks version number, no personal info
+- **No accounts:** No login, no cloud, no sync
 
-### Permissions — Minimal 7
+### Permissions — Only What's Needed
 
-- `INTERNET` — TMDB metadata, OpenSubtitles/SubDL subtitles, GitHub update check (only when internet detected)
-- `ACCESS_NETWORK_STATE` — Check if internet available before update check (offline-first data sipping)
-- `WAKE_LOCK` — Keep screen awake while playing (if enabled in Settings)
-- `READ_MEDIA_VIDEO` — Scan device for video files via MediaStore (Android 13+)
-- `POST_NOTIFICATIONS` — MediaSession notification for playback controls (Android 13+)
-- `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_MEDIA_PLAYBACK` — Playback service for background audio + PiP
-- `REQUEST_INSTALL_PACKAGES` — In-app APK install via FileProvider for updates without browser
-- Legacy `READ_EXTERNAL_STORAGE` maxSdk 32 / `WRITE_EXTERNAL_STORAGE` maxSdk 29 — For Android 8-12 compatibility
+- **Internet** — To fetch movie information and subtitles, and check for updates (only when internet available)
+- **Network State** — To check if internet is available before update check (saves data)
+- **Video Library Access** — To find your video files
+- **Notifications** — To show playback controls
+- **Background Playback** — To keep playing in background and Picture-in-Picture
+- **Install Updates** — To install app updates inside the app without browser
+- **Keep Screen Awake** — To keep screen on while watching (if enabled)
 
 No location, no contacts, no microphone, no camera.
 
-### Offline-First
+### Works Offline
 
-- **Library:** Scanned via MediaStore, stored locally, no cloud
-- **Posters/Backdrops:** Cached via Coil + `PosterCache`, `prefetchArtworkOnce` for offline use, blurred poster fallback when no backdrop (never black)
-- **Subtitles:** Saved to `filesDir/subtitles/` with JSON sidecar, `secondary_subtitles.json` for dual subtitles, persists offline, always cached during scan when autoSubtitles enabled
-- **Metadata:** Cached in `MetadataStore`, `CachedDetails` bundle, offline-first, no network while fresh
-- **Thumbnails:** Frame previews cached for scrub, prepared on first scrub, offline
+- **Library:** Found on your device, saved locally, no cloud
+- **Posters:** Saved for offline viewing, beautiful blurred fallback never shows black
+- **Subtitles:** Saved on your device for offline viewing, supports two at once
+- **Movie Info:** Saved for offline, no internet needed later
 
-### Third-Party Services (Only When You Configure)
+### Optional Services (Only If You Want)
 
-- **TMDB:** Optional, requires your API key, fetches movie/TV metadata, posters, backdrops. This product uses TMDB API but not endorsed by TMDB. Provider credits in app.
-- **OpenSubtitles:** Optional subtitle search/download, requires API key, provider account rules/quotas apply. Subtitle authors retain rights.
-- **SubDL:** Optional alternative subtitle search, requires API key.
-- **OMDb / Fanart.tv:** Optional ratings + extra artwork, requires API keys.
+- **Movie Info:** Optional, fetches movie and TV information, posters
+- **Subtitles:** Optional subtitle search and download
+- **Extra Info:** Optional ratings and extra artwork
 
-All third-party use governed by their terms, quotas, copyright law. OptiCast does not claim redistribution licence.
+All optional services have their own terms. OptiCast doesn't claim ownership.
 
 ### Updates
 
-- Checks GitHub Releases API once when internet detected, 24h min, 7 days max — minimal data
-- In-app download to cache, installs via FileProvider, no browser
-- What's New card shows real changelog, compact design, dismissible
+- Checks for updates only when internet is available, uses minimal data
+- Downloads inside app, installs automatically, no browser
+- What's New shows real changes, easy to close
 
-### Children's Privacy
+### Kids
 
-No data collection, no ads, safe for all ages. Plays only your own media.
+No data collection, no ads, safe for all ages. Plays only your own videos.
 
 ### Changes
 
-Any changes to this policy will be in GitHub README + docs/PRIVACY.md + GitHub Pages.
+Any changes will be in GitHub and website.
 
 ### Contact
 
@@ -65,6 +62,6 @@ Any changes to this policy will be in GitHub README + docs/PRIVACY.md + GitHub P
 
 ### License
 
-GPL-3.0 — Open source, source in GitHub releases `complete-source.zip` contains prebuilt AAR 26M with libmpv.
+Open source — source code available in GitHub releases.
 
-**Package:** `com.opticast.player` | **MinSdk 26** | **TargetSdk 35** | **Mobile only** (no TV, touchscreen required=true) | **37.6M APK** full mpv 24 .so, baseline 54 locked v2.6.84 (133)
+**Works on:** Android 8 and newer, all phones, mobile only, offline-first

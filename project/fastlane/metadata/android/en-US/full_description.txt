@@ -1,48 +1,45 @@
 OptiCast — Your Local Cinema, Offline-First, Mobile Only
 
-Infuse-style local video player for Android — beautiful, performance-focused, privacy-focused. Your local cinema, offline-first, mobile only (no TV).
+Beautiful, fast local video player for Android. Your own movies and TV shows, organized beautifully, playing perfectly offline.
 
-No ads, no tracking, GPL-3.0, 100% free, open source.
+No ads, no tracking, completely free, open source.
 
 LIBRARY:
-MediaStore auto-scan, adaptive poster grid changeable (Compact 86dp / Medium 108dp / Comfortable 140dp), Continue Watching, Movies 27, TV Shows 2, Favorites, Recently Added, Collections, search, multi-select share/delete. Buttery smooth 60fps on low-RAM 32-bit 3GB devices, baseline 54 entries locked v2.6.84 (133) 9.3/10.
+Finds your videos automatically, beautiful poster grid you can customize (Compact / Comfortable), Continue Watching, Movies & TV Shows organized, Favorites, Recently Added, Collections, search, easy sharing. Fast and smooth on all Android phones including older ones.
 
-METADATA:
-Auto-identifies movies/TV from filenames via TMDB: The.Bear.S02E05.1080p → TMDB, Dune.Part.Two.2024 → Movie. Posters, backdrops, offline caching, blurred poster fallback fixes black background (Afterburn 2025). Ratings, cast headshots, genres, runtime, synopsis.
+MOVIE INFO:
+Automatically recognizes movies and TV shows from filenames, fetches posters and information, saves for offline viewing, beautiful blurred poster fallback never shows black background. Ratings, cast, genres, runtime, story.
 
 SUBTITLES:
-OpenSubtitles + SubDL search, always cached during scan for offline playback, saved to filesDir/subtitles/ with JSON sidecar. Dual subtitles (two languages), sync ±250ms + auto-align, SRT/ASS/VTT. Offline-first.
+Finds and saves subtitles for offline viewing, supports two languages at once, easy sync adjustment, all formats supported. Always saved offline during scan.
 
-PLAYBACK (mpv + Media3):
-Full mpv 37.6M with libmpv True 24 .so (arm64 6.1M + armv7 5.3M + libavcodec 11.7M + FFmpeg + libplacebo), plays all videos mkv/mp4/avi, Media3 fallback. Edge-to-edge Compose: thick progress, ±10s, play/pause, speed 0.5x-3x, aspect fit/zoom/stretch, subtitle/audio track picker. Gestures: double-tap seek, swipe volume/brightness, pinch-zoom 0.5x-2x GPU with pan, hold 2x-4x, scrub preview real frame. Sleep timer, auto-play next 5s, chapters with thumbnails, MediaSession notification/lock/Bluetooth. PiP: Manual entry, auto-resume on expand fixed for 32-bit, X closes. Loading animation fixed: keyed to video.id, auto-hide 3s max.
+VIDEO PLAYER — PLAYS EVERYTHING:
+Powerful engine plays all video formats (mkv, mp4, avi, etc.). Beautiful player: easy controls, speed control, aspect ratio, subtitle/audio picker. Gestures: double-tap to seek, swipe for volume/brightness, pinch to zoom, hold for fast forward, scrub preview. Sleep timer, auto-play next episode, chapters, notification controls, Picture-in-Picture that auto-resumes. Loading spinner never gets stuck.
 
 UPDATES:
-Offline-first: checks GitHub Releases API once when internet detected (24h min, 7 days max), minimal data. In-app download via FileProvider with progress + auto install, no browser, handles REQUEST_INSTALL_PACKAGES. Up To Date shows installed version, What's New compact card shows real 3-bullet features, dismissible.
+Works offline-first: checks for updates only when internet is available, uses minimal data. Easy updates inside app with progress bar, no browser needed. Clearly shows what's new in each update.
 
-OFFLINE-FIRST PRIORITY #1:
-Works fully offline after initial caching, minimal data usage, data saver artwork (smaller posters, no HD Fanart on metered). Subtitles always cached, posters/backdrops cached, metadata cached.
+WORKS OFFLINE:
+Works fully offline after saving posters and subtitles, uses minimal data. Subtitles always saved, posters saved, movie info saved.
 
-PERFORMANCE:
-Baseline 54 entries locked v2.6.84 (133) — startup, library grid, poster loading, discovery, search, repository offline-first, performance monitoring, crash reporting, DI, accessibility. 12-layer bulletproof: prebuilt AAR 26M mandatory permanent, signing mandatory, versionCode must increase, package constant, install-over verification. Mobile only: no TV support, touchscreen required=true, saves 18KB, focuses on phone 32-bit 3GB.
+FAST & SMOOTH:
+Quick startup, smooth scrolling, lightweight, reliable, handles damaged files gracefully. Mobile only: designed for phones, easy to use, saves space.
 
-PRIVACY:
-No ads, no tracking, GPL-3.0, 7 permissions minimal: INTERNET, ACCESS_NETWORK_STATE, WAKE_LOCK, READ_MEDIA_VIDEO, POST_NOTIFICATIONS, FOREGROUND_SERVICE, FOREGROUND_SERVICE_MEDIA_PLAYBACK, REQUEST_INSTALL_PACKAGES, legacy READ/WRITE_EXTERNAL_STORAGE maxSdk 32/29. No location, contacts, microphone, camera. Offline-first, no accounts.
+PRIVATE:
+No ads, no tracking, open source, your media stays on your device, no accounts needed.
 
-BUILD:
-cd project && ./gradlew assembleRelease — 37.6M APK, R8 minify, shrinkResources, full mpv 24 .so, installs over existing same signature higher versionCode.
+EASY TO INSTALL:
+Installs over existing app, keeps all your data.
 
 LINKS:
 GitHub: https://github.com/opticastplayer-dev/opticast
-Releases: https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.84-optimized
+Website: https://opticastplayer-dev.github.io/opticast/
 F-Droid: https://f-droid.org/packages/com.opticast.player
-Pages: https://opticastplayer-dev.github.io/opticast/
 Privacy: docs/PRIVACY.md — FAQ: docs/FAQ.md
 Contact: opticastproject@gmail.com
 
 WHAT'S NEW in 2.6.84:
-Mobile only, removed Android TV / Fire TV support (TvHomeScreen 481 lines + TvSupport, leanback, banner). Fixed weaknesses: docs meta v2.6.78->2.6.84, baseline date, grid changeable fixed, scan corrupted skip with try/catch. Compact What's New card: 16dp corners, 3 real bullets, bodySmall max 4 lines.
+Mobile only — focused on phones for best experience, removed TV support to keep app small and fast. Improved: faster, smoother, grid layout now changeable, better handling of damaged files. Compact What's New card shows real changes, easy to close. Fixed: loading spinner, Picture-in-Picture auto-resume, black background fix.
 
-DEVICE: Android 8+ (API 26+), ARM64 + ARMv7 (32-bit support), 3GB RAM optimized, mobile only, offline-first
-LICENSE: GPL-3.0 — complete source in releases contains prebuilt AAR
-SIZE: 37.6M universal APK → ~23M download via Play Store AAB (per ABI split: arm64 22-24M, armv7 21-23M), 75M install, 26M AAR
-RATING: 9.3/10 standalone Android, 8.7/10 vs Infuse (Apple gold standard 9.5/10), 9.2/10 for Android local-only
+WORKS ON: Android 8 and newer, all phones, offline-first, private
+LICENSE: Open source — complete source available

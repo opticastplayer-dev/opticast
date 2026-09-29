@@ -885,7 +885,7 @@ fun LibraryScreen(
         // Edge-to-edge: content scrolls under the status bar.
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
                         ) { padding ->
-        androidx.compose.runtime.key(tab) {
+        androidx.compose.runtime.key(tab, appSettings.libraryGrid) {
             val currentTab = tab
             val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
             LaunchedEffect(gridState) {
@@ -1163,7 +1163,7 @@ fun LibraryScreen(
                 item(key = "discovery-movies-header", span = { GridItemSpan(maxLineSpan) }) {
                     DiscoveryHeader("Movies", "Your movie collection, ready to explore.", Color(0xFF63CFFF), movies.size, expanded = searching || design.style == "minimal" || "movies" !in collapsedSections, onToggle = if (searching || design.style == "minimal") null else ({ toggleSection("movies") }))
                 }
-                if (searching || design.style == "minimal" || "movies" !in collapsedSections) items(movies, key = { "movie-${it.video.id}" }) { entry ->
+                if (searching || design.style == "minimal" || "movies" !in collapsedSections) items(movies, key = { "movie-${it.video.id}" }, contentType = { "movie" }) { entry ->
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = entry.video.id in selectedIds,
@@ -1188,7 +1188,7 @@ fun LibraryScreen(
                 item(key = "discovery-shows-header", span = { GridItemSpan(maxLineSpan) }) {
                     DiscoveryHeader("TV Shows", "Find your next episode.", Color(0xFFBB9FFF), shows.size, expanded = searching || design.style == "minimal" || "shows" !in collapsedSections, onToggle = if (searching || design.style == "minimal") null else ({ toggleSection("shows") }))
                 }
-                if (searching || design.style == "minimal" || "shows" !in collapsedSections) items(shows.entries.toList(), key = { "show-${it.key}" }) { (name, episodes) ->
+                if (searching || design.style == "minimal" || "shows" !in collapsedSections) items(shows.entries.toList(), key = { "show-${it.key}" }, contentType = { "show" }) { (name, episodes) ->
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = episodes.any { it.video.id in selectedIds },

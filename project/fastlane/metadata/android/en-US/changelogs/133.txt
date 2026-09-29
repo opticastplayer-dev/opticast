@@ -1,0 +1,13 @@
+v2.6.84 (133) - Mobile only, remove Android TV support
+
+• Mobile only app, not for TV devices - removed Android TV / Fire TV support:
+  - Removed ui/tv/ folder: TvHomeScreen 481 lines + TvSupport isTelevision
+  - AndroidManifest: removed leanback feature, banner tv_banner, LEANBACK_LAUNCHER category
+  - MainActivity: always show LibraryScreen, no TV check
+  - Touchscreen required=true, saves ~18KB, simplifies codebase
+
+• Fixed weaknesses: docs meta v2.6.78->2.6.83, baseline date, grid changeable fixed, scan corrupted skip
+
+• Compact What's New card shows real features, loading spinner fix
+
+• 37.6M APK full mpv 24 .so (now slightly smaller without TV), baseline 54 entries locked, versionCode 133, mobile only

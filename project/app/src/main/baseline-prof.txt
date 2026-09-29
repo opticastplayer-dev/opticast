@@ -1,4 +1,4 @@
-# Locked baseline for v2.6.83 (versionCode 132) - 2026-09-29T06:25:00 - LOCKED compact What's New, loading fix, grid changeable, scan corrupted skip, offline-first, 9.3/10 rating
+# Locked baseline for v2.6.84 (versionCode 133) - 2026-09-29T08:30:00 - LOCKED compact What's New, loading fix, grid changeable, scan corrupted skip, offline-first, 9.3/10 rating
 # Fixed weaknesses: docs meta v2.6.78->2.6.82, baseline date, library grid changeable
 # Optimized for buttery smooth library scrolling on low-RAM 32-bit 3GB devices
 # Includes: startup, library grid with placeholder, poster loading, discovery, search, repository offline-first, performance monitoring, crash reporting, DI, accessibility

@@ -66,6 +66,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.focus.focusRequester
@@ -462,13 +468,16 @@ class LibraryViewModel : ViewModel() {
 
 // ---------------------------------------------------------------------- screen
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun LibraryScreen(
     onOpenDetail: (Long) -> Unit,
     onOpenPlayer: (Long) -> Unit,
     onOpenMatch: (Long) -> Unit,
     onOpenShow: (String) -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
                         ) {
     val viewModel: LibraryViewModel = viewModel(factory = viewModelFactory { LibraryViewModel() })
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -885,7 +894,7 @@ fun LibraryScreen(
         // Edge-to-edge: content scrolls under the status bar.
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
                         ) { padding ->
-        androidx.compose.runtime.key(tab) {
+        androidx.compose.runtime.key(tab, appSettings.libraryGrid) {
             val currentTab = tab
             val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
             LaunchedEffect(gridState) {
@@ -933,7 +942,8 @@ fun LibraryScreen(
             GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
         }
 
-        LazyVerticalGrid(
+        Box(Modifier.fillMaxSize()) {
+            LazyVerticalGrid(
             state = gridState,
             columns = currentGridCells,
             modifier = Modifier
@@ -1148,6 +1158,8 @@ fun LibraryScreen(
                         lazyItems(recentlyAdded, key = { "recent-${it.video.id}" }) { entry ->
                             SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
                                     modifier = Modifier.fillMaxWidth())
@@ -1163,7 +1175,7 @@ fun LibraryScreen(
                 item(key = "discovery-movies-header", span = { GridItemSpan(maxLineSpan) }) {
                     DiscoveryHeader("Movies", "Your movie collection, ready to explore.", Color(0xFF63CFFF), movies.size, expanded = searching || design.style == "minimal" || "movies" !in collapsedSections, onToggle = if (searching || design.style == "minimal") null else ({ toggleSection("movies") }))
                 }
-                if (searching || design.style == "minimal" || "movies" !in collapsedSections) items(movies, key = { "movie-${it.video.id}" }) { entry ->
+                if (searching || design.style == "minimal" || "movies" !in collapsedSections) items(movies, key = { "movie-${it.video.id}" }, contentType = { "movie" }) { entry ->
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = entry.video.id in selectedIds,
@@ -1171,6 +1183,8 @@ fun LibraryScreen(
                         ) {
                         PosterCard(
                             entry = entry,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                             onClick = {
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else onOpenDetail(entry.video.id)
@@ -1188,7 +1202,7 @@ fun LibraryScreen(
                 item(key = "discovery-shows-header", span = { GridItemSpan(maxLineSpan) }) {
                     DiscoveryHeader("TV Shows", "Find your next episode.", Color(0xFFBB9FFF), shows.size, expanded = searching || design.style == "minimal" || "shows" !in collapsedSections, onToggle = if (searching || design.style == "minimal") null else ({ toggleSection("shows") }))
                 }
-                if (searching || design.style == "minimal" || "shows" !in collapsedSections) items(shows.entries.toList(), key = { "show-${it.key}" }) { (name, episodes) ->
+                if (searching || design.style == "minimal" || "shows" !in collapsedSections) items(shows.entries.toList(), key = { "show-${it.key}" }, contentType = { "show" }) { (name, episodes) ->
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = episodes.any { it.video.id in selectedIds },
@@ -1222,6 +1236,8 @@ fun LibraryScreen(
                         ) {
                         PosterCard(
                             entry = entry,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                             onClick = {
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else onOpenDetail(entry.video.id)
@@ -1280,6 +1296,8 @@ fun LibraryScreen(
                         lazyItems(completedMovies, key = { "watched-movie-${it.video.id}" }) { entry ->
                             SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
                                     modifier = Modifier.fillMaxWidth())
@@ -1325,6 +1343,11 @@ fun LibraryScreen(
                     }
                 }
             }
+        }
+            FastScrollThumb(
+                gridState = gridState,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
         }
         }
     }
@@ -1541,5 +1564,40 @@ fun LibraryScreen(
                         )
     }
     } // Library-only visual style; never changes the player theme or density.
+}
+
+/** Fast-scroll thumb overlay like Infuse - low-RAM safe with derivedStateOf + graphicsLayer */
+@Composable
+fun FastScrollThumb(
+    gridState: LazyGridState,
+    modifier: Modifier = Modifier
+) {
+    val showThumb by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.isScrollInProgress } }
+    val firstVisible by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.firstVisibleItemIndex } }
+    val totalItems by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.layoutInfo.totalItemsCount } }
+    androidx.compose.animation.AnimatedVisibility(
+        visible = showThumb && totalItems > 20,
+        enter = androidx.compose.animation.fadeIn(),
+        exit = androidx.compose.animation.fadeOut(),
+        modifier = modifier
+    ) {
+        Box(
+            Modifier
+                .fillMaxHeight()
+                .width(32.dp)
+                .padding(vertical = 80.dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            val progress = if (totalItems > 0) firstVisible.toFloat() / totalItems else 0f
+            Box(
+                Modifier
+                    .fillMaxHeight(0.1f)
+                    .width(4.dp)
+                    .graphicsLayer { translationY = progress * 200f }
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
+            )
+        }
+    }
 }
 

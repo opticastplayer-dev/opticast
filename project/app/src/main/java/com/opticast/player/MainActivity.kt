@@ -28,6 +28,8 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -153,6 +155,7 @@ private fun playerIntent(context: android.content.Context, videoId: Long): Inten
     return PlayerActivity.intent(context, videoId)
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0L, returnShowTitle: String? = null) {
     val navController = rememberNavController()
@@ -196,9 +199,10 @@ private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
     ) {
-        NavHost(
-            navController = navController,
-            startDestination = ROUTE_LIBRARY,
+        SharedTransitionLayout {
+            NavHost(
+                navController = navController,
+                startDestination = ROUTE_LIBRARY,
             // Keep the underlying library stationary; only the covering page fades.
             enterTransition = { fadeIn(animationSpec = tween(140)) },
             exitTransition = { androidx.compose.animation.ExitTransition.None },
@@ -214,6 +218,8 @@ private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0
                     onOpenMatch = { id -> navController.navigate("match/$id") },
                     onOpenShow = { name -> navigate("show/${Uri.encode(name)}") },
                     onOpenSettings = { navigate(ROUTE_SETTINGS) },
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this@composable,
                 )
             }
             composable(ROUTE_SETTINGS) {
@@ -254,6 +260,8 @@ private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0
                     onBack = { navController.popBackStack() },
                     onPlay = { launchPlayer(id) },
                     onOpenMatch = { navController.navigate("match/$id") },
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this@composable,
                 )
             }
             composable("match/{videoId}") { entry ->
@@ -262,6 +270,7 @@ private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0
                     videoId = id,
                     onDone = { navController.popBackStack() },
                 )
+            }
             }
         }
     }

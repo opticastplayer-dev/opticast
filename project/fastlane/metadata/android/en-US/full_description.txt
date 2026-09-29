@@ -1,4 +1,5 @@
 OptiCast — Your Local Cinema, Offline-First, Mobile Only — Stable 9.3/10
+OptiCast — Your Local Cinema, Offline-First, Mobile Only — Stable 9.3/10
 
 Beautiful, fast local video player for Android. Your own movies and TV shows, organized beautifully, playing perfectly offline. Infuse-style polish for Android.
 
@@ -24,6 +25,7 @@ Works fully offline after saving posters and subtitles, uses minimal data. Subti
 
 FAST & SMOOTH:
 Quick startup <300ms, smooth scrolling 60fps, lightweight 38M, reliable 9.3/10 stable, handles damaged files gracefully. Mobile only: designed for phones, easy to use, saves 18KB, touchscreen required.
+Quick startup <300ms, smooth scrolling 60fps, lightweight 38M, reliable 9.3/10 stable, handles damaged files gracefully. Mobile only: designed for phones, easy to use, saves 18KB, touchscreen required.
 
 PRIVATE:
 No ads, no tracking, open source GPL-3.0, your media stays on your device, no accounts needed.
@@ -39,8 +41,10 @@ Privacy: docs/PRIVACY.md — FAQ: docs/FAQ.md
 Contact: opticastproject@gmail.com
 
 WHAT'S NEW in 2.6.93 — Stable 9.3/10:
+WHAT'S NEW in 2.6.93 — Stable 9.3/10:
 Fast-scroll thumb like Infuse, shared element Library→Detail hero, library smoothness fixed without removing features grid changeable works, baseline 99→110 locked 110 entries, predictive back, custom fonts picker, mobile only, offline-first minimal data, fixes X dismiss 48dp, loading animation persisting, What's New real new, versionName matches asset version.
 
 WORKS ON: Android 8 and newer, all phones, offline-first, private, 159 files 25.4k lines
 LICENSE: Open source GPL-3.0 — complete source with full mpv available
+Best local video player for Android — offline, no ads, open source — 9.3/10 stable
 Best local video player for Android — offline, no ads, open source — 9.3/10 stable

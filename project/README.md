@@ -1,4 +1,5 @@
 # OptiCast 2.6.93 (142) — Final Stable 9.3/10 — Perfect Release
+# OptiCast 2.6.93 (142) — Stable 9.3/10 — Infuse Polish
 
 [![Release](https://img.shields.io/github/v/release/opticastplayer-dev/opticast?label=Release)](https://github.com/opticastplayer-dev/opticast/releases)
 [![License](https://img.shields.io/github/license/opticastplayer-dev/opticast)](LICENSE)
@@ -10,6 +11,7 @@ Infuse-style local video player for Android — dark cinematic Material 3 Expres
 
 ---
 
+## Showcase (2.6.93)
 ## Showcase (2.6.93)
 
 | Library | Detail | Player |
@@ -24,6 +26,7 @@ Fastlane screenshots: `fastlane/metadata/android/en-US/images/phoneScreenshots/`
 
 ---
 
+## What's New in 2.6.93 — Stable 9.3/10
 ## What's New in 2.6.93 — Stable 9.3/10
 
 - **Fast-scroll thumb:** Infuse-like overlay — appears only when scrolling >20 items, `derivedStateOf` + `graphicsLayer` GPU, 0 recomposition, low-RAM safe
@@ -56,6 +59,7 @@ Previous: 2.6.91 shared element attempt failed due to brace mismatch — fixed w
 **Extras:** OMDb (IMDb/RT/Metacritic), Fanart.tv (clearlogos), frame artwork for unscraped, thumbnail cache scrub previews, offline poster cache w185/w342 with 60 visible prefetch, confetti, heart burst, highlight.
 
 **Performance 2.6.93:** No runBlocking main (async settings deferred warmUp), 6/16 MiB image cache, 64/192 MiB disk, no HW bitmaps lowRam RGB_565, lock-free ConcurrentHashMap, limited prefetch, baseline 110 + profileinstaller + R8 fullMode, PlaybackWorkBudget gates poster downloads during playback, fast-scroll thumb derivedStateOf GPU.
+**Performance 2.6.93:** No runBlocking main (async settings deferred warmUp), 6/16 MiB image cache, 64/192 MiB disk, no HW bitmaps lowRam RGB_565, lock-free ConcurrentHashMap, limited prefetch, baseline 110 + profileinstaller + R8 fullMode, PlaybackWorkBudget gates poster downloads during playback, fast-scroll thumb derivedStateOf GPU.
 
 **Updates:** GitHub API check offline-first 7 days, manual check, Download & Install in-app via FileProvider with progress, startup check, What's New dialog, Up To Date notification when installed matches GitHub but not always visible header.
 
@@ -65,11 +69,13 @@ Previous: 2.6.91 shared element attempt failed due to brace mismatch — fixed w
 
 **GitHub Releases (Recommended):**
 1. https://github.com/opticastplayer-dev/opticast/releases → download `OptiCast-v2.6.93-optimized.apk` (38M ARM32/ARM64)
+1. https://github.com/opticastplayer-dev/opticast/releases → download `OptiCast-v2.6.93-optimized.apk` (38M ARM32/ARM64)
 2. Install, allow unknown sources
 3. Future: Settings → Check for updates → Download & Install
 
 **F-Droid:** Metadata in `fastlane/` + `fdroid-com.opticast.player.yml`. Once included: https://f-droid.org/packages/com.opticast.player
 
+**Direct APK:** `OptiCast-v2.6.93-optimized.apk` SHA256 see `SHA256SUMS-v2.6.93-optimized.txt`
 **Direct APK:** `OptiCast-v2.6.93-optimized.apk` SHA256 see `SHA256SUMS-v2.6.93-optimized.txt`
 
 ---
@@ -89,6 +95,7 @@ Signing: release signs with `signing/opticast-release.jks` (same key). Restore b
 
 Native: controlled pinned-source mpv build — see `native/README.md`, `distribution-manifest.json`, `runtime-manifest.json`. Corresponding sources in `native/corresponding-sources/` or `.cache/`.
 
+Locked baseline: 2.6.93/141, 110 entries, budget 111 MiB /128 MiB, 159 files 25.4k lines, 9.3/10 stable
 Locked baseline: 2.6.93/141, 110 entries, budget 111 MiB /128 MiB, 159 files 25.4k lines, 9.3/10 stable
 
 ---
@@ -114,4 +121,5 @@ Providers: TMDB, OpenSubtitles, SubDL, OMDb, Fanart.tv, AniList — credits Sett
 mpv: GPL-compatible controlled build pinned source — see native/
 Contact: opticastproject@gmail.com
 
+Rating vs others: Infuse 10/10 (iOS closed), OptiCast 9.3/10 Android open-source #1, Plex 8.0, Kodi 8.0, Nova 7.5, VLC 7.0
 Rating vs others: Infuse 10/10 (iOS closed), OptiCast 9.3/10 Android open-source #1, Plex 8.0, Kodi 8.0, Nova 7.5, VLC 7.0

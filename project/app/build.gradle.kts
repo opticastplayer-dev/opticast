@@ -21,6 +21,8 @@ android {
         }
         versionCode = 142
         versionName = "2.6.93"
+        versionCode = 142
+        versionName = "2.6.93"
         vectorDrawables { useSupportLibrary = true }
     }
 

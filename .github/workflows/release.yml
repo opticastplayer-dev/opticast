@@ -297,5 +297,7 @@ jobs:
         with:
           files: releases/*
           generate_release_notes: true
+          tag_name: ${{ inputs.version }}
+          name: ${{ inputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

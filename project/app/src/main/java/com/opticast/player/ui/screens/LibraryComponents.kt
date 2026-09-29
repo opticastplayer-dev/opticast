@@ -5,11 +5,15 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -27,12 +31,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.AutoFixHigh
@@ -71,67 +77,48 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-
-import com.opticast.player.ui.components.discoveryMotionEnabled
-import com.opticast.player.data.remote.tmdbBackdropUrl
-import com.opticast.player.ui.components.posterUrlFor
-import com.opticast.player.data.model.showTitleOf
-import com.opticast.player.ui.screens.countedLibraryTab
-import com.opticast.player.ui.screens.featuredTap
-import com.opticast.player.ui.screens.featuredPageOpacity
-import com.opticast.player.ui.screens.FeaturedTap
-import com.opticast.player.ui.screens.DiscoveryGutterDp
-import com.opticast.player.ui.screens.LibraryPosterInsetDp
-import com.opticast.player.ui.screens.LibraryBottomBarAlpha
-import com.opticast.player.ui.screens.LibraryWordmarkWidthFraction
-import com.opticast.player.ui.screens.libraryPosterMinimumDp
-
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
-import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.unit.Density
 import com.opticast.player.R
 import com.opticast.player.data.AppContainer
 import com.opticast.player.data.model.LibraryEntry
+import com.opticast.player.data.remote.UpdateChecker
+import com.opticast.player.data.remote.tmdbBackdropUrl
 import com.opticast.player.ui.components.AutoFitLabel
 import com.opticast.player.ui.components.PosterImage
-import com.opticast.player.data.remote.UpdateChecker
+import com.opticast.player.ui.components.discoveryMotionEnabled
+import com.opticast.player.data.model.showTitleOf
+import com.opticast.player.ui.components.posterUrlFor
 import kotlinx.coroutines.delay
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+
+
+// Extracted from LibraryScreen.kt to reduce god file size - all components made internal for reuse
+
+// Extracted from LibraryScreen.kt to reduce god file size - all components made internal for reuse
+
+// Extracted from LibraryScreen.kt to reduce god file size - all components made internal for reuse
 
 // Extracted from LibraryScreen.kt to reduce god file size - all components made internal for reuse
 
@@ -366,9 +353,7 @@ internal fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
         Column {
         BoxWithConstraints(Modifier.fillMaxWidth()) {
         val density = LocalDensity.current
-        val navigation = androidx.compose.foundation.layout.WindowInsets.navigationBars
-        val direction = androidx.compose.ui.platform.LocalLayoutDirection.current
-        val sideInset = with(density) { (navigation.getLeft(density, direction) + navigation.getRight(density, direction)).toDp() }
+        val sideInset = 0.dp
         val cellWidth = maxOf(com.opticast.player.ui.layout.adaptiveControlWidthDp(density.fontScale).dp,
             with(density) { widestLabelPx.toDp() } + 12.dp)
         val rowWidth = maxOf(maxWidth, cellWidth * 4 + sideInset)

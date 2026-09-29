@@ -290,12 +290,22 @@ jobs:
         with:
           name: OptiCast-APK
           path: releases/*
-
-              - name: Upload APK artifact
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: OptiCast-APK
           path: releases/*
+
+      - name: Create Release
+        if: always()
+        uses: softprops/action-gh-release@v2
+        with:
+          files: releases/*
+          generate_release_notes: true
+          tag_name: ${{ inputs.version }}
+          name: ${{ inputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release
         if: always()

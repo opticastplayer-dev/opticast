@@ -939,6 +939,16 @@ fun LibraryScreen(
         val currentGridCells = remember(appSettings.libraryGrid) {
             GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
         }
+
+        // Heart burst at top for visibility - moved from bottom bar
+        val favVersion by com.opticast.player.data.AppContainer.breadcrumb.favVersion.collectAsStateWithLifecycle(initialValue = 0)
+        var showHeartTop by remember { mutableStateOf(false) }
+        LaunchedEffect(favVersion) {
+            if (favVersion > 0) {
+                showHeartTop = true
+                kotlinx.coroutines.delay(1200)
+                showHeartTop = false
+            }
         }
 
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {

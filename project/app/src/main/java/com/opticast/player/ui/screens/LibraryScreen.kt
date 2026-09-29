@@ -858,10 +858,17 @@ fun LibraryScreen(
                     enter = androidx.compose.animation.slideInVertically(tween(180)) { it } + androidx.compose.animation.fadeIn(tween(140)),
                     exit = androidx.compose.animation.slideOutVertically(tween(180)) { it } + androidx.compose.animation.fadeOut(tween(140))
                         ) {
+                    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
                     LibraryBottomBar(favoriteVersion = favVersion, tab = tab,
-                        onTabChange = { closeSearch(); tab = it },
+                        onTabChange = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                            closeSearch(); tab = it
+                        },
                         movieCount = stats.movies, showCount = stats.shows, favoriteCount = favoriteTitleCount,
-                        searchOpen = searchOpen, onSearch = { if (searchOpen) closeSearch() else searchOpen = true },
+                        searchOpen = searchOpen, onSearch = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                            if (searchOpen) closeSearch() else searchOpen = true
+                        },
                         modifier = Modifier.onSizeChanged { bottomChromePx = it.height })
                 }
             }
@@ -1721,19 +1728,26 @@ private fun HeroPager(items: List<LibraryEntry>, onOpenDetail: (Long) -> Unit, o
     }
 }
 
-/** Compact labelled bottom bar; grows only as needed for system font scaling. */
+/** Compact labelled bottom bar with polish like Infuse — haptic feedback, heart burst, spring animations */
 @Composable
 private fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
     movieCount: Int, showCount: Int, favoriteCount: Int, searchOpen: Boolean, onSearch: () -> Unit,
     modifier: Modifier = Modifier, favoriteVersion: Int = 0) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val favoriteBounce = remember { androidx.compose.animation.core.Animatable(1f) }
     var lastFavoriteVersion by rememberSaveable { mutableStateOf(favoriteVersion) }
+    var showHeartBurst by remember { mutableStateOf(false) }
     LaunchedEffect(favoriteVersion) {
         if (favoriteVersion != lastFavoriteVersion) {
             lastFavoriteVersion = favoriteVersion
+            // Polish: Haptic feedback + heart burst like Infuse when adding favorite
+            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+            showHeartBurst = true
             favoriteBounce.snapTo(0.8f)
             favoriteBounce.animateTo(1.22f, tween(130))
             favoriteBounce.animateTo(1f, spring(dampingRatio = 0.38f, stiffness = 420f))
+            kotlinx.coroutines.delay(600)
+            showHeartBurst = false
         }
     }
     val destinations = listOf(Triple("movies", countedLibraryTab("Movies", movieCount), Icons.Filled.Movie),
@@ -1839,6 +1853,13 @@ private fun UpToDateCard(version: String, onDismiss: (() -> Unit)? = null) {
 @Composable
 private fun WhatsNewCard(version: String, onDismiss: () -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    // Polish: Confetti animation like Infuse when showing What's New — celebration
+    var showConfetti by remember { mutableStateOf(true) }
+    LaunchedEffect(version) {
+        showConfetti = true
+        kotlinx.coroutines.delay(2000)
+        showConfetti = false
+    }
     // COMPACT: Show real new features, compact design - user requested compact card
     val realChangelog = remember(version) {
         val stored = com.opticast.player.data.remote.UpdateChecker.getWhatsNewChangelog(context)
@@ -1846,39 +1867,40 @@ private fun WhatsNewCard(version: String, onDismiss: () -> Unit) {
             // Use stored real changelog but trim to compact 3 lines max
             stored.lines().filter { it.isNotBlank() }.take(4).joinToString("\n")
         } else {
-            // Compact real changelog for current version - only key features, no fluff
+            // Compact real changelog for current version - only key features, no fluff, universal language
             when {
-                version.contains("2.6.81") -> "• Fixed loading spinner persisting when quickly jumping videos\n• PiP expand auto-resumes playback (32-bit fix)\n• Blurred poster fallback fixes black background"
-                version.contains("2.6.80") -> "• Blurred poster fallback for detail (fixes black bg)\n• Up To Date shows installed version\n• Offline-first: minimal data, subtitles cached"
-                version.contains("2.6.79") -> "• Fixed black background in detail (poster fallback)\n• Offline-first + subtitles cached\n• Up To Date shows installed version"
-                version.contains("2.6.78") -> "• Offline-first: check once when internet detected\n• Always cache subtitles for offline\n• Minimal data usage"
-                else -> "• Stability, reliability, performance improvements\n• Offline-first, full mpv 38M, baseline locked"
+                version.contains("2.6.86") -> "• Library smooth like Settings — no white flash, fast scrolling\n• Scan never freezes — handles damaged files, crash log saved\n• Saves data — small posters on metered, only when not playing"
+                version.contains("2.6.85") -> "• Easy to understand for everyone — removed confusing technical words\n• Beautiful, fast, offline-first — works on all phones\n• Plays everything — simple language, no jargon"
+                version.contains("2.6.84") -> "• Mobile only — focused on phones for best experience\n• Faster and smoother — grid changeable, better file handling\n• Compact What's New shows real changes"
+                version.contains("2.6.81") -> "• Fixed loading spinner when quickly switching videos\n• Picture-in-Picture auto-resumes playback\n• Beautiful poster fallback fixes black background"
+                else -> "• Stability and performance improvements\n• Works offline, fast and smooth"
             }
         }
     }
-    // Compact card: smaller padding, smaller corners, tighter spacing
-    Surface(
-        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.primaryContainer
-    ) {
-        Column(
-            Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+    // Compact card: smaller padding, smaller corners, tighter spacing, with confetti like Infuse
+    Box(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)) {
+        Surface(
+            Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.primaryContainer
         ) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Text(
-                    "🎉 What's New in $version",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    maxLines = 1,
-                    modifier = Modifier.weight(1f)
-                )
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "🎉 What's New in $version",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        maxLines = 1,
+                        modifier = Modifier.weight(1f)
+                    )
                 // Compact X - 32dp visual, 48dp touch target via padding
                 Box(
                     Modifier
@@ -1902,6 +1924,16 @@ private fun WhatsNewCard(version: String, onDismiss: () -> Unit) {
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 maxLines = 4
             )
+        }
+    }
+        // Polish: Confetti celebration like Infuse — simple colorful dots when showing What's New
+        if (showConfetti) {
+            Row(
+                Modifier.fillMaxWidth().padding(top = 4.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text("🎊 ✨ 🎉 ✨ 🎊", style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }

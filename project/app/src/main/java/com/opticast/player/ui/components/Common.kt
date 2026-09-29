@@ -548,6 +548,146 @@ fun ShowCard(
     }
 }
 
+/** Polish: Highlight matching text in search like Infuse — bold yellow for query */
+@Composable
+fun HighlightedText(
+    text: String,
+    query: String,
+    modifier: Modifier = Modifier,
+    style: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.labelLarge,
+    highlightColor: Color = Color(0xFFFFE066)
+) {
+    val q = query.trim()
+    if (q.isEmpty() || !text.lowercase().contains(q.lowercase())) {
+        Text(text = text, style = style, modifier = modifier, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        return
+    }
+    val start = text.lowercase().indexOf(q.lowercase())
+    val end = start + q.length
+    androidx.compose.material3.Text(
+        text = androidx.compose.ui.text.buildAnnotatedString {
+            append(text.substring(0, start))
+            withStyle(style = androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.Bold, color = highlightColor)) {
+                append(text.substring(start, end))
+            }
+            append(text.substring(end))
+        },
+        style = style,
+        modifier = modifier,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+/** Polish: Heart burst animation when adding favorite like Infuse */
+@Composable
+fun HeartBurst(
+    visible: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "heartBurst")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 0.8f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = 600
+                0.8f at 0
+                1.4f at 150
+                1.0f at 300
+                1.1f at 450
+                1.0f at 600
+            }
+        ),
+        label = "heartScale"
+    )
+    if (visible) {
+        Box(modifier = modifier, contentAlignment = Alignment.Center) {
+            Text("❤️", fontSize = (24 * scale).sp)
+        }
+    }
+}
+
+/** Polish: Streak for stats like Infuse — "5 days in a row" */
+@Composable
+fun StreakBadge(
+    days: Int,
+    modifier: Modifier = Modifier
+) {
+    if (days <= 1) return
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFFFF6B35).copy(alpha = 0.9f)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text("🔥", fontSize = 12.sp)
+            Text(
+                "$days days",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        }
+    }
+}
+
+/** Polish: Illustration empty states like Infuse — cinema icon with gradient */
+@Composable
+fun IllustratedEmptyLibrary(
+    fromSearch: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 40.dp, vertical = 60.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Cinema illustration with gradient like Infuse
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+                .background(
+                    Brush.linearGradient(
+                        listOf(Color(0xFF667EEA), Color(0xFF764BA2))
+                    )
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Filled.Movie,
+                contentDescription = null,
+                modifier = Modifier.size(40.dp),
+                tint = Color.White
+            )
+        }
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = if (fromSearch) "Nothing matches" else "Your cinema is empty",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = if (fromSearch) {
+                "Try different words or check all genres"
+            } else {
+                "Add movies to your phone, then tap Scan to build your beautiful library"
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+    }
+}
+
 /** Bold section header used across the library. */
 @Composable
 fun SectionHeader(

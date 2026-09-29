@@ -504,6 +504,7 @@ fun SettingsScreen(
             item(key = "Media Settings") {
                 SettingsGroup("Media Settings") {
                 TrackSettingsCard(settings, scope)
+                SubtitleFontSettingsCard(scope)
                 LanguageDropdownCard(settings = settings, scope = scope)
                 SettingsCard(icon = Icons.Filled.Subtitles, title = "Auto subtitles") {
                     Row(
@@ -1090,6 +1091,61 @@ private fun TrackSettingsCard(settings: AppSettings, scope: CoroutineScope) {
         }
         Text("No matching forced/full track? Subtitles stay off. Download languages are set separately.", style = MaterialTheme.typography.bodySmall)
         Spacer(Modifier.height(10.dp))
+    }
+}
+
+@Composable
+private fun SubtitleFontSettingsCard(scope: CoroutineScope) {
+    val context = LocalContext.current
+    val fontManager = remember { AppContainer.subtitleFonts }
+    var fonts by remember { mutableStateOf(fontManager.fontNames()) }
+    var selectedFont by remember { mutableStateOf("System Default") }
+    val fontPicker = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let {
+            try {
+                val input = context.contentResolver.openInputStream(it)
+                val fileName = it.lastPathSegment?.substringAfterLast("/") ?: "custom.ttf"
+                val tempFile = java.io.File(context.cacheDir, fileName)
+                input?.use { inp -> tempFile.outputStream().use { out -> inp.copyTo(out) } }
+                if (fontManager.importFont(tempFile)) {
+                    fonts = fontManager.fontNames()
+                }
+                tempFile.delete()
+            } catch (_: Exception) {}
+        }
+    }
+    
+    SettingsCard(icon = Icons.Filled.Subtitles, title = "Subtitle fonts — custom") {
+        Text("Add your own subtitle fonts — offline, no internet needed. Supports .ttf and .otf. Falls back to system font.", style = MaterialTheme.typography.bodySmall)
+        Spacer(Modifier.height(8.dp))
+        Text("Available fonts: ${fonts.size}", style = MaterialTheme.typography.labelLarge)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            fonts.forEach { fontName ->
+                FilterChip(
+                    selected = selectedFont == fontName,
+                    onClick = { selectedFont = fontName },
+                    label = { Text(fontName, maxLines = 1) }
+                )
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick = { fontPicker.launch(arrayOf("font/*", "application/octet-stream")) }) {
+                Text("Import font")
+            }
+            if (selectedFont != "System Default") {
+                OutlinedButton(onClick = {
+                    if (fontManager.deleteFont(selectedFont)) {
+                        fonts = fontManager.fontNames()
+                        selectedFont = "System Default"
+                    }
+                }) {
+                    Text("Delete")
+                }
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Text("Fonts saved to: ${fontManager.fontDirPath()} — 10MB max per font, offline-first, private, stays on device", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 

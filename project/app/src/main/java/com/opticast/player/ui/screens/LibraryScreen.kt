@@ -933,16 +933,18 @@ fun LibraryScreen(
             GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
         }
 
-        LazyVerticalGrid(
-            state = gridState,
-            columns = currentGridCells,
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(chromeScroll)
-                .padding(top = padding.calculateTopPadding()).consumeWindowInsets(padding),
-            // Draw scrolling content behind the translucent bar; keep the last row reachable above it.
-            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 12.dp)
-                        ) {
+        // 10/10 minor polish: Fast-scroll thumb + exact skeleton integration - Box wrapper with overlay like Infuse
+        Box(Modifier.fillMaxSize()) {
+            LazyVerticalGrid(
+                state = gridState,
+                columns = currentGridCells,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .nestedScroll(chromeScroll)
+                    .padding(top = padding.calculateTopPadding()).consumeWindowInsets(padding),
+                // Draw scrolling content behind the translucent bar; keep the last row reachable above it.
+                contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 12.dp)
+            ) {
             if (!searching) item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
             }
@@ -1326,6 +1328,15 @@ fun LibraryScreen(
                 }
             }
         }
+            // 10/10 minor polish: Fast-scroll thumb overlay like Infuse - shows when scrolling, drag to fast scroll
+            com.opticast.player.ui.components.FastScrollThumb(
+                gridState = gridState,
+                itemCount = filtered.size,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .fillMaxHeight()
+                    .padding(end = 2.dp, top = 100.dp, bottom = 80.dp)
+            )
         }
     }
 

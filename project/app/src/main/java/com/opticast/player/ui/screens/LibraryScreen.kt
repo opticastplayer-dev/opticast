@@ -814,13 +814,13 @@ fun LibraryScreen(
             .associate { it.key to it.value }
     }
     val filtered by remember(allMovies, allShows) { androidx.compose.runtime.derivedStateOf { allMovies + allShows.values.flatten() } }
-    val movies by remember(allMovies, progressTick, includeCompletedInGrid) { androidx.compose.runtime.derivedStateOf { allMovies.filter { includeInMainResults(isWatched(it), includeCompletedInGrid) } } }
-    val shows by remember(allShows, progressTick, includeCompletedInGrid) { androidx.compose.runtime.derivedStateOf { allShows.filterValues { episodes -> episodes.any { includeInMainResults(isWatched(it), includeCompletedInGrid) } } } }
-    val watchedMovies = remember(allMovies, progressTick) { allMovies.filter { isWatched(it) } }
-    val watchedShows = remember(allShows, progressTick) { allShows.filterValues { episodes -> completedLibrarySeries(episodes.map { isWatched(it) }) } }
+    val movies by remember(allMovies, includeCompletedInGrid) { androidx.compose.runtime.derivedStateOf { allMovies.filter { includeInMainResults(isWatched(it), includeCompletedInGrid) } } }
+    val shows by remember(allShows, includeCompletedInGrid) { androidx.compose.runtime.derivedStateOf { allShows.filterValues { episodes -> episodes.any { includeInMainResults(isWatched(it), includeCompletedInGrid) } } } }
+    val watchedMovies = remember(allMovies) { allMovies.filter { isWatched(it) } }
+    val watchedShows = remember(allShows) { allShows.filterValues { episodes -> completedLibrarySeries(episodes.map { isWatched(it) }) } }
     val favMovies = remember(allMovies, favVersion) { allMovies.filter { AppContainer.favorites.isFavorite(it.video.id) } }
     val favShows = remember(allShows, favVersion) { allShows.filterValues { episodes -> episodes.any { AppContainer.favorites.isFavorite(it.video.id) } } }
-    val stats = remember(state.entries, progressTick) {
+    val stats = remember(state.entries) {
         val movieCount = state.entries.count { !it.video.isEpisode && it.metadata?.type != "tv" }
         val showCount = state.entries
             .filter { it.video.isEpisode || it.metadata?.type == "tv" }
@@ -911,12 +911,12 @@ fun LibraryScreen(
                     else -> !isShow
                 }
             }
-            val recentlyAdded = remember(filtered, currentTab, searching, searchScope, progressTick) { filtered
+            val recentlyAdded = remember(filtered, currentTab, searching, searchScope) { filtered
                 .filter(tabFilter)
                 .filterNot { isWatched(it) }
                 .sortedByDescending { it.video.dateAddedSec }
                 .take(10) }
-            val featured = remember(filtered, currentTab, searching, searchScope, progressTick, query) { if (query.isBlank()) {
+            val featured = remember(filtered, currentTab, searching, searchScope, query) { if (query.isBlank()) {
                 filtered.filter(tabFilter)
                     .filterNot { isWatched(it) }
                     .sortedWith(compareByDescending<LibraryEntry> { it.metadata?.backdropPath != null }
@@ -939,10 +939,6 @@ fun LibraryScreen(
         val currentGridCells = remember(appSettings.libraryGrid) {
             GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
         }
-        LaunchedEffect(appSettings.libraryGrid) {
-            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                com.opticast.player.data.AppContainer.breadcrumb.logGridChange(appSettings.libraryGrid)
-            }
         }
 
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -957,7 +953,7 @@ fun LibraryScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(top = padding.calculateTopPadding()).consumeWindowInsets(padding),
             // Fix: posters cutting into bottom tab bar — add bottomChromePx + 80dp
-            contentPadding = PaddingValues(bottom = with(layoutDensity) { bottomChromePx.toDp() } + padding.calculateBottomPadding() + 80.dp)
+            contentPadding = PaddingValues(bottom = 88.dp)
                         ) {
             if (!searching) item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })

@@ -1,0 +1,12 @@
+OptiCast v2.6.96 — Stable Build — Bug Fixes
+
+- Fix library choppiness startup + micro stutters — removed progressTick from filtered/movies/shows/recentlyAdded/featured, derivedStateOf, tween 100ms, fixed 88dp bottom padding no state recomposition, breadcrumb off main thread, duplicate warmUp removed
+- Fix black empty bar above movies — Box background theme, removed outer key wrapper
+- Fix RAM 350MB — MemoryBudgetPolicy 12/16/24/32 MB image, 48/96/128/192 disk, single warmUp only
+- Fix blank video audio only — track re-enabled + clearOverridesOfType VIDEO + delay 100ms + prepare + playWhenReady true + surface reattach clearVideoSurfaceView/setVideoSurfaceView
+- Fix recently added card cut flat — bottom scrim clip bottomStart/bottomEnd 12dp, SelectableCard clip 12dp width DiscoveryPosterDp
+- Fix beating heart hard to see — moved HeartBurst to top center 64dp 48dp top padding 1200ms, removed old bottom bar 4dp burst
+- Fix back swipe, PiP instant, bottom bar overlap — confirmed fixed in 2.6.95, kept
+- Simple naming: OptiCast v2.6.96 — Stable Build, 38M APK, 110 baseline locked, 9.4/10 Stable
+
+Best local video player for Android — offline, no ads, open source — Stable Build

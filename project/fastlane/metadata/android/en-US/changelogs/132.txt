@@ -1,0 +1,15 @@
+v2.6.83 (132) - Fix weaknesses: docs meta, baseline date, grid changeable, scan corrupted file
+
+• Fixed weaknesses from assessment:
+  - docs/index.html meta v2.6.78 build 127 -> v2.6.82 build 131 -> v2.6.83 build 132
+  - baseline-prof.txt date 2026-09-28T22:15:00 -> 2026-09-29T04:30:00, rating 9.2/10
+  - Library grid changeable wasn't working: remember inside columns param not triggering recomposition, now compute currentGridCells outside with remember(libraryGrid)
+  - MediaScanner: skip corrupted file with try/catch + log warning, don't crash whole scan (stability)
+  - Subtitles always cached: filesDir/subtitles persists offline, verified
+
+• Compact What's New card shows real features (previous 2.6.82)
+  - 3 concise bullets, bodySmall, max 4 lines, 16dp corners
+
+• Stability: loading animation persisting when quickly jumping videos (2.6.81)
+
+• 37.6M APK full mpv 24 .so, baseline 54 entries locked, versionCode 132

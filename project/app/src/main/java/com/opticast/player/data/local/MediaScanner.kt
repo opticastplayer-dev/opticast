@@ -50,23 +50,29 @@ class MediaScanner(private val context: Context) {
             val pathCol = cursor.getColumnIndex("relative_path") // -1 below API 29
 
             while (cursor.moveToNext()) {
-                val name = cursor.getString(nameCol) ?: continue
-                val duration = cursor.getLong(durCol)
-                if (duration < minDurationMs) continue
-                val id = cursor.getLong(idCol)
-                result += LocalVideo(
-                    id = id,
-                    name = name,
-                    uri = ContentUris.withAppendedId(collection, id).toString(),
-                    sizeBytes = cursor.getLong(sizeCol),
-                    durationMs = duration,
-                    dateAddedSec = cursor.getLong(dateCol),
-                    width = if (widthCol >= 0) cursor.getInt(widthCol) else 0,
-                    height = if (heightCol >= 0) cursor.getInt(heightCol) else 0,
-                    parsed = NameParser.parse(name),
-                    relativePath = if (pathCol >= 0) cursor.getString(pathCol).orEmpty() else "",
-                    modifiedSec = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED)),
-                )
+                try {
+                    val name = cursor.getString(nameCol) ?: continue
+                    val duration = cursor.getLong(durCol)
+                    if (duration < minDurationMs) continue
+                    val id = cursor.getLong(idCol)
+                    result += LocalVideo(
+                        id = id,
+                        name = name,
+                        uri = ContentUris.withAppendedId(collection, id).toString(),
+                        sizeBytes = cursor.getLong(sizeCol),
+                        durationMs = duration,
+                        dateAddedSec = cursor.getLong(dateCol),
+                        width = if (widthCol >= 0) cursor.getInt(widthCol) else 0,
+                        height = if (heightCol >= 0) cursor.getInt(heightCol) else 0,
+                        parsed = NameParser.parse(name),
+                        relativePath = if (pathCol >= 0) cursor.getString(pathCol).orEmpty() else "",
+                        modifiedSec = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED)),
+                    )
+                } catch (e: Exception) {
+                    // STABILITY: Skip corrupted file, don't crash whole scan
+                    android.util.Log.w("MediaScanner", "Skipping corrupted file at cursor ${cursor.position}: ${e.message}")
+                    continue
+                }
             }
         } ?: error("Video storage could not be queried. Saved library records were kept.")
         // A null cursor is a provider failure, not an empty device.

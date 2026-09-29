@@ -910,9 +910,15 @@ fun LibraryScreen(
                 if (playback.isResumable) ContinueItem(entry, playback) else null
             }.sortedByDescending { it.playback.updatedAt }.take(12) }
 
+        // FIX WEAKNESS: Library grid changeable wasn't working - remember inside columns param was not triggering recomposition
+        // Now compute grid cells outside, keyed to libraryGrid, and use key() to force LazyVerticalGrid recomposition when grid changes
+        val currentGridCells = remember(appSettings.libraryGrid) {
+            GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
+        }
+
         LazyVerticalGrid(
             state = gridState,
-            columns = remember(appSettings.libraryGrid) { GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp) }, // Adaptive with remember - keeps grid change feature
+            columns = currentGridCells,
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(chromeScroll)

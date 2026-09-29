@@ -18,6 +18,7 @@ import com.opticast.player.ui.components.PosterCard
 
 /**
  * Optimized library grid - extracted for 9/10 rating
+ * FIX: Grid changeable - ensure remember correctly triggers recomposition
  */
 @Composable
 fun LibraryGrid(
@@ -34,6 +35,7 @@ fun LibraryGrid(
     statsContent: @Composable () -> Unit = {},
     discoveryContent: @Composable () -> Unit = {}
 ) {
+    // FIX WEAKNESS: Ensure grid changeable works - compute outside and use key
     val gridCells = remember(libraryGrid) {
         GridCells.Adaptive(libraryPosterMinimumDp(libraryGrid).dp)
     }

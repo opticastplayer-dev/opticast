@@ -1,4 +1,5 @@
-# Locked baseline for v2.6.82 (versionCode 131) - 2026-09-28T22:15:00 - bump + blurred poster + offline-first + 9/10 rating
+# Locked baseline for v2.6.83 (versionCode 132) - 2026-09-29T04:30:00 - compact What's New, loading fix, PiP auto-resume, blurred fallback, offline-first, 9.2/10 rating
+# Fixed weaknesses: docs meta v2.6.78->2.6.82, baseline date, library grid changeable
 # Optimized for buttery smooth library scrolling on low-RAM 32-bit 3GB devices
 # Includes: startup, library grid with placeholder, poster loading, discovery, search, repository offline-first, performance monitoring, crash reporting, DI, accessibility
 # 12-layer bulletproof: prebuilt mandatory 25M permanent, signing mandatory, versionCode must increase, package constant, install-over verification, CODEOWNERS

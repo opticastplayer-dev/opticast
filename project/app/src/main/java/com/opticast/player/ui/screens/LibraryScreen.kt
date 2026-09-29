@@ -940,11 +940,10 @@ fun LibraryScreen(
             GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
         }
 
-        // Heart burst at top for visibility - moved from bottom bar (renamed to avoid clash with favorites favVersion)
-        val heartFavVersion by com.opticast.player.data.AppContainer.breadcrumb.favVersion.collectAsStateWithLifecycle(initialValue = 0)
+        // Heart burst at top for visibility - moved from bottom bar (uses existing favVersion from favorites)
         var showHeartTop by remember { mutableStateOf(false) }
-        LaunchedEffect(heartFavVersion) {
-            if (heartFavVersion > 0) {
+        LaunchedEffect(favVersion) {
+            if (favVersion > 0) {
                 showHeartTop = true
                 kotlinx.coroutines.delay(1200)
                 showHeartTop = false

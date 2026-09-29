@@ -1,4 +1,4 @@
-# OptiCast v2.6.93 (142) — Final Stable 9.3/10 — Your Local Cinema
+# OptiCast v2.6.93 — Stable Build
 
 ## 🎬 Beautiful, Fast, Offline-First, No Ads, Open Source
 

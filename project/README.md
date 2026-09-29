@@ -1,4 +1,4 @@
-# OptiCast 2.6.93 (142) — Final Stable 9.3/10 — Perfect Release
+# OptiCast v2.6.93 — Stable Build
 # OptiCast 2.6.93 (142) — Stable 9.3/10 — Infuse Polish
 
 [![Release](https://img.shields.io/github/v/release/opticastplayer-dev/opticast?label=Release)](https://github.com/opticastplayer-dev/opticast/releases)

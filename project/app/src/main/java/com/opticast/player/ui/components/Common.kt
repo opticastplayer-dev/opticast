@@ -14,7 +14,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.rememberSharedContentState
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -364,9 +363,8 @@ private val PosterScrim = Brush.verticalGradient(
 )
 
 /** Poster grid card for a single movie / episode file. */
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
-@OptIn(ExperimentalSharedTransitionApi::class)
 fun PosterCard(
     entry: LibraryEntry,
     onClick: () -> Unit,

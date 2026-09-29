@@ -99,7 +99,6 @@ import com.opticast.player.ui.components.rememberExternalPlayer
 import com.opticast.player.ui.components.FallbackPoster
 import com.opticast.player.ui.components.rememberFrameArtwork
 import com.opticast.player.ui.components.PosterImage
-import androidx.compose.animation.rememberSharedContentState
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi

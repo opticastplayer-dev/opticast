@@ -383,10 +383,7 @@ fun PosterCard(
     val pressed by interactionSource.collectIsPressedAsState()
     val scale by androidx.compose.animation.core.animateFloatAsState(
         targetValue = if (pressed) 0.96f else 1f,
-        animationSpec = androidx.compose.animation.core.spring(
-            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
-            stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
-        ),
+        animationSpec = androidx.compose.animation.core.tween(100),
         label = "posterScale"
     )
 

@@ -1177,20 +1177,20 @@ fun PlayerScreen(
         switchToNext()
     }
 
-    BackHandler { if (screenLocked) unlockVisible = true else (onSystemBack ?: onBack)() }
-    // 10/10 minor polish: Predictive back gesture - Android 14+ swipe back preview like Infuse
+    // Fix: Swiping back from now playing screen doesn't work
     if (android.os.Build.VERSION.SDK_INT >= 34) {
-        androidx.activity.compose.PredictiveBackHandler { progress ->
+        androidx.activity.compose.PredictiveBackHandler(enabled = true) { progress ->
             try {
                 progress.collect { backEvent ->
-                    // Show preview of library when swiping back - polish like Infuse
-                    val progressValue = backEvent.progress
-                    if (progressValue > 0.5f) {
-                        // Could animate player scaling down
-                    }
+                    val _progressValue = backEvent.progress
                 }
-            } catch (_: Exception) {}
+            } catch (_: Exception) {
+                return@PredictiveBackHandler
+            }
+            if (screenLocked) unlockVisible = true else (onSystemBack ?: onBack)()
         }
+    } else {
+        BackHandler { if (screenLocked) unlockVisible = true else (onSystemBack ?: onBack)() }
     }
 
     // ----------------------------------- titles -----------------------------------

@@ -813,9 +813,9 @@ fun LibraryScreen(
             .entries.sortedWith { a, b -> comparatorFor(sortBy).compare(a.value.first(), b.value.first()) }
             .associate { it.key to it.value }
     }
-    val filtered = remember(allMovies, allShows) { allMovies + allShows.values.flatten() }
-    val movies = remember(allMovies, progressTick, includeCompletedInGrid) { allMovies.filter { includeInMainResults(isWatched(it), includeCompletedInGrid) } }
-    val shows = remember(allShows, progressTick, includeCompletedInGrid) { allShows.filterValues { episodes -> episodes.any { includeInMainResults(isWatched(it), includeCompletedInGrid) } } }
+    val filtered by remember(allMovies, allShows) { androidx.compose.runtime.derivedStateOf { allMovies + allShows.values.flatten() } }
+    val movies by remember(allMovies, progressTick, includeCompletedInGrid) { androidx.compose.runtime.derivedStateOf { allMovies.filter { includeInMainResults(isWatched(it), includeCompletedInGrid) } } }
+    val shows by remember(allShows, progressTick, includeCompletedInGrid) { androidx.compose.runtime.derivedStateOf { allShows.filterValues { episodes -> episodes.any { includeInMainResults(isWatched(it), includeCompletedInGrid) } } } }
     val watchedMovies = remember(allMovies, progressTick) { allMovies.filter { isWatched(it) } }
     val watchedShows = remember(allShows, progressTick) { allShows.filterValues { episodes -> completedLibrarySeries(episodes.map { isWatched(it) }) } }
     val favMovies = remember(allMovies, favVersion) { allMovies.filter { AppContainer.favorites.isFavorite(it.video.id) } }

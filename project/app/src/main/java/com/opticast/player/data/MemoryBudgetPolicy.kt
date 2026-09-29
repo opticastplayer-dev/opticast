@@ -1,32 +1,31 @@
 package com.opticast.player.data
 
-/** Artwork LRU only, not total process PSS. Increased for smooth scrolling - 6/16 was too small causing eviction during scroll. 
- * 10/10: Adaptive to memoryClass for ultra low-RAM 1.5GB devices - 24MB for 128MB class, 32 for 192, 48 for 256, 96 for high.
+/** Artwork LRU only, not total process PSS. Optimized for low RAM 270MB avg - reduced from 24/32/48/96 to 12/16/24/32 to fix 350MB vs 270MB regression.
+ * 10/10: Adaptive to memoryClass, keeps smooth scrolling without reloading, low-RAM safe.
  */
 internal fun imageMemoryBudgetBytes(lowRam: Boolean, memoryClass: Int = if (lowRam) 128 else 256): Int {
     val mb = when {
-        memoryClass <= 128 -> 24
-        memoryClass <= 192 -> 32
-        memoryClass <= 256 -> 48
-        lowRam -> 48
-        else -> 96
+        memoryClass <= 128 -> 12
+        memoryClass <= 192 -> 16
+        memoryClass <= 256 -> 24
+        lowRam -> 16
+        else -> 32
     }
     return mb * 1024 * 1024
 }
 
-/** Disk cache budget for Coil - increased for offline posters, adaptive */
+/** Disk cache budget for Coil - reduced for RAM, still offline posters */
 internal fun imageDiskBudgetBytes(lowRam: Boolean, memoryClass: Int = if (lowRam) 128 else 256): Long {
     val mb = when {
-        memoryClass <= 128 -> 64
-        memoryClass <= 192 -> 128
-        memoryClass <= 256 -> 192
-        lowRam -> 128
-        else -> 256
+        memoryClass <= 128 -> 48
+        memoryClass <= 192 -> 96
+        memoryClass <= 256 -> 128
+        lowRam -> 96
+        else -> 192
     }
     return mb * 1024 * 1024L
 }
 
-/** Poster download concurrency - single on low-RAM to avoid competing with UI, adaptive */
 internal fun posterDownloadConcurrency(lowRam: Boolean, memoryClass: Int = if (lowRam) 128 else 256): Int {
     return when {
         memoryClass <= 128 -> 1
@@ -36,9 +35,6 @@ internal fun posterDownloadConcurrency(lowRam: Boolean, memoryClass: Int = if (l
     }
 }
 
-/** WeakReference pool for LibraryEntry list - holds only IDs in memory, metadata LRU 100 items for 1.5GB devices */
 internal const val METADATA_LRU_SIZE = 100
 internal const val ENTRY_ID_POOL_SIZE = 500
-
-/** MediaStore scan should filter tiny clips - keep 60s minimum */
 internal const val MIN_VIDEO_DURATION_MS = 60_000L

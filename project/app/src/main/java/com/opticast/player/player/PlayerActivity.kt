@@ -207,21 +207,20 @@ class PlayerActivity : ComponentActivity() {
         PiPController.inPictureInPicture = isInPictureInPictureMode
         if (isInPictureInPictureMode) { usedPip = true; refreshPip() }
         if (!isInPictureInPictureMode) {
-            // When expanding PiP, activity will become RESUMED and should auto-resume playback
-            // On 32-bit devices RESUMED can take >400ms, so use longer delay and check for expand
-            handler.postDelayed({
-                if (ownsPlaybackSession() && !this@PlayerActivity.isInPictureInPictureMode) {
-                    if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) {
-                        // Expanded to fullscreen - auto-resume if it was playing before PiP
-                        if (PiPController.wasPlayingBeforePip) {
-                            PiPController.onReturnFromPip?.invoke()
+            // Fix: Slow to cut sound when PiP closed, should be instant
+            if (!lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) {
+                if (isFinishing || isDestroyed) requestStop() else PiPController.onBackground?.invoke()
+            } else {
+                handler.postDelayed({
+                    if (ownsPlaybackSession() && !this@PlayerActivity.isInPictureInPictureMode) {
+                        if (lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) {
+                            if (PiPController.wasPlayingBeforePip) {
+                                PiPController.onReturnFromPip?.invoke()
+                            }
                         }
-                    } else {
-                        // Still not resumed - likely PiP was dismissed (X button), not expanded
-                        if (isFinishing || isDestroyed) requestStop() else PiPController.onBackground?.invoke()
                     }
-                }
-            }, 1000L)
+                }, 150L)
+            }
         }
     }
 

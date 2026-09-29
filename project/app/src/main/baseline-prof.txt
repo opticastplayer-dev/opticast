@@ -1,4 +1,4 @@
-# Locked baseline for v2.6.87 (versionCode 136) - 2026-09-29T11:00:00 - LOCKED polish to match Infuse, haptic heart burst confetti spring shimmer, universal language, mobile only, offline-first, 70 entries
+# Locked baseline for v2.6.88 (versionCode 137) - 2026-09-29T11:30:00 - LOCKED error fixes baseline 65->70 mismatch gradlew executable .git/config showHeartBurst unused, polish to match Infuse, universal language, mobile only, offline-first, 70 entries
 # Stability improvements: library grid buttery smooth like settings, scan corrupted skip per file try/catch, crash log filesDir/crashes keep 5, baseline 70 entries, offline data sipping w185 on metered, prefetch only when idle, playback loading fix keyed to video.id auto-hide 3s
 # Includes: startup, library grid with placeholder + animateItem + contentType + stable keys, poster loading offline-first, discovery, search, repository offline-first, performance monitoring, crash reporting, DI, accessibility, memory budget, playback work budget
 # 12-layer bulletproof: prebuilt mandatory 25M permanent, signing mandatory, versionCode must increase, package constant, install-over verification, CODEOWNERS

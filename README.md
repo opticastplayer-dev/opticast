@@ -12,7 +12,7 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build)](https://github.com/opticastplayer-dev/opticast/actions)
 [![Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.85 — Fast, smooth, mobile only, universal language, offline-first
+**Current:** v2.6.86 — Fast, smooth, mobile only, universal language, offline-first
 
 ### ✨ Why OptiCast?
 
@@ -67,9 +67,9 @@
 
 ### 📦 Installation
 
-#### GitHub Releases (Recommended) — Latest v2.6.85
+#### GitHub Releases (Recommended) — Latest v2.6.86
 1. Go to https://github.com/opticastplayer-dev/opticast/releases
-2. Download `OptiCast-v2.6.85-optimized.apk` from latest release
+2. Download `OptiCast-v2.6.86-optimized.apk` from latest release
 3. Install APK (allow unknown sources)
 4. Open → Grant video permission → Auto-scan → Enjoy!
 5. Settings → Check for updates → Download & Install in-app
@@ -124,11 +124,11 @@ Requires Android Studio Ladybug+ (Android 8+, JDK 17)
 - [ ] Trakt sync — optional
 - [ ] Cast support
 
-**Current:** v2.6.85 — Fast, smooth, mobile only, universal language, offline-first, no ads, open source
+**Current:** v2.6.86 — Fast, smooth, mobile only, universal language, offline-first, no ads, open source
 
 **Links:**
 - **GitHub:** https://github.com/opticastplayer-dev/opticast
-- **Releases:** https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.85-optimized
+- **Releases:** https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.86-optimized
 - **Website:** https://opticastplayer-dev.github.io/opticast/
 - **F-Droid:** https://f-droid.org/packages/com.opticast.player
 
@@ -138,4 +138,4 @@ OptiCast, OptiCast Video Player, local video player Android, Infuse alternative 
 
 ---
 
-**OptiCast — Your local cinema, offline-first, no ads, open source — v2.6.85 — 2026**
+**OptiCast — Your local cinema, offline-first, no ads, open source — v2.6.86 — 2026**

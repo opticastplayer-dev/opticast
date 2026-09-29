@@ -1833,47 +1833,69 @@ private fun UpToDateCard(version: String, onDismiss: (() -> Unit)? = null) {
 @Composable
 private fun WhatsNewCard(version: String, onDismiss: () -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
-    // FIX: Always show what's really new in updated version card, not old hardcoded info
-    // Try to get real changelog from UpdateChecker prefs (stored when version changed)
-    // If not available, show changelog for current version from fastlane
+    // COMPACT: Show real new features, compact design - user requested compact card
     val realChangelog = remember(version) {
-        // Try stored changelog from UpdateChecker (real GitHub release body)
         val stored = com.opticast.player.data.remote.UpdateChecker.getWhatsNewChangelog(context)
-        if (!stored.isNullOrBlank() && stored.length > 20) {
-            stored
+        if (!stored.isNullOrBlank() && stored.length > 20 && !stored.contains("clearly shows what's new")) {
+            // Use stored real changelog but trim to compact 3 lines max
+            stored.lines().filter { it.isNotBlank() }.take(4).joinToString("\n")
         } else {
-            // Fallback: show real changelog for current version based on versionCode
-            // This ensures card shows what's really new, not old 2.6.65 info
+            // Compact real changelog for current version - only key features, no fluff
             when {
-                version.contains("2.6.81") -> "• 🚀 Bump to v2.6.81 (130) — latest\n• 🎬 Blurred poster fallback for detail — fixes black background (Afterburn 2025)\n• ✅ Up To Date card shows installed version — matches real app\n• 🔋 Offline-first: check once when internet detected (24h min, 7 days max)\n• 📝 Always cache subtitles during scan for offline\n• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 130"
-                version.contains("2.6.80") -> "• 🚀 Bump to v2.6.80 (129) — latest optimizations\n• 🎬 Blurred poster fallback for detail when no backdrop — fixes black background\n• ✅ Up To Date card shows installed version — matches real app\n• 🔋 Offline-first: check once when internet detected, minimal data\n• 📝 Always cache subtitles during scan for offline\n• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 129"
-                version.contains("2.6.79") -> "• 🎬 Fixed black background in detail page — now shows poster fallback when no backdrop (Afterburn 2025 fix)\n• 🔋 Offline-first: poster scaled 1.2x + alpha 0.6 + gradient overlay\n• ✅ Up To Date card shows installed 2.6.79 not old GitHub — matches real version\n• 🌐 Check once when internet detected (24h min, 7 days max) — minimal data\n• 📝 Always cache subtitles during scan for offline\n• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 128"
-                version.contains("2.6.78") -> "• 🔋 OFFLINE-FIRST: Check once when internet detected, not every 6h — minimal data\n• 📵 Removed Up To Date card from library — only real update available\n• 🌐 Check once when internet detected (24h min, 7 days max) — data sipping\n• 📝 Always download subtitles during scan and cache for offline\n• ✅ Fixed Up To Date card shows installed version — matches real app\n• ✅ Baseline locked v2.6.78 with 54 entries"
-                version.contains("2.6.77") -> "• 🔧 Fixed version mismatch: APK now correctly shows 2.6.77 instead of 2.6.76\n• 🚀 9/10 improvements: optimized poster with placeholder (60fps on 3GB 32-bit)\n• 🛡️ Ultra bulletproof 12 layers: prebuilt AAR mandatory 25M permanent\n• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 126"
-                version.contains("2.6.76") -> "• 🚀 Ultra bulletproof + smooth scrolling: optimized poster with placeholder\n• 🛡️ 12-layer bulletproof: prebuilt AAR 25M mandatory\n• 📦 Full mpv 31M with libmpv True 24 .so, versionCode 125\n• 🎨 Split LibraryScreen 2116 lines into Header/Cards/Grid\n• ✅ Up To Date + What's New cards dismissible"
-                else -> "• 🚀 Updated to $version — latest improvements\n• 📦 Full mpv 38M with libmpv True 24 .so\n• 🔋 Offline-first, minimal data, subtitles cached\n• ✅ Baseline locked with 54 entries, buttery smooth"
+                version.contains("2.6.81") -> "• Fixed loading spinner persisting when quickly jumping videos\n• PiP expand auto-resumes playback (32-bit fix)\n• Blurred poster fallback fixes black background"
+                version.contains("2.6.80") -> "• Blurred poster fallback for detail (fixes black bg)\n• Up To Date shows installed version\n• Offline-first: minimal data, subtitles cached"
+                version.contains("2.6.79") -> "• Fixed black background in detail (poster fallback)\n• Offline-first + subtitles cached\n• Up To Date shows installed version"
+                version.contains("2.6.78") -> "• Offline-first: check once when internet detected\n• Always cache subtitles for offline\n• Minimal data usage"
+                else -> "• Stability, reliability, performance improvements\n• Offline-first, full mpv 38M, baseline locked"
             }
         }
     }
-    val changelog = realChangelog
-    Surface(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.primaryContainer) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("🎉 What's New in $version", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.weight(1f))
-                IconButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.size(48.dp) // Larger touch target - fix X not dismissing
+    // Compact card: smaller padding, smaller corners, tighter spacing
+    Surface(
+        Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.primaryContainer
+    ) {
+        Column(
+            Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "🎉 What's New in $version",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    maxLines = 1,
+                    modifier = Modifier.weight(1f)
+                )
+                // Compact X - 32dp visual, 48dp touch target via padding
+                Box(
+                    Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(onClick = onDismiss),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         Icons.Filled.Close,
                         "Dismiss",
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
-            Text(changelog, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
-            Text("This card shows when app is fully updated — clearly shows what's new!", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f))
+            // Compact changelog - bodySmall, tighter line height, max 4 lines
+            Text(
+                realChangelog,
+                style = MaterialTheme.typography.bodySmall.copy(lineHeight = 16.sp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                maxLines = 4
+            )
         }
     }
 }

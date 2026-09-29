@@ -12,7 +12,7 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build)](https://github.com/opticastplayer-dev/opticast/actions)
 [![Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.81 (build 130) — 37.6M APK, full mpv True 24 .so, baseline 54 entries locked, offline-first
+**Current:** v2.6.82 (build 131) — 37.6M APK, full mpv True 24 .so, baseline 54 entries locked, offline-first
 
 ### ✨ Why OptiCast?
 
@@ -61,29 +61,29 @@
 #### Updates (Offline-First, Data Sipping)
 - **Check:** Once when internet detected (24h min, 7 days max), not every 6h, minimal data usage
 - **Library:** **No Up To Date card spam** on every startup — only real update available shows dialog
-- **Settings:** Up To Date card only in Settings (not library), shows **installed version** (2.6.81) not old GitHub version — matches real app version (fixed 2.6.77 vs 2.6.78 bug)
+- **Settings:** Up To Date card only in Settings (not library), shows **installed version** (2.6.82) not old GitHub version — matches real app version (fixed 2.6.77 vs 2.6.78 bug)
 - **In-App:** Download & Install via FileProvider, progress, no browser needed, clearly shows what's new (1000 chars, not truncated link)
 
 #### Performance & Bulletproof
-- **Baseline:** 54 entries locked v2.6.81 (130) — startup, library grid, poster loading, discovery, search, repository, performance monitoring, crash reporting, DI, accessibility
+- **Baseline:** 54 entries locked v2.6.82 (131) — startup, library grid, poster loading, discovery, search, repository, performance monitoring, crash reporting, DI, accessibility
 - **12-Layer Bulletproof:** Prebuilt AAR 25M permanent mandatory, signing mandatory, versionCode must increase, package constant, install-over verification, CODEOWNERS
 - **Size:** 37.6M APK universal (dual ABIs) → **~23M download via Play Store AAB** (per ABI split), 75M install, 26M AAR (53.3M uncompressed .so: arm64 28.1M + armv7 25.2M)
 - **Workspace:** 107M / 128MB SAFE (cleaned)
 
 ### 📦 Installation
 
-#### GitHub Releases (Recommended) — Latest v2.6.81-optimized
+#### GitHub Releases (Recommended) — Latest v2.6.82-optimized
 1. Go to https://github.com/opticastplayer-dev/opticast/releases
-2. Latest: **v2.6.81-optimized** — Download `OptiCast-v2.6.81-optimized.apk` **37.6M full mpv** (24 .so)
+2. Latest: **v2.6.82-optimized** — Download `OptiCast-v2.6.82-optimized.apk` **37.6M full mpv** (24 .so)
 3. SHA256 in `SHA256SUMS` file
-4. Install APK (allow unknown sources) — installs over existing (same signature, higher versionCode 130 > 130 > 128)
+4. Install APK (allow unknown sources) — installs over existing (same signature, higher versionCode 131 > 131 > 128)
 5. Open → Grant video permission → Auto-scan → Enjoy!
 6. Settings → Check for updates → Download & Install in-app
 
 #### F-Droid
 - **Available:** https://f-droid.org/packages/com.opticast.player
-- Auto-updates from GitHub releases (Tags mode) — v2.6.81 will be built in 2-3 days
-- Metadata in `project/fastlane/` + changelogs 125-130
+- Auto-updates from GitHub releases (Tags mode) — v2.6.82 will be built in 2-3 days
+- Metadata in `project/fastlane/` + changelogs 125-131
 
 #### Google Play Store (If Uploaded)
 - **Download size:** ~23M via AAB (per ABI: arm64 22-24M, armv7 21-23M) vs 37.6M universal APK
@@ -98,7 +98,7 @@ ls project/native/prebuilt/opticast-mpv-runtime.aar # 26M must exist
 cd project && ./gradlew assembleRelease # 37.6M APK, R8 minify, shrinkResources
 
 # GitHub Actions (official)
-# Trigger via workflow_dispatch with version input: 2.6.81-optimized
+# Trigger via workflow_dispatch with version input: 2.6.82-optimized
 # Builds 37.6M APK + 26M source + SHA256, uploads to release
 
 # Media3-only (quick, no mpv, doesn't play some videos)
@@ -143,7 +143,7 @@ Requires Android Studio Ladybug+ (AGP 8.7, Kotlin 2.0, compileSdk 36, minSdk 26,
 - [x] Always cache subtitles during scan for offline
 - [x] Blurred poster fallback for detail (fix black background Afterburn)
 - [x] No Up To Date card spam in library — only real update available
-- [x] Baseline locked v2.6.81 (130) 54 entries, 12-layer bulletproof
+- [x] Baseline locked v2.6.82 (131) 54 entries, 12-layer bulletproof
 - [x] Google indexing: Pages enabled https://opticastplayer-dev.github.io/opticast/, SEO meta, sitemap.xml, robots.txt, 19 topics
 - [x] F-Droid ready, auto-update from GitHub Tags
 - [x] Workspace 107M / 128MB SAFE, 37.6M APK full mpv dual-ABI
@@ -151,11 +151,11 @@ Requires Android Studio Ladybug+ (AGP 8.7, Kotlin 2.0, compileSdk 36, minSdk 26,
 - [ ] Trakt sync — optional
 - [ ] Cast + trailer in detail
 
-**Current:** v2.6.81 (130) — 37.6M APK, 54 baseline entries, 107M workspace, offline-first, no ads, open source
+**Current:** v2.6.82 (131) — 37.6M APK, 54 baseline entries, 107M workspace, offline-first, no ads, open source
 
 **Links:**
 - **GitHub:** https://github.com/opticastplayer-dev/opticast
-- **Releases:** https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.81-optimized
+- **Releases:** https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.82-optimized
 - **Pages (SEO):** https://opticastplayer-dev.github.io/opticast/
 - **F-Droid:** https://f-droid.org/packages/com.opticast.player
 - **License:** https://www.gnu.org/licenses/gpl-3.0.html
@@ -174,4 +174,4 @@ OptiCast, OptiCast Video Player, local video player Android, Infuse Android alte
 
 ---
 
-**OptiCast — Your local cinema, offline-first, no ads, open source — v2.6.81 (130) — 2026**
+**OptiCast — Your local cinema, offline-first, no ads, open source — v2.6.82 (131) — 2026**

@@ -1,0 +1,13 @@
+v2.6.82 (131) - Compact What's New card shows real features
+
+• Compact What's New card: shows real new features, compact design
+  - Fixed loading spinner persisting when quickly jumping videos (keyed to video.id, auto-hide 3s)
+  - PiP expand auto-resumes playback (32-bit fix)
+  - Blurred poster fallback fixes black background (Afterburn 2025)
+  - Real changelog not generic, 3 concise bullets, bodySmall, max 4 lines
+
+• Stability: loading animation fix (previous 2.6.81) - prevents persistent spinner until screen closed
+
+• Complete GitHub README for visitors
+
+• 37.6M APK full mpv 24 .so, baseline 54 entries locked, versionCode 131

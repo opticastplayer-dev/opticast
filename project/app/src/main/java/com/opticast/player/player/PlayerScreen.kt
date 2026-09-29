@@ -1357,11 +1357,9 @@ fun PlayerScreen(
                     } else {
                         view.videoSurfaceView?.visibility = android.view.View.VISIBLE
                         view.visibility = android.view.View.VISIBLE
-                        // Robust reattach: clear + set surface to fix blank video after audio only
-                        view.videoSurfaceView?.let { surfaceView ->
-                            view.clearVideoSurfaceView(surfaceView)
-                            view.setVideoSurfaceView(surfaceView)
-                        }
+                        // Robust reattach: reassign player to force surface reattach
+                        view.player = null
+                        view.player = controller
                     }
                     view.resizeMode = surfaceResizeMode(resizeMode)
                     val surfaceScale = if(selectedEngine == "mpv") 1f else aggressiveVideoScale(resizeMode)

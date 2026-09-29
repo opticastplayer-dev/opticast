@@ -8,6 +8,7 @@ OptiCast v2.6.92 (141) — Stable 9.2/10 — Infuse Polish
 - Mobile only: removed TV support saves 18KB, touchscreen required=true
 - Offline-first #1: checks once when internet detected 7 days 24h min, minimal data, always download subtitles during scan cache them
 - Fixes: Tapping X dismiss 48dp, loading animation persisting when quickly jumping videos, What's New shows real new not old, versionName matches asset version, complete source with full mpv
-- Version consistency all match perfectly: build.gradle.kts 141/2.6.92, baseline 141/2.6.92 110 entries, README v2.6.92 build 141, docs/index.html Version 2.6.92 v2.6.92-optimized Download Latest v2.6.92, sitemap v2.6.92-optimized, fastlane 141.txt v2.6.92, APK versionName matches asset version, 38M APK
+- LibraryScreen 2203->1603 + LibraryComponents 777 modular, 0 private, 0 star imports, 0 TODO, 6 tests, workflow if: always() fixed
+- Version consistency all match perfectly: build.gradle.kts 141/2.6.92, baseline 141/2.6.92 110 entries, README v2.6.92 build 141, docs/index.html Version 2.6.92 v2.6.92-optimized Download Latest v2.6.92, fastlane 141.txt v2.6.92, APK versionName matches asset version, 38M APK
 
 Rating: Infuse 10/10 iOS closed, OptiCast 9.2/10 Android open-source #1, Plex 8.0, Kodi 8.0, Nova 7.5, VLC 7.0 — stable release ready

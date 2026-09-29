@@ -286,10 +286,9 @@ fun PosterImage(
     remoteUrl: String? = null,
     videoId: Long? = null,
 ) {
-    var useRemote by remember(url) { mutableStateOf(false) }
-    var failed by remember(url) { mutableStateOf(false) }
+    var useRemote by remember(url, remoteUrl) { mutableStateOf(false) }
+    var failed by remember(url, remoteUrl) { mutableStateOf(false) }
     val effectiveUrl = if (useRemote && remoteUrl != null) remoteUrl else url
-    val rememberedUrl = remember(effectiveUrl) { effectiveUrl }
     // Placeholder brush - shows immediately while real poster loads, prevents white flash
     val placeholderBrush = remember {
         Brush.linearGradient(
@@ -301,21 +300,21 @@ fun PosterImage(
         )
     }
     Box(modifier.background(placeholderBrush)) {
-        if (rememberedUrl != null && !failed) {
+        if (effectiveUrl != null && !failed) {
             AsyncImage(
                 onError = {
-                    if (!useRemote && remoteUrl != null && rememberedUrl != remoteUrl) {
+                    if (!useRemote && remoteUrl != null && effectiveUrl != remoteUrl) {
                         useRemote = true
                     } else {
                         failed = true
                     }
                 },
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(rememberedUrl)
-                    .crossfade(true)
-                    .crossfade(200)
-                    .memoryCacheKey(rememberedUrl)
-                    .diskCacheKey(rememberedUrl)
+                    .data(effectiveUrl)
+                    .crossfade(false)
+                    .crossfade(0)
+                    .memoryCacheKey(effectiveUrl)
+                    .diskCacheKey(effectiveUrl)
                     .diskCachePolicy(coil.request.CachePolicy.ENABLED)
                     .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                     .build(),

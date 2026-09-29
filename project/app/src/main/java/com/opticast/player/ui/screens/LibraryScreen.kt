@@ -894,7 +894,6 @@ fun LibraryScreen(
         // Edge-to-edge: content scrolls under the status bar.
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
                         ) { padding ->
-        androidx.compose.runtime.key(tab, appSettings.libraryGrid) {
             val currentTab = tab
             val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
             LaunchedEffect(gridState) {
@@ -938,20 +937,27 @@ fun LibraryScreen(
         // Now compute grid cells outside, keyed to libraryGrid, and use key() to force LazyVerticalGrid recomposition when grid changes
         // 10/10: Breadcrumb for grid change + adaptive RAM log
         val currentGridCells = remember(appSettings.libraryGrid) {
-            com.opticast.player.data.AppContainer.breadcrumb.logGridChange(appSettings.libraryGrid)
             GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
         }
+        LaunchedEffect(appSettings.libraryGrid) {
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                com.opticast.player.data.AppContainer.breadcrumb.logGridChange(appSettings.libraryGrid)
+            }
+        }
 
-        Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
             LazyVerticalGrid(
             state = gridState,
             columns = currentGridCells,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .fillMaxSize()
                 .nestedScroll(chromeScroll)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(top = padding.calculateTopPadding()).consumeWindowInsets(padding),
-            // Draw scrolling content behind the translucent bar; keep the last row reachable above it.
-            contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 12.dp)
+            // Fix: posters cutting into bottom tab bar — add bottomChromePx + 80dp
+            contentPadding = PaddingValues(bottom = with(layoutDensity) { bottomChromePx.toDp() } + padding.calculateBottomPadding() + 80.dp)
                         ) {
             if (!searching) item(span = { GridItemSpan(maxLineSpan) }) {
                 LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
@@ -1348,7 +1354,6 @@ fun LibraryScreen(
                 gridState = gridState,
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
-        }
         }
     }
 

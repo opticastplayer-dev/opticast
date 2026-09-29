@@ -1757,6 +1757,15 @@ private fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
     val countStyle = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold)
     val widestLabelPx = destinations.maxOf { textMeasurer.measure(it.second, countStyle, softWrap = false).size.width }
     val barHeight = 52.dp + 14.dp * (LocalDensity.current.fontScale - 1f).coerceAtLeast(0f)
+    // Polish: Heart burst UI like Infuse — shows when adding favorite
+    Box(Modifier.fillMaxWidth()) {
+        if (showHeartBurst) {
+            com.opticast.player.ui.components.HeartBurst(
+                visible = true,
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 4.dp)
+            )
+        }
+    }
     Surface(modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = LibraryBottomBarAlpha), tonalElevation = 0.dp) {
         Column {

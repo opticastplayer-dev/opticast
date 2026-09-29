@@ -436,18 +436,29 @@ fun PlayerScreen(
     fun eventIsCurrent(): Boolean = requestIsCurrent() && samePlaybackItem(video.id,controller.currentMediaItem?.mediaId)
 
     // ------------------------- state mirrored from the player -------------------------
-    var isPlaying by remember { mutableStateOf(eventIsCurrent() && controller.isPlaying) }
-    var buffering by remember { mutableStateOf(controller.playbackState == Player.STATE_BUFFERING) }
-    // Fix loading animation persisting when quickly jumping between videos - reset buffering on video change
+    // STABILITY: Fix loading animation persisting when quickly jumping videos
+    // Key all player state to video.id so rapid switches don't retain old buffering
+    var isPlaying by remember(video.id) { mutableStateOf(false) }
+    var buffering by remember(video.id) { mutableStateOf(false) }
+    // Reset all loading state immediately when video changes - prevents persistent spinner
     LaunchedEffect(video.id) {
         buffering = false
+        isPlaying = false
     }
-    var playbackEnded by remember { mutableStateOf(controller.playbackState == Player.STATE_ENDED) }
+    var playbackEnded by remember(video.id) { mutableStateOf(false) }
     // Errors and progress warnings are scoped to the currently requested movie.
     var engineError by remember(video.id) { mutableStateOf<String?>(null) }
-    var diagnosticErrorCode by remember(video.id) { mutableStateOf<Int?>(if(eventIsCurrent()) controller.playerError?.errorCode else null) }
+    var diagnosticErrorCode by remember(video.id) { mutableStateOf<Int?>(null) }
     var progressWarning by remember(video.id) { mutableStateOf(false) }
     var retryAttempt by remember(video.id) { mutableIntStateOf(0) }
+    // STABILITY: When video changes quickly, reset all error/ended state immediately
+    LaunchedEffect(video.id) {
+        playbackEnded = false
+        engineError = null
+        diagnosticErrorCode = null
+        progressWarning = false
+        retryAttempt = 0
+    }
     var showDiagnostics by remember { mutableStateOf(false) }
     var showSkipRanges by remember { mutableStateOf(false) }
     val extrasStore = remember(context) { com.opticast.player.data.local.LibraryExtrasStore(context) }
@@ -1796,29 +1807,47 @@ fun PlayerScreen(
         }
 
         // Loading feedback is independent of initially hidden transport controls.
-        // Fix: Don't show loading persistently when quickly jumping - only if buffering and not playing and same video
-        var showLoading by remember { mutableStateOf(false) }
-        LaunchedEffect(buffering, isPlaying, video.id) {
-            if (buffering && !isPlaying) {
-                kotlinx.coroutines.delay(200) // Small delay to avoid flicker when quickly jumping
-                if (buffering && !isPlaying) {
+        // STABILITY FIX: Don't show loading persistently when quickly jumping videos
+        // - Keyed to video.id so rapid switches reset immediately
+        // - Only show if buffering for CURRENT video and same request
+        // - Auto-hide after 3s max to prevent stuck spinner
+        var showLoading by remember(video.id) { mutableStateOf(false) }
+        LaunchedEffect(video.id) {
+            showLoading = false
+        }
+        LaunchedEffect(buffering, isPlaying, video.id, requestToken) {
+            if (video.id <= 0) {
+                showLoading = false
+                return@LaunchedEffect
+            }
+            // Only show loading if buffering for current video and not playing
+            // Check samePlaybackItem to avoid showing for previous video's buffering
+            val isCurrentVideo = samePlaybackItem(video.id, controller.currentMediaItem?.mediaId) && requestIsCurrent()
+            if (buffering && !isPlaying && isCurrentVideo && engineError == null) {
+                kotlinx.coroutines.delay(300) // Small delay to avoid flicker when quickly jumping
+                // Re-check after delay - video may have changed
+                if (buffering && !isPlaying && samePlaybackItem(video.id, controller.currentMediaItem?.mediaId) && requestIsCurrent()) {
                     showLoading = true
                 }
             } else {
                 showLoading = false
             }
         }
-        // Auto-hide loading after 5s if still showing to prevent persistent animation
+        // Auto-hide loading after 3s if still showing to prevent persistent animation until screen closed
         LaunchedEffect(showLoading, video.id) {
             if (showLoading) {
-                kotlinx.coroutines.delay(5000)
+                kotlinx.coroutines.delay(3000)
                 if (showLoading) {
                     showLoading = false
-                    buffering = false
+                    // Don't reset buffering here - let player state drive it, but ensure spinner gone
                 }
             }
         }
-        if (showLoading && buffering && engineError == null && !showDiagnostics) {
+        // Extra safety: if video changes, force hide loading immediately
+        LaunchedEffect(activeVideoId) {
+            showLoading = false
+        }
+        if (showLoading && engineError == null && !showDiagnostics && samePlaybackItem(video.id, controller.currentMediaItem?.mediaId)) {
             androidx.compose.material3.LoadingIndicator(
                 modifier = Modifier.align(Alignment.Center).offset(y = if (controlsVisible) (-80).dp else 0.dp).size(64.dp),
                 color = MaterialTheme.colorScheme.primary,

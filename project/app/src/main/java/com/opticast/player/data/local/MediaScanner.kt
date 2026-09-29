@@ -51,23 +51,30 @@ class MediaScanner(private val context: Context) {
 
             while (cursor.moveToNext()) {
                 try {
-                    val name = cursor.getString(nameCol) ?: continue
-                    val duration = cursor.getLong(durCol)
+                    val name = try { cursor.getString(nameCol) } catch (_: Exception) { null } ?: continue
+                    val duration = try { cursor.getLong(durCol) } catch (_: Exception) { 0L }
                     if (duration < minDurationMs) continue
-                    val id = cursor.getLong(idCol)
+                    val id = try { cursor.getLong(idCol) } catch (_: Exception) { continue }
                     result += LocalVideo(
                         id = id,
                         name = name,
                         uri = ContentUris.withAppendedId(collection, id).toString(),
-                        sizeBytes = cursor.getLong(sizeCol),
+                        sizeBytes = try { cursor.getLong(sizeCol) } catch (_: Exception) { 0L },
                         durationMs = duration,
-                        dateAddedSec = cursor.getLong(dateCol),
-                        width = if (widthCol >= 0) cursor.getInt(widthCol) else 0,
-                        height = if (heightCol >= 0) cursor.getInt(heightCol) else 0,
-                        parsed = NameParser.parse(name),
-                        relativePath = if (pathCol >= 0) cursor.getString(pathCol).orEmpty() else "",
-                        modifiedSec = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED)),
+                        dateAddedSec = try { cursor.getLong(dateCol) } catch (_: Exception) { 0L },
+                        width = if (widthCol >= 0) try { cursor.getInt(widthCol) } catch (_: Exception) { 0 } else 0,
+                        height = if (heightCol >= 0) try { cursor.getInt(heightCol) } catch (_: Exception) { 0 } else 0,
+                        parsed = try { NameParser.parse(name) } catch (_: Exception) { NameParser.parse("video") },
+                        relativePath = if (pathCol >= 0) try { cursor.getString(pathCol).orEmpty() } catch (_: Exception) { "" } else "",
+                        modifiedSec = try { cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED)) } catch (_: Exception) { 0L },
                     )
+                } catch (e: SecurityException) {
+                    // 10/10: Android 13+ MediaStore can throw SecurityException for restricted files
+                    android.util.Log.w("MediaScanner", "Skipping restricted file at cursor ${cursor.position}: ${e.message}")
+                    continue
+                } catch (e: IllegalStateException) {
+                    android.util.Log.w("MediaScanner", "Skipping illegal state at cursor ${cursor.position}: ${e.message}")
+                    continue
                 } catch (e: Exception) {
                     // STABILITY: Skip corrupted file, don't crash whole scan
                     android.util.Log.w("MediaScanner", "Skipping corrupted file at cursor ${cursor.position}: ${e.message}")

@@ -183,26 +183,36 @@ class PosterCache(context: Context) {
     }
 
     private suspend fun download(key: String, url: String): Boolean {
-        val tmp = File(dir, "$key.tmp")
-        val ok = withContext(Dispatchers.IO) {
-            runCatching {
-                client.newCall(Request.Builder().url(url).build()).execute().use { response ->
-                    if (!response.isSuccessful) false
-                    else {
-                        val body = response.body ?: return@runCatching false
-                        tmp.outputStream().use { out -> body.byteStream().copyTo(out) }
-                        true
+        // 10/10: Exponential backoff retry - 1s, 2s, 4s max 3 times, prevents network loop on bad URL
+        var attempt = 0
+        var delayMs = 1000L
+        while (attempt < 3) {
+            val tmp = File(dir, "$key.tmp")
+            val ok = withContext(Dispatchers.IO) {
+                runCatching {
+                    client.newCall(Request.Builder().url(url).build()).execute().use { response ->
+                        if (!response.isSuccessful) false
+                        else {
+                            val body = response.body ?: return@runCatching false
+                            tmp.outputStream().use { out -> body.byteStream().copyTo(out) }
+                            true
+                        }
                     }
+                }.getOrDefault(false)
+            }
+            if (ok && tmp.length() > 0) {
+                if (tmp.renameTo(fileFor(key))) existingKeys.add(key)
+                return true
+            } else {
+                tmp.delete()
+                attempt++
+                if (attempt < 3) {
+                    kotlinx.coroutines.delay(delayMs)
+                    delayMs *= 2
                 }
-            }.getOrDefault(false)
+            }
         }
-        return if (ok && tmp.length() > 0) {
-            if (tmp.renameTo(fileFor(key))) existingKeys.add(key)
-            true
-        } else {
-            tmp.delete()
-            false
-        }
+        return false
     }
 
     private fun cleanupOrphans(entries: List<LibraryEntry>) {

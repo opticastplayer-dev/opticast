@@ -769,12 +769,20 @@ fun LibraryScreen(
     val searchedUnscoped = remember(state.entries, query) {
         val q = query.trim().lowercase()
         if (q.isEmpty()) state.entries
-        else state.entries.filter { entry ->
-            entry.metadata?.displayTitle?.lowercase()?.contains(q) == true ||
-                entry.metadata?.title?.lowercase()?.contains(q) == true ||
-                entry.video.name.lowercase().contains(q) ||
-                entry.video.parsed.title.lowercase().contains(q) ||
-                entry.metadata?.showTitle?.lowercase()?.contains(q) == true
+        else {
+            // 10/10: Fuzzy search with typo tolerance like Infuse - Avngers finds Avengers
+            val exact = state.entries.filter { entry ->
+                entry.metadata?.displayTitle?.lowercase()?.contains(q) == true ||
+                    entry.metadata?.title?.lowercase()?.contains(q) == true ||
+                    entry.video.name.lowercase().contains(q) ||
+                    entry.video.parsed.title.lowercase().contains(q) ||
+                    entry.metadata?.showTitle?.lowercase()?.contains(q) == true
+            }
+            if (exact.isNotEmpty()) exact
+            else com.opticast.player.data.local.FuzzySearch.search(state.entries, q).also {
+                // Breadcrumb for crash debugging
+                com.opticast.player.data.AppContainer.breadcrumb.logSearch(q)
+            }
         }
     }
     val searched = remember(searchedUnscoped, searchOpen, searchScope) {
@@ -919,7 +927,9 @@ fun LibraryScreen(
 
         // FIX WEAKNESS: Library grid changeable wasn't working - remember inside columns param was not triggering recomposition
         // Now compute grid cells outside, keyed to libraryGrid, and use key() to force LazyVerticalGrid recomposition when grid changes
+        // 10/10: Breadcrumb for grid change + adaptive RAM log
         val currentGridCells = remember(appSettings.libraryGrid) {
+            com.opticast.player.data.AppContainer.breadcrumb.logGridChange(appSettings.libraryGrid)
             GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
         }
 

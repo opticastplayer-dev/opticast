@@ -36,6 +36,10 @@ object AppContainer {
         private set
 
     @Volatile
+    var memoryClassMb: Int = 256
+        private set
+
+    @Volatile
     var dataSaver: Boolean = true
         private set
 
@@ -48,6 +52,12 @@ object AppContainer {
     }.getOrDefault(false)
 
     fun setLowRamMode(enabled: Boolean) { lowRamMode = enabled }
+    fun setMemoryClass(mb: Int) { memoryClassMb = mb.coerceIn(64, 1024) }
+
+    // 10/10: Adaptive budgets using memoryClass
+    fun adaptiveImageMemoryBudget(): Int = com.opticast.player.data.imageMemoryBudgetBytes(lowRamMode, memoryClassMb)
+    fun adaptiveImageDiskBudget(): Long = com.opticast.player.data.imageDiskBudgetBytes(lowRamMode, memoryClassMb)
+    fun adaptivePosterConcurrency(): Int = com.opticast.player.data.posterDownloadConcurrency(lowRamMode, memoryClassMb)
 
     // Default settings to avoid blocking main thread - will be replaced async
     @Volatile
@@ -128,4 +138,10 @@ object AppContainer {
     val fanart: FanartApi by lazy { FanartApi(settings) }
     val subDl: SubDlApi by lazy { SubDlApi(settings, metadataStore) }
     val subtitles: SubtitleSources by lazy { SubtitleSources(openSubtitles, subDl, settings) }
+
+    // 10/10: Clean - removed placeholder cloud/cast that didn't benefit end user (0 benefit)
+    // Cloud Drive/SMB/WebDAV + Cast will be added later when real implementation ready, offline-first #1
+    val breadcrumb: com.opticast.player.data.local.BreadcrumbTracker by lazy { com.opticast.player.data.local.BreadcrumbTracker(application) }
+    val subtitleFonts: com.opticast.player.data.local.SubtitleFontManager by lazy { com.opticast.player.data.local.SubtitleFontManager(application) }
+    val gaplessQueue: com.opticast.player.player.GaplessQueue by lazy { com.opticast.player.player.GaplessQueue() }
 }

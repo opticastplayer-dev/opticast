@@ -179,10 +179,15 @@ class MpvPlayer(private val context: Context) : SimpleBasePlayer(Looper.getMainL
             val fonts = java.io.File(context.filesDir, "mpv-fonts.conf")
             if (!fonts.exists()) fonts.writeText("""<?xml version="1.0"?><!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd"><fontconfig><dir>/system/fonts</dir><dir>/product/fonts</dir><cachedir>${context.cacheDir.absolutePath}/mpv-fonts</cachedir></fontconfig>""")
             android.system.Os.setenv("FONTCONFIG_FILE", fonts.absolutePath, true)
+            // 10/10: HDR tone-mapping for HDR->SDR on low-RAM, gapless next episode support
+            val isLowRam = com.opticast.player.data.AppContainer.lowRamMode
+            val toneMapping = if (isLowRam) "hable" else "bt.2390"
             val options = mapOf("vo" to "gpu", "gpu-api" to "opengl", "gpu-context" to "android",
                 "profile" to "fast", "keepaspect" to "no", "hwdec" to "mediacodec,mediacodec-copy,no", "hwdec-codecs" to "all",
                 "hr-seek" to "yes", "idle" to "yes", "keep-open" to "yes", "force-window" to "no", "pause" to "yes",
                 "terminal" to "no", "input-default-bindings" to "no", "input-vo-keyboard" to "no",
+                "tone-mapping" to toneMapping, "hdr-compute-peak" to "yes", "tone-mapping-param" to "0.5",
+                "gapless-audio" to "yes", "prefetch-playlist" to "yes",
                 "speed" to speed.toString(), "volume" to (volume * 100).toString())
             options.forEach { (key,value) -> check(NativeMpv.option(handle,key,value),key) }
             if (localTrialApplied) localPacketBufferOptions.forEach { (key, value) ->

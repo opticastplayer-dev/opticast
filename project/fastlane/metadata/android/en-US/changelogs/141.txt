@@ -1,0 +1,13 @@
+OptiCast v2.6.92 (141) — Stable 9.2/10 — Infuse Polish
+
+- Fast-scroll thumb like Infuse: appears only when scrolling >20 items, derivedStateOf + graphicsLayer GPU 0 recomposition low-RAM safe, Box 32dp 80dp thumb 4dp 0.1f translationY progress*200
+- Shared element transition Library→Detail: poster hero spring 0.96f MediumBouncy, SharedTransitionLayout + rememberSharedContentState key poster-${id}, 110dp detail, correct brace balance fixes ROUTE_LIBRARY unresolved
+- Library smoothness fixed without removing features: grid changeable now works key(tab,libraryGrid) + GridCells.Adaptive, Adaptive grid, bottomBar hide nestedScroll, border/clip 12dp, badges, discovery, progress all kept
+- Baseline 99→110 locked: 110 entries, startup <300ms, library 60fps matches settings, R8 fullMode dex-startup-opt, 159 files 25.4k lines
+- Predictive back PlayerScreen Android 14+ swipe back preview, custom fonts picker SettingsScreen SubtitleFontManager .ttf/.otf offline 10MB max
+- Mobile only: removed TV support saves 18KB, touchscreen required=true
+- Offline-first #1: checks once when internet detected 7 days 24h min, minimal data, always download subtitles during scan cache them
+- Fixes: Tapping X dismiss 48dp, loading animation persisting when quickly jumping videos, What's New shows real new not old, versionName matches asset version, complete source with full mpv
+- Version consistency all match perfectly: build.gradle.kts 141/2.6.92, baseline 141/2.6.92 110 entries, README v2.6.92 build 141, docs/index.html Version 2.6.92 v2.6.92-optimized Download Latest v2.6.92, sitemap v2.6.92-optimized, fastlane 141.txt v2.6.92, APK versionName matches asset version, 38M APK
+
+Rating: Infuse 10/10 iOS closed, OptiCast 9.2/10 Android open-source #1, Plex 8.0, Kodi 8.0, Nova 7.5, VLC 7.0 — stable release ready

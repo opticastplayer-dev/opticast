@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,6 +25,7 @@ import com.opticast.player.ui.components.PosterCard
  * - AnimateItem: smooth animations when grid changes
  * - Offline-first: uses cached posters, no network while scrolling
  */
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun LibraryGrid(
     entries: List<LibraryEntry>,

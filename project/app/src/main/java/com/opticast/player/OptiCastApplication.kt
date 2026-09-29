@@ -70,17 +70,9 @@ class OptiCastApplication : Application() {
                 .build()
         )
 
-        // Build poster index off main thread - first fling never waits on FS stats
+        // Build poster index off main thread - immediate warmUp for posters to appear instantly, no blank gap
+        // Idempotent: second call no-op, so single immediate is enough for 12/16/24/32 MB budget
         startupScope.launch { AppContainer.posterCache.warmUp() }
-
-        // Build poster index off main thread with delay for smooth startup - critical for library scrolling responsiveness matching settings
-        startupScope.launch {
-            try {
-                // Delay warmUp to let library first frame render - settings smooth because no warmUp needed
-                kotlinx.coroutines.delay(1500)
-                AppContainer.posterCache.warmUp()
-            } catch (_: Exception) { }
-        }
 
         // OFFLINE-FIRST: Check for updates once when internet detected, not every 6 hours, minimal data usage
         // User priority: offline use, little data, check once when internet detected

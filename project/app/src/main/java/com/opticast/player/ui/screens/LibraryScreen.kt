@@ -960,12 +960,13 @@ fun LibraryScreen(
                 .fillMaxSize()
                 .nestedScroll(chromeScroll)
                 .background(MaterialTheme.colorScheme.background)
-                .padding(top = padding.calculateTopPadding()).consumeWindowInsets(padding),
-            // Fix: posters cutting into bottom tab bar — add bottomChromePx + 80dp
-            contentPadding = PaddingValues(bottom = 88.dp)
+                .consumeWindowInsets(padding),
+            contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = 88.dp)
                         ) {
             if (!searching) item(span = { GridItemSpan(maxLineSpan) }) {
-                LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
+                Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background)) {
+                    LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
+                }
             }
             // OFFLINE-FIRST: Only show What's New once after update, not Up To Date card on every startup
             // User request: Don't show Up To Date card in library on every app startup, only when real update available
@@ -1167,7 +1168,7 @@ fun LibraryScreen(
                         horizontalArrangement = Arrangement.spacedBy(DiscoveryGapDp.dp)
                         ) {
                         lazyItems(recentlyAdded, key = { "recent-${it.video.id}" }) { entry ->
-                            SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp), onToggle = { toggleSelect(entry.video.id) }) {
+                            SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp).clip(RoundedCornerShape(12.dp)), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
                                     sharedTransitionScope = sharedTransitionScope,
                                     animatedVisibilityScope = animatedVisibilityScope,
@@ -1305,13 +1306,13 @@ fun LibraryScreen(
                         contentPadding = PaddingValues(horizontal = DiscoveryGutterDp.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(DiscoveryGapDp.dp)) {
                         lazyItems(completedMovies, key = { "watched-movie-${it.video.id}" }) { entry ->
-                            SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp), onToggle = { toggleSelect(entry.video.id) }) {
+                            SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp).clip(RoundedCornerShape(12.dp)), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
                                     sharedTransitionScope = sharedTransitionScope,
                                     animatedVisibilityScope = animatedVisibilityScope,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
-                                    modifier = Modifier.fillMaxWidth())
+                                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)))
                             }
                         }
                         lazyItems(completedShows.entries.toList(), key = { "watched-show-${it.key}" }) { (name, episodes) ->

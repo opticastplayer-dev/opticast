@@ -392,7 +392,7 @@ fun PosterCard(
             modifier
                 .fillMaxWidth()
                 .aspectRatio(2f / 3f)
-                .graphicsLayer(scaleX = scale, scaleY = scale)
+                .graphicsLayer(scaleX = scale, scaleY = scale, clip = true)
                 .clip(RoundedCornerShape(12.dp))
                 .sharedElement(
                     rememberSharedContentState(key = "poster-${entry.video.id}"),
@@ -406,12 +406,13 @@ fun PosterCard(
                     onLongClick = onLongClick
                 )
                 .background(MaterialTheme.colorScheme.surfaceContainer)
+                .clip(RoundedCornerShape(12.dp))
         }
     } else {
         modifier
             .fillMaxWidth()
             .aspectRatio(2f / 3f)
-            .graphicsLayer(scaleX = scale, scaleY = scale)
+            .graphicsLayer(scaleX = scale, scaleY = scale, clip = true)
             .clip(RoundedCornerShape(12.dp))
             .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(12.dp))
             .combinedClickable(
@@ -421,6 +422,7 @@ fun PosterCard(
                 onLongClick = onLongClick
             )
             .background(MaterialTheme.colorScheme.surfaceContainer)
+            .clip(RoundedCornerShape(12.dp))
     }
     Box(
         modifier = sharedModifier,

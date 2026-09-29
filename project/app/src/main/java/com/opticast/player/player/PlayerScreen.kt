@@ -995,14 +995,27 @@ fun PlayerScreen(
         }
     }
 
-    // Audio-only: the video track is switched off, so the decoder is not run at
-    // all. This is what saves the data and the battery, not just hiding the view.
+    // Audio-only: robust fix for blank video when exiting audio only
+    // Disable VIDEO track when audioOnly, re-enable + clearOverrides + prepare + playWhenReady + surface reattach when exiting
     LaunchedEffect(audioOnly, controller) {
         runCatching {
-            controller.trackSelectionParameters = controller.trackSelectionParameters
-                .buildUpon()
-                .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_VIDEO, audioOnly)
-                .build()
+            if (audioOnly) {
+                controller.trackSelectionParameters = controller.trackSelectionParameters
+                    .buildUpon()
+                    .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_VIDEO, true)
+                    .build()
+            } else {
+                controller.trackSelectionParameters = controller.trackSelectionParameters
+                    .buildUpon()
+                    .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_VIDEO, false)
+                    .clearOverridesOfType(androidx.media3.common.C.TRACK_TYPE_VIDEO)
+                    .build()
+                kotlinx.coroutines.delay(100)
+                if (controller.playbackState != androidx.media3.common.Player.STATE_READY) {
+                    controller.prepare()
+                }
+                controller.playWhenReady = true
+            }
         }
     }
 
@@ -1338,8 +1351,18 @@ fun PlayerScreen(
                 onRelease = { view -> view.player = null },
                 update = { view ->
                     if (view.player !== controller) view.player = controller
-                    view.visibility = if (audioOnly) android.view.View.INVISIBLE
-                    else android.view.View.VISIBLE
+                    if (audioOnly) {
+                        view.videoSurfaceView?.visibility = android.view.View.INVISIBLE
+                        view.visibility = android.view.View.INVISIBLE
+                    } else {
+                        view.videoSurfaceView?.visibility = android.view.View.VISIBLE
+                        view.visibility = android.view.View.VISIBLE
+                        // Robust reattach: clear + set surface to fix blank video after audio only
+                        view.videoSurfaceView?.let { surfaceView ->
+                            view.clearVideoSurfaceView(surfaceView)
+                            view.setVideoSurfaceView(surfaceView)
+                        }
+                    }
                     view.resizeMode = surfaceResizeMode(resizeMode)
                     val surfaceScale = if(selectedEngine == "mpv") 1f else aggressiveVideoScale(resizeMode)
                     view.videoSurfaceView?.apply { scaleX = surfaceScale; scaleY = surfaceScale }

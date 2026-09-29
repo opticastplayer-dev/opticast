@@ -69,6 +69,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.focus.focusRequester
@@ -465,13 +468,16 @@ class LibraryViewModel : ViewModel() {
 
 // ---------------------------------------------------------------------- screen
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun LibraryScreen(
     onOpenDetail: (Long) -> Unit,
     onOpenPlayer: (Long) -> Unit,
     onOpenMatch: (Long) -> Unit,
     onOpenShow: (String) -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
                         ) {
     val viewModel: LibraryViewModel = viewModel(factory = viewModelFactory { LibraryViewModel() })
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -1152,6 +1158,8 @@ fun LibraryScreen(
                         lazyItems(recentlyAdded, key = { "recent-${it.video.id}" }) { entry ->
                             SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
                                     modifier = Modifier.fillMaxWidth())
@@ -1175,6 +1183,8 @@ fun LibraryScreen(
                         ) {
                         PosterCard(
                             entry = entry,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                             onClick = {
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else onOpenDetail(entry.video.id)
@@ -1226,6 +1236,8 @@ fun LibraryScreen(
                         ) {
                         PosterCard(
                             entry = entry,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                             onClick = {
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else onOpenDetail(entry.video.id)
@@ -1284,6 +1296,8 @@ fun LibraryScreen(
                         lazyItems(completedMovies, key = { "watched-movie-${it.video.id}" }) { entry ->
                             SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
                                     modifier = Modifier.fillMaxWidth())

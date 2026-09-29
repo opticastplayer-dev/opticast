@@ -99,6 +99,10 @@ import com.opticast.player.ui.components.rememberExternalPlayer
 import com.opticast.player.ui.components.FallbackPoster
 import com.opticast.player.ui.components.rememberFrameArtwork
 import com.opticast.player.ui.components.PosterImage
+import androidx.compose.animation.rememberSharedContentState
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import com.opticast.player.ui.components.formatDuration
 import com.opticast.player.ui.components.viewModelFactory
 import kotlinx.coroutines.Dispatchers
@@ -336,11 +340,14 @@ class DetailViewModel(private val videoId: Long) : ViewModel() {
 // ---------------------------------------------------------------------- screen
 
 @Composable
+@OptIn(ExperimentalSharedTransitionApi::class)
 fun DetailScreen(
     videoId: Long,
     onBack: () -> Unit,
     onPlay: () -> Unit,
     onOpenMatch: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val viewModel: DetailViewModel =
         viewModel(key = "detail$videoId", factory = viewModelFactory { DetailViewModel(videoId) })
@@ -636,18 +643,31 @@ fun DetailScreen(
                         .padding(horizontal = 20.dp)
                         .padding(top = 12.dp, bottom = 4.dp)
                 ) {
+                    val detailPosterModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                        with(sharedTransitionScope) {
+                            Modifier
+                                .width(110.dp)
+                                .aspectRatio(2f / 3f)
+                                .clip(RoundedCornerShape(16.dp))
+                                .sharedElement(
+                                    rememberSharedContentState(key = "poster-${videoId}"),
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
+                                .shadow(16.dp)
+                        }
+                    } else {
+                        Modifier
+                            .width(110.dp)
+                            .aspectRatio(2f / 3f)
+                            .clip(RoundedCornerShape(16.dp))
+                            .shadow(16.dp)
+                    }
                     PosterImage(
                         url = posterUrl,
                         fallbackTitle = video.parsed.title,
                         cacheBust = posterVersion,
-                        // Same artwork the library grid shows: for an unscraped
-                        // title this becomes the frame extracted from the file.
                         videoId = videoId,
-                        modifier = Modifier
-                            .width(110.dp)
-                            .aspectRatio(2f / 3f)
-                            .clip(RoundedCornerShape(16.dp))
-                            .shadow(16.dp),
+                        modifier = detailPosterModifier,
                     )
                     Spacer(Modifier.width(16.dp))
                     Column(Modifier.weight(1f).align(Alignment.Bottom)) {

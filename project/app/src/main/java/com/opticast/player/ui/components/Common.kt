@@ -14,6 +14,10 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.rememberSharedContentState
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.core.spring
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -362,12 +366,15 @@ private val PosterScrim = Brush.verticalGradient(
 /** Poster grid card for a single movie / episode file. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+@OptIn(ExperimentalSharedTransitionApi::class)
 fun PosterCard(
     entry: LibraryEntry,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     cacheBust: Int = 0,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val metadata = entry.metadata
     val posterUrl = remember(entry.video.id, entry.metadata?.posterPath) { posterUrlFor(entry) }
@@ -386,8 +393,28 @@ fun PosterCard(
         label = "posterScale"
     )
 
-    Box(
-        modifier = modifier
+    val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            modifier
+                .fillMaxWidth()
+                .aspectRatio(2f / 3f)
+                .graphicsLayer(scaleX = scale, scaleY = scale)
+                .clip(RoundedCornerShape(12.dp))
+                .sharedElement(
+                    rememberSharedContentState(key = "poster-${entry.video.id}"),
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+                .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(12.dp))
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onClick,
+                    onLongClick = onLongClick
+                )
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+        }
+    } else {
+        modifier
             .fillMaxWidth()
             .aspectRatio(2f / 3f)
             .graphicsLayer(scaleX = scale, scaleY = scale)
@@ -399,7 +426,10 @@ fun PosterCard(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
-            .background(MaterialTheme.colorScheme.surfaceContainer),
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+    }
+    Box(
+        modifier = sharedModifier,
     ) {
         PosterImage(
             url = posterUrl,

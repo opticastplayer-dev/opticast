@@ -1,0 +1,13 @@
+v2.6.87 — Polish to Match Infuse — Beautiful, Fast, Easy to Understand
+
+- Library feels like Settings: no white flash, fast scrolling, beautiful grid you can customize, smooth spring animations when changing layout, stable and fast
+- Haptic feedback: light tick when changing tabs and searching, feels precise like Infuse, heart burst animation when adding favorite
+- What's New celebration: confetti 🎉 when showing what's new, compact card shows real changes easy to read, easy to close
+- Beautiful posters: shimmer placeholder that matches design, no white flash, uses cached posters offline, no internet while scrolling
+- Search highlight: bold yellow for matching words like Infuse, easy to see
+- Empty states beautiful: cinema illustration with gradient, helpful message Add movies to your phone tap Scan to build beautiful library
+- Stats engaging: streak badge 🔥 days like Infuse 5 days in a row, watched and library time
+- Fast and smooth: quick startup, smooth scrolling, lightweight, reliable, handles damaged files gracefully, saves crashes to file keeps last 5
+- Saves data: small posters on metered connection, only downloads when not playing video saves battery, works fully offline after first scan, subtitles always saved offline
+- Plays everything: powerful video engine plays all formats, beautiful player with gestures, loading never stuck when switching videos quickly
+- Mobile only, offline-first, no ads, open source, easy to understand for everyone, works on all Android phones

@@ -1,4 +1,4 @@
-# Locked baseline for v2.6.86 (versionCode 135) - 2026-09-29T10:30:00 - LOCKED stability reliability performance, library buttery smooth, scan crash stability, baseline 65, offline data sipping, playback stability, universal language
+# Locked baseline for v2.6.87 (versionCode 136) - 2026-09-29T11:00:00 - LOCKED polish to match Infuse, haptic heart burst confetti spring shimmer, universal language, mobile only, offline-first
 # Stability improvements: library grid buttery smooth like settings, scan corrupted skip per file try/catch, crash log filesDir/crashes keep 5, baseline 65 entries, offline data sipping w185 on metered, prefetch only when idle, playback loading fix keyed to video.id auto-hide 3s
 # Includes: startup, library grid with placeholder + animateItem + contentType + stable keys, poster loading offline-first, discovery, search, repository offline-first, performance monitoring, crash reporting, DI, accessibility, memory budget, playback work budget
 # 12-layer bulletproof: prebuilt mandatory 25M permanent, signing mandatory, versionCode must increase, package constant, install-over verification, CODEOWNERS

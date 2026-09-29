@@ -220,7 +220,7 @@ private data class ContinueItem(
     val playback: PlaybackState
                         )
 
-private data class LibraryStats(
+internal data class LibraryStats(
     val movies: Int,
     val shows: Int,
     val watched: Int,

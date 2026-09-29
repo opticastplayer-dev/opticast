@@ -1,3 +1,4 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 package com.opticast.player.ui.screens
 
 import androidx.compose.animation.core.Animatable
@@ -5,10 +6,13 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -28,6 +32,22 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+
+import com.opticast.player.ui.components.discoveryMotionEnabled
+import com.opticast.player.data.remote.tmdbBackdropUrl
+import com.opticast.player.ui.components.posterUrlFor
+import com.opticast.player.data.model.showTitleOf
+import com.opticast.player.ui.screens.countedLibraryTab
+import com.opticast.player.ui.screens.featuredTap
+import com.opticast.player.ui.screens.featuredPageOpacity
+import com.opticast.player.ui.screens.FeaturedTap
+import com.opticast.player.ui.screens.DiscoveryGutterDp
+import com.opticast.player.ui.screens.LibraryPosterInsetDp
+import com.opticast.player.ui.screens.LibraryBottomBarAlpha
+import com.opticast.player.ui.screens.LibraryWordmarkWidthFraction
+import com.opticast.player.ui.screens.LibraryPosterMinimumDp
+import com.opticast.player.ui.screens.LibraryPosterInsetDp
+
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics

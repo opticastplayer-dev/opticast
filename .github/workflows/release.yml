@@ -301,28 +301,3 @@ jobs:
           name: ${{ inputs.version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          generate_release_notes: true
-          tag_name: ${{ inputs.version }}
-          name: ${{ inputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Release
-        if: always()
-        uses: softprops/action-gh-release@v2
-        with:
-          files: releases/*
-          generate_release_notes: true
-          tag_name: ${{ inputs.version }}
-          name: ${{ inputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: always()
-        uses: softprops/action-gh-release@v2
-        with:
-          files: releases/*
-          generate_release_notes: true
-          tag_name: ${{ inputs.version }}
-          name: ${{ inputs.version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

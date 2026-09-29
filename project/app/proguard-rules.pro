@@ -67,8 +67,6 @@
 -keepattributes Signature, InnerClasses, EnclosingMethod, *Annotation*, SourceFile, LineNumberTable
 
 # For official release - reduce notes
--dontnote **
--dontwarn **
 
 # Keep crash reporting - for debugging
 -keep class com.opticast.player.data.CrashReporting { *; }
@@ -86,3 +84,8 @@
 # Keep line numbers for crash reports
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
+# Specific dontnote for third-party - not broad **
+-dontnote okhttp3.**
+-dontnote okio.**
+-dontnote coil.**
+-dontnote androidx.**

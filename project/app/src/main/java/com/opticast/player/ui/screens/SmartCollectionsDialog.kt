@@ -33,7 +33,7 @@ internal fun SmartCollectionsDialog(rules: List<SmartRule>, onSave: (List<SmartR
             if(editingId==null) onDismiss() else {
                 val numbers=listOf(days,minutes,from,to)
                 if(name.isBlank() || numbers.any { it.isNotBlank() && (it.toIntOrNull() ?: 0) <= 0 } || (from.toIntOrNull()!=null && to.toIntOrNull()!=null && from.toInt()>to.toInt())) error="Enter a name and valid positive numbers; the start year must not exceed the end year."
-                else { val rule=SmartRule(editingId!!,name.trim().take(60),type,unwatched,days.toIntOrNull(),minutes.toIntOrNull(),genre.trim(),from.toIntOrNull(),to.toIntOrNull());onSave(rules.filterNot{it.id==rule.id}+rule);editingId=null }
+                else { val rule=SmartRule(editingId ?: return@TextButton,name.trim().take(60),type,unwatched,days.toIntOrNull(),minutes.toIntOrNull(),genre.trim(),from.toIntOrNull(),to.toIntOrNull());onSave(rules.filterNot{it.id==rule.id}+rule);editingId=null }
             }
         }){Text(if(editingId==null) "Done" else "Save")}},
         dismissButton={if(editingId!=null) TextButton(onClick={editingId=null}){Text("Cancel")}},

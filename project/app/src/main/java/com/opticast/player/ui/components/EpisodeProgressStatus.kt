@@ -25,7 +25,7 @@ internal fun episodeStatusLabel(state: PlaybackState?, preferredResume: Boolean 
 
 internal fun latestUnfinishedEpisode(states: Map<Long, PlaybackState?>): Long? = states.entries
     .filter { it.value?.isResumable == true }
-    .maxWithOrNull(compareBy<Map.Entry<Long, PlaybackState?>> { it.value!!.updatedAt }.thenBy { it.key })?.key
+    .maxWithOrNull(compareBy<Map.Entry<Long, PlaybackState?>> { it.value?.updatedAt ?: 0L }.thenBy { it.key })?.key
 
 @Composable
 internal fun EpisodeProgressStatus(state: PlaybackState?, preferredResume: Boolean = false) {

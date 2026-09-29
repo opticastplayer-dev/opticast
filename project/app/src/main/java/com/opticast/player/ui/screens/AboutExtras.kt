@@ -121,7 +121,7 @@ internal fun UpdateCheckOption(version: String) {
             }
         }
         if (error != null) {
-            Text(error!!, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            Text(error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
         }
         if (downloading) {
             LinearProgressIndicator(progress = { progress / 100f }, modifier = Modifier.fillMaxWidth())
@@ -129,8 +129,8 @@ internal fun UpdateCheckOption(version: String) {
         }
     }
 
-    if (show && updateInfo != null) {
-        val info = updateInfo!!
+    if (show) {
+        val info = updateInfo ?: return
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
             onDismissRequest = { show = false },
@@ -326,8 +326,8 @@ internal fun AutoUpdateDialog() {
         } catch (_: Exception) { }
     }
 
-    if (show && updateInfo != null) {
-        val info = updateInfo!!
+    if (show) {
+        val info = updateInfo ?: return
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
             onDismissRequest = { show = false },

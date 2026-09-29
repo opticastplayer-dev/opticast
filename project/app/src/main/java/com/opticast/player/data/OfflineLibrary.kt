@@ -93,7 +93,7 @@ class OfflineLibrary(context: android.content.Context) {
                 if (cast != null || imdb != null || ratings != null || artwork != null) {
                     details = CachedDetails.from(imdbId = imdb, ratings = ratings, artwork = artwork,
                         cast = cast.orEmpty(), previous = null)
-                    AppContainer.detailCache.save(videoId, details!!)
+                    details?.let { AppContainer.detailCache.save(videoId, it) }
                 }
             }
         }

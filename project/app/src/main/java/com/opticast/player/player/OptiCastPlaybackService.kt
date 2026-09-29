@@ -209,7 +209,7 @@ class OptiCastPlaybackService : MediaSessionService() {
                 val oldId = oldPosition.mediaItem?.mediaId?.toLongOrNull()
                 val newId = newPosition.mediaItem?.mediaId?.toLongOrNull()
                 if (shouldSaveOutgoing(oldId, newId, oldPosition.positionMs)) {
-                    val id = oldId!!
+                    val id = oldId ?: return
                     val duration = knownDurations[id]
                         ?: AppContainer.playbackState.state(id)?.durationMs?.takeIf { it > 0L }
                         ?: 0L
@@ -248,7 +248,7 @@ class OptiCastPlaybackService : MediaSessionService() {
                     val oldId = oldPosition.mediaItem?.mediaId?.toLongOrNull()
                     val newId = newPosition.mediaItem?.mediaId?.toLongOrNull()
                     if (shouldSaveOutgoing(oldId, newId, oldPosition.positionMs)) {
-                        val id = oldId!!
+                        val id = oldId ?: return
                         AppContainer.playbackState.save(id, oldPosition.positionMs,
                             knownDurations[id] ?: AppContainer.playbackState.state(id)?.durationMs ?: 0L)
                     }

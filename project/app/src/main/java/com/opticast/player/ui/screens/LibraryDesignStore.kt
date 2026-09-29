@@ -9,8 +9,8 @@ internal class LibraryDesignStore(context: Context) {
     private val prefs = context.getSharedPreferences("library_design_v1", Context.MODE_PRIVATE)
     fun design(tab: String) = LibraryDesign(
         supportedLibraryStyle(prefs.getString("style", "classic")),
-        normalizeSectionOrder(prefs.getString("order_$tab", classicSectionOrder.joinToString(","))!!.split(',')),
-        prefs.getStringSet("hidden_$tab", emptySet())!!.toSet(), prefs.getBoolean("stats_$tab", true))
+        normalizeSectionOrder((prefs.getString("order_$tab", classicSectionOrder.joinToString(",")) ?: classicSectionOrder.joinToString(",")).split(',')),
+        (prefs.getStringSet("hidden_$tab", emptySet()) ?: emptySet()).toSet(), prefs.getBoolean("stats_$tab", true))
     fun save(tab: String, value: LibraryDesign) {
         prefs.edit().putString("style", value.style).putString("order_$tab", normalizeSectionOrder(value.order).joinToString(","))
             .putStringSet("hidden_$tab", value.hidden - "titles").putBoolean("stats_$tab", value.stats).apply()

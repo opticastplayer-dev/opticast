@@ -391,7 +391,7 @@ class MpvPlayer(private val context: Context) : SimpleBasePlayer(Looper.getMainL
                 MpvRuntimeInfo.current = info
                 // mpv readiness releases PlayerView's shutter. Do not use this as measured first-frame timing.
                 revealVideo = events[0] and 2 != 0 && width > 0 && height > 0
-                if (accepted && sampleSeek == seekEpoch.get()) position = sampled!!
+                if (accepted && sampleSeek == seekEpoch.get()) sampled?.let { position = it }
                 if (length != null) duration = length
                 if (width > 0 && height > 0) size = VideoSize(width,height)
                 if (failure == null) status = if(ended) Player.STATE_ENDED else if(buffering) Player.STATE_BUFFERING else Player.STATE_READY

@@ -83,9 +83,9 @@ class PlayerActivity : ComponentActivity() {
             rotationAnimation = android.view.WindowManager.LayoutParams.ROTATION_ANIMATION_CROSSFADE
         }
         val restoredSelection = savedInstanceState?.containsKey("playingVideoId") == true
-        currentVideoId.longValue = if (restoredSelection) savedInstanceState!!.getLong("playingVideoId") else intent.getLongExtra(EXTRA_VIDEO_ID, 0L)
-        remoteUri.value = if (restoredSelection) savedInstanceState!!.getString("playingRemoteUri") else intent.getStringExtra(EXTRA_REMOTE_URI)
-        remoteTitle.value = if (restoredSelection) savedInstanceState!!.getString("playingRemoteTitle") else intent.getStringExtra(EXTRA_REMOTE_TITLE)
+        currentVideoId.longValue = if (restoredSelection) savedInstanceState?.getLong("playingVideoId") ?: 0L else intent.getLongExtra(EXTRA_VIDEO_ID, 0L)
+        remoteUri.value = if (restoredSelection) savedInstanceState?.getString("playingRemoteUri") else intent.getStringExtra(EXTRA_REMOTE_URI)
+        remoteTitle.value = if (restoredSelection) savedInstanceState?.getString("playingRemoteTitle") else intent.getStringExtra(EXTRA_REMOTE_TITLE)
         ContextCompat.registerReceiver(
             this,
             pipReceiver,
@@ -297,7 +297,7 @@ class PlayerActivity : ComponentActivity() {
             val owner = activePlayer.get()
             if (reusePipPlayer(owner != null, owner?.isInPictureInPictureMode == true,
                     owner?.isFinishing == true, owner?.isDestroyed == true)) {
-                owner!!.acceptPlaybackIntent(incoming)
+                owner?.acceptPlaybackIntent(incoming)
             } else context.startActivity(incoming)
         }
 

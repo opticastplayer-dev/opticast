@@ -1,0 +1,4 @@
+# Large AAR should use LFS in future - for now keep but mark
+*.aar filter=lfs diff=lfs merge=lfs -text
+# But we keep current AAR in repo for bulletproof build, LFS optional
+# To enable LFS: git lfs track "*.aar"

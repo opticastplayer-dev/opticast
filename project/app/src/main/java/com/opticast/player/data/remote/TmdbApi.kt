@@ -342,7 +342,9 @@ class TmdbApi(private val settings: SettingsRepository) {
         return if (video.isEpisode) {
             val shows = searchTv(parsed.title)
             val best = pickBest(shows, parsed.title, null) ?: return null
-            episodeMetadata(best.id, parsed.season!!, parsed.episode!!)
+            val season = parsed.season ?: return null
+            val episode = parsed.episode ?: return null
+            episodeMetadata(best.id, season, episode)
         } else {
             val movies = searchMovies(parsed.title, parsed.year)
             val best = pickBest(movies, parsed.title, parsed.year) ?: return null

@@ -152,8 +152,8 @@ class MatchViewModel(private val videoId: Long) : ViewModel() {
                     !candidate.isTv -> AppContainer.tmdb.movieMetadata(candidate.result.id)
                     video.isEpisode -> AppContainer.tmdb.episodeMetadata(
                         candidate.result.id,
-                        video.parsed.season!!,
-                        video.parsed.episode!!,
+                        video.parsed.season ?: return@runCatching null,
+                        video.parsed.episode ?: return@runCatching null,
                     )
                     else -> AppContainer.tmdb.showMetadata(candidate.result.id)
                 }

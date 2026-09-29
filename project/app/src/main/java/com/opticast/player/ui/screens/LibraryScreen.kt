@@ -80,6 +80,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -88,6 +89,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -933,6 +935,7 @@ fun LibraryScreen(
             GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
         }
 
+        Box(Modifier.fillMaxSize()) {
         LazyVerticalGrid(
             state = gridState,
             columns = currentGridCells,
@@ -1541,5 +1544,40 @@ fun LibraryScreen(
                         )
     }
     } // Library-only visual style; never changes the player theme or density.
+}
+
+/** Fast-scroll thumb overlay like Infuse - low-RAM safe with derivedStateOf + graphicsLayer */
+@Composable
+internal fun FastScrollThumb(
+    gridState: LazyGridState,
+    modifier: Modifier = Modifier
+) {
+    val showThumb by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.isScrollInProgress } }
+    val firstVisible by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.firstVisibleItemIndex } }
+    val totalItems by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.layoutInfo.totalItemsCount } }
+    androidx.compose.animation.AnimatedVisibility(
+        visible = showThumb && totalItems > 20,
+        enter = androidx.compose.animation.fadeIn(),
+        exit = androidx.compose.animation.fadeOut(),
+        modifier = modifier
+    ) {
+        Box(
+            Modifier
+                .fillMaxHeight()
+                .width(32.dp)
+                .padding(vertical = 80.dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            val progress = if (totalItems > 0) firstVisible.toFloat() / totalItems else 0f
+            Box(
+                Modifier
+                    .fillMaxHeight(0.1f)
+                    .width(4.dp)
+                    .graphicsLayer(translationY = progress * 200)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
+            )
+        }
+    }
 }
 

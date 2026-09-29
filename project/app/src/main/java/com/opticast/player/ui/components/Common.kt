@@ -211,7 +211,20 @@ private fun StatusBadge(status: PosterBadge, modifier: Modifier = Modifier, sing
     val minimal = LocalMinimalStyle.current
     val colours = remember(status) { listOf(Color(status.gradientStart), Color(status.gradientEnd)) }
     val gradient = remember(status) { Brush.linearGradient(colours) }
-    // Shimmer disabled for smooth scrolling - was causing choppiness
+    // Infuse polish: shimmer for NEW badge only - low-RAM safe with rememberInfiniteTransition, only 1 badge at a time
+    val shimmerAlpha = if (status == PosterBadge.NEW) {
+        val infiniteTransition = androidx.compose.runtime.rememberInfiniteTransition(label = "newShimmer")
+        val alpha by infiniteTransition.animateFloat(
+            initialValue = 0.8f,
+            targetValue = 1f,
+            animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+                animation = androidx.compose.animation.core.tween(1000),
+                repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+            ),
+            label = "shimmerAlpha"
+        )
+        alpha
+    } else 1f
     val icon = when (status) {
         PosterBadge.NEW -> Icons.Filled.AutoAwesome
         PosterBadge.CONTINUE -> Icons.Filled.PlayArrow
@@ -220,7 +233,7 @@ private fun StatusBadge(status: PosterBadge, modifier: Modifier = Modifier, sing
     Surface(modifier = modifier, shape = RoundedCornerShape(7.dp),
         color = Color.Transparent, contentColor = BadgeInk,
         border = BorderStroke(1.dp, Color.White.copy(alpha = if(minimal) 0.16f else 0.75f)), shadowElevation = if(minimal) 0.dp else 2.dp) {
-        Row(Modifier.background(gradient).padding(horizontal = 4.dp, vertical = 2.dp),
+        Row(Modifier.background(gradient).graphicsLayer(alpha = shimmerAlpha).padding(horizontal = 4.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(3.dp)) {
             // Reserve the narrow portrait badge for the full two-line resume label.
@@ -356,14 +369,31 @@ fun PosterCard(
     val remotePosterUrl = remember(entry.metadata?.posterPath) { posterRemoteUrlFor(entry) }
     val fallbackTitle = remember(entry.video.name, entry.video.parsed.title) { entry.video.parsed.title.ifBlank { entry.video.name } }
     val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) }
+    // Infuse polish: spring animation on press - low-RAM safe with remember + graphicsLayer (GPU, no recomposition)
+    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+    val scale by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (pressed) 0.96f else 1f,
+        animationSpec = androidx.compose.animation.core.spring(
+            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+            stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow
+        ),
+        label = "posterScale"
+    )
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(2f / 3f)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
             .clip(RoundedCornerShape(12.dp))
             .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(12.dp))
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .combinedClickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .background(MaterialTheme.colorScheme.surfaceContainer),
     ) {
         PosterImage(
@@ -582,32 +612,21 @@ fun HighlightedText(
     )
 }
 
-/** Polish: Heart burst animation when adding favorite like Infuse */
+/** Polish: Heart burst animation when adding favorite like Infuse - low-RAM safe single animation */
 @Composable
 fun HeartBurst(
     visible: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "heartBurst")
-    val scale by infiniteTransition.animateFloat(
-        initialValue = 0.8f,
-        targetValue = 1.2f,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 600
-                0.8f at 0
-                1.4f at 150
-                1.0f at 300
-                1.1f at 450
-                1.0f at 600
-            }
-        ),
-        label = "heartScale"
-    )
-    if (visible) {
-        Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            Text("❤️", fontSize = (24 * scale).sp)
-        }
+    if (!visible) return
+    // Low-RAM safe: single Animatable, not infinite, auto-dispose after 600ms
+    val scale = remember { androidx.compose.animation.core.Animatable(0.8f) }
+    LaunchedEffect(visible) {
+        scale.animateTo(1.4f, animationSpec = androidx.compose.animation.core.tween(150))
+        scale.animateTo(1f, animationSpec = androidx.compose.animation.core.spring(dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy))
+    }
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Text("❤️", fontSize = (24 * scale.value).sp)
     }
 }
 

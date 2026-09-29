@@ -120,6 +120,8 @@ import kotlinx.coroutines.delay
 
 // Extracted from LibraryScreen.kt to reduce god file size - all components made internal for reuse
 
+// Extracted from LibraryScreen.kt to reduce god file size - all components made internal for reuse
+
 @Composable
 internal fun LibraryHeader(onOpenSettings: () -> Unit, onCustomize: () -> Unit, scanning: Boolean, onScan: () -> Unit) {
     BoxWithConstraints(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = LibraryPosterInsetDp.dp, vertical = 6.dp)) {

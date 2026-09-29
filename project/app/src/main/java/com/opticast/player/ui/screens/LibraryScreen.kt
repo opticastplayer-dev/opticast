@@ -66,6 +66,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.focus.focusRequester
@@ -80,7 +83,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -89,7 +91,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -936,7 +937,7 @@ fun LibraryScreen(
         }
 
         Box(Modifier.fillMaxSize()) {
-        LazyVerticalGrid(
+            LazyVerticalGrid(
             state = gridState,
             columns = currentGridCells,
             modifier = Modifier
@@ -1329,6 +1330,11 @@ fun LibraryScreen(
                 }
             }
         }
+            FastScrollThumb(
+                gridState = gridState,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
         }
     }
 
@@ -1548,7 +1554,7 @@ fun LibraryScreen(
 
 /** Fast-scroll thumb overlay like Infuse - low-RAM safe with derivedStateOf + graphicsLayer */
 @Composable
-internal fun FastScrollThumb(
+fun FastScrollThumb(
     gridState: LazyGridState,
     modifier: Modifier = Modifier
 ) {
@@ -1573,7 +1579,7 @@ internal fun FastScrollThumb(
                 Modifier
                     .fillMaxHeight(0.1f)
                     .width(4.dp)
-                    .graphicsLayer(translationY = progress * 200)
+                    .graphicsLayer { translationY = progress * 200f }
                     .clip(RoundedCornerShape(2.dp))
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
             )

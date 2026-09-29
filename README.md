@@ -69,7 +69,7 @@
 
 #### GitHub Releases (Recommended) — Latest v2.6.90
 1. Go to https://github.com/opticastplayer-dev/opticast/releases
-2. Download `OptiCast-v2.6.91-optimized.apk` from latest release
+2. Download `OptiCast-v2.6.92-optimized.apk` from latest release
 3. Install APK (allow unknown sources)
 4. Open → Grant video permission → Auto-scan → Enjoy!
 5. Settings → Check for updates → Download & Install in-app
@@ -128,7 +128,7 @@ Requires Android Studio Ladybug+ (Android 8+, JDK 17)
 
 **Links:**
 - **GitHub:** https://github.com/opticastplayer-dev/opticast
-- **Releases:** https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.91-optimized
+- **Releases:** https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.92-optimized
 - **Website:** https://opticastplayer-dev.github.io/opticast/
 - **F-Droid:** https://f-droid.org/packages/com.opticast.player
 

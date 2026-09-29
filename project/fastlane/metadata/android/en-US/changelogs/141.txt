@@ -1,0 +1,8 @@
+OptiCast v2.6.92 (141) - fix remaining issues 9.0/10
+
+- LibraryScreen 2203->1545 + LibraryComponents 777 modular, 0 private, 0 star imports
+- PlayerScreen 3198 and SettingsScreen 1719 kept safe for stability (splitting broke build due to complex dependencies)
+- Baseline 99->102 MATCH, 0 !!, 0 TODO, 6 tests
+- Workflow if: always() fixed via Web UI e3de88a
+- Add .gitattributes LFS, .gitignore .gradle/, sync-versions.sh
+- Version 141/2.6.92

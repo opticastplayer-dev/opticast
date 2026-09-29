@@ -383,8 +383,6 @@ fun DetailScreen(
     }
     val shareContext = LocalContext.current
     fun toggleFavorite() {
-        val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
         AppContainer.favorites.toggle(videoId)
     }
 

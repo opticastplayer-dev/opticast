@@ -213,7 +213,7 @@ private fun StatusBadge(status: PosterBadge, modifier: Modifier = Modifier, sing
     val gradient = remember(status) { Brush.linearGradient(colours) }
     // Infuse polish: shimmer for NEW badge only - low-RAM safe with rememberInfiniteTransition, only 1 badge at a time
     val shimmerAlpha = if (status == PosterBadge.NEW) {
-        val infiniteTransition = androidx.compose.runtime.rememberInfiniteTransition(label = "newShimmer")
+        val infiniteTransition = rememberInfiniteTransition(label = "newShimmer")
         val alpha by infiniteTransition.animateFloat(
             initialValue = 0.8f,
             targetValue = 1f,

@@ -67,8 +67,8 @@
 
 #### GitHub Releases (Recommended) — Latest v2.6.93 Final Stable
 1. Go to https://github.com/opticastplayer-dev/opticast/releases
-2. Download `OptiCast-v2.6.93-optimized.apk` (38M ARM32+ARM64)
-2. Download `OptiCast-v2.6.93-optimized.apk` from latest release
+2. Download `OptiCast-v2.6.93.apk` (38M ARM32+ARM64)
+2. Download `OptiCast-v2.6.93.apk` from latest release
 3. Install APK (allow unknown sources)
 4. Open → Grant video permission → Auto-scan → Enjoy!
 5. Settings → Check for updates → Download & Install in-app
@@ -130,9 +130,9 @@ Locked baseline: v2.6.93/142, 110 entries, 9.3/10 Final Stable Perfect
 
 **Links:**
 - **GitHub:** https://github.com/opticastplayer-dev/opticast
-- **Releases:** https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.93-optimized
-- **APK:** https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.93-optimized/OptiCast-v2.6.93-optimized.apk
-- **Releases:** https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.93-optimized
+- **Releases:** https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.93
+- **APK:** https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.93/OptiCast-v2.6.93.apk
+- **Releases:** https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.93
 - **Website:** https://opticastplayer-dev.github.io/opticast/
 - **F-Droid:** https://f-droid.org/packages/com.opticast.player
 

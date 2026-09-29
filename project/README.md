@@ -68,15 +68,15 @@ Previous: 2.6.91 shared element attempt failed due to brace mismatch — fixed w
 ## Installation
 
 **GitHub Releases (Recommended):**
-1. https://github.com/opticastplayer-dev/opticast/releases → download `OptiCast-v2.6.93-optimized.apk` (38M ARM32/ARM64)
-1. https://github.com/opticastplayer-dev/opticast/releases → download `OptiCast-v2.6.93-optimized.apk` (38M ARM32/ARM64)
+1. https://github.com/opticastplayer-dev/opticast/releases → download `OptiCast-v2.6.93.apk` (38M ARM32/ARM64)
+1. https://github.com/opticastplayer-dev/opticast/releases → download `OptiCast-v2.6.93.apk` (38M ARM32/ARM64)
 2. Install, allow unknown sources
 3. Future: Settings → Check for updates → Download & Install
 
 **F-Droid:** Metadata in `fastlane/` + `fdroid-com.opticast.player.yml`. Once included: https://f-droid.org/packages/com.opticast.player
 
-**Direct APK:** `OptiCast-v2.6.93-optimized.apk` SHA256 see `SHA256SUMS-v2.6.93-optimized.txt`
-**Direct APK:** `OptiCast-v2.6.93-optimized.apk` SHA256 see `SHA256SUMS-v2.6.93-optimized.txt`
+**Direct APK:** `OptiCast-v2.6.93.apk` SHA256 see `SHA256SUMS-v2.6.93.txt`
+**Direct APK:** `OptiCast-v2.6.93.apk` SHA256 see `SHA256SUMS-v2.6.93.txt`
 
 ---
 

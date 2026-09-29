@@ -215,7 +215,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 
 // -------------------------------------------------------------------------- VM
 
-private data class ContinueItem(
+internal data class ContinueItem(
     val entry: LibraryEntry,
     val playback: PlaybackState
                         )
@@ -227,7 +227,7 @@ internal data class LibraryStats(
     val totalHours: Double
                         )
 
-private fun comparatorFor(sortBy: String): Comparator<LibraryEntry> = when (sortBy) {
+internal fun comparatorFor(sortBy: String): Comparator<LibraryEntry> = when (sortBy) {
     "title" -> compareBy { (it.metadata?.displayTitle ?: it.video.parsed.title).lowercase() }
     "rating" -> compareByDescending { it.metadata?.voteAverage ?: 0.0 }
     "year" -> compareByDescending { it.metadata?.year ?: 0 }

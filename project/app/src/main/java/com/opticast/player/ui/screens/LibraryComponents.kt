@@ -45,7 +45,7 @@ import com.opticast.player.ui.screens.DiscoveryGutterDp
 import com.opticast.player.ui.screens.LibraryPosterInsetDp
 import com.opticast.player.ui.screens.LibraryBottomBarAlpha
 import com.opticast.player.ui.screens.LibraryWordmarkWidthFraction
-import com.opticast.player.ui.screens.LibraryPosterMinimumDp
+import com.opticast.player.ui.screens.libraryPosterMinimumDp
 import com.opticast.player.ui.screens.LibraryPosterInsetDp
 
 import androidx.compose.ui.semantics.Role

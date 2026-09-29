@@ -260,7 +260,7 @@ fun PlayerScreen(
         if(remoteVideo==null) resolvedVideo=withContext(Dispatchers.IO) { runCatching { AppContainer.mediaScanner.byId(activeVideoId) }.getOrNull() }
         resolvingVideo=false
         if(resolvedVideo!=null) {
-            ResumeProbes.forId(requestedId.toString())?.bind(resolvedVideo!!.uri)
+            resolvedVideo?.let { ResumeProbes.forId(requestedId.toString())?.bind(it.uri) }
             PlayerStats.markStartup(requestedId.toString(),StartupStage.RESOLVED)
         }
     }
@@ -431,7 +431,7 @@ fun PlayerScreen(
         }
         return
     }
-    val controller: MediaController = controllerState!!
+    val controller: MediaController = controllerState ?: return
     fun requestIsCurrent(): Boolean = (activity !is PlayerActivity || activity.ownsPlaybackSession()) && currentPlaybackRequest(requestToken,latestRequest.value) && controller.isConnected && controller === controllerRef.value
     fun eventIsCurrent(): Boolean = requestIsCurrent() && samePlaybackItem(video.id,controller.currentMediaItem?.mediaId)
 

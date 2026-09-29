@@ -40,8 +40,6 @@ import com.opticast.player.ui.screens.MatchScreen
 import com.opticast.player.ui.screens.NetworkScreen
 import com.opticast.player.ui.screens.SettingsScreen
 import com.opticast.player.ui.screens.StorageScreen
-import com.opticast.player.ui.tv.TvHomeScreen
-import com.opticast.player.ui.tv.isTelevision
 import com.opticast.player.ui.screens.ShowScreen
 import com.opticast.player.ui.theme.OptiCastTheme
 
@@ -209,27 +207,14 @@ private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0
         ) {
             composable(ROUTE_LIBRARY) {
                 val launchPlayer = rememberPlayerLauncher()
-                // Android TV gets its own remote-first home: same library, same
-                // player, rails instead of a phone grid. Everything else (detail,
-                // show, settings, storage) is shared.
-                val onTv = remember { isTelevision(context) }
-                if (onTv) {
-                    TvHomeScreen(
-                        onOpenDetail = { id -> navigate("detail/$id") },
-                        onOpenPlayer = { id -> launchPlayer(id) },
-                        onOpenShow = { name -> navigate("show/${Uri.encode(name)}") },
-                        onOpenSettings = { navigate(ROUTE_SETTINGS) },
-                        onOpenNetwork = { navigate(ROUTE_NETWORK) },
-                    )
-                } else {
-                    LibraryScreen(
-                        onOpenDetail = { id -> navigate("detail/$id") },
-                        onOpenPlayer = { id -> launchPlayer(id) },
-                        onOpenMatch = { id -> navController.navigate("match/$id") },
-                        onOpenShow = { name -> navigate("show/${Uri.encode(name)}") },
-                        onOpenSettings = { navigate(ROUTE_SETTINGS) },
-                    )
-                }
+                // Mobile only: no TV support - always show phone LibraryScreen
+                LibraryScreen(
+                    onOpenDetail = { id -> navigate("detail/$id") },
+                    onOpenPlayer = { id -> launchPlayer(id) },
+                    onOpenMatch = { id -> navController.navigate("match/$id") },
+                    onOpenShow = { name -> navigate("show/${Uri.encode(name)}") },
+                    onOpenSettings = { navigate(ROUTE_SETTINGS) },
+                )
             }
             composable(ROUTE_SETTINGS) {
                 SettingsScreen(

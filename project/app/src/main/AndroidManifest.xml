@@ -16,16 +16,13 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
 
-    <!-- One universal APK. Leanback and touch are both optional, which is what
-         lets Google Play hand the same build to a phone and to a TV box. -->
-    <uses-feature android:name="android.software.leanback" android:required="false" />
-    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <!-- Mobile only: no TV support, touchscreen required -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="true" />
 
     <application
         android:name=".OptiCastApplication"
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
-        android:banner="@drawable/tv_banner"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -44,9 +41,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <!-- TV launcher: shows OptiCast on the Android TV / Fire TV home
-                     screen with the banner above. -->
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
 

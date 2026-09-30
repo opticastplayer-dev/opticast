@@ -336,6 +336,47 @@ internal fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
     val countStyle = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold)
     val widestLabelPx = destinations.maxOf { textMeasurer.measure(it.second, countStyle, softWrap = false).size.width }
     val barHeight = 52.dp + 14.dp * (LocalDensity.current.fontScale - 1f).coerceAtLeast(0f)
+    Surface(modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = LibraryBottomBarAlpha), tonalElevation = 0.dp) {
+        Column {
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val density = LocalDensity.current
+        val sideInset = 0.dp
+        val cellWidth = maxOf(com.opticast.player.ui.layout.adaptiveControlWidthDp(density.fontScale).dp,
+            with(density) { widestLabelPx.toDp() } + 12.dp)
+        val rowWidth = maxOf(maxWidth, cellWidth * 4 + sideInset)
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).width(rowWidth).navigationBarsPadding().height(barHeight),
+            verticalAlignment = Alignment.CenterVertically) {
+            destinations.forEach { (id, label, icon) ->
+                val selected = tab == id && !searchOpen
+                val tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                Box(Modifier.weight(1f).height(barHeight)
+                    .selectable(selected = selected, role = Role.Tab,
+                        onClick = { onTabChange(id) }), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.padding(horizontal = 4.dp)) {
+                        Icon(icon, contentDescription = null, modifier = Modifier.size(22.dp).graphicsLayer { val factor = if (id == "favs") favoriteBounce.value else 1f; scaleX = factor; scaleY = factor }, tint = tint)
+                        com.opticast.player.ui.components.AutoFitLabel(label, color = tint, maxSp = 12,
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium))
+                    }
+                }
+            }
+            Box(Modifier.weight(1f).height(barHeight)
+                .selectable(selected = searchOpen, role = Role.Button, onClick = onSearch),
+                contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.padding(horizontal = 4.dp)) {
+                    val tint = if (searchOpen) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    Icon(Icons.Filled.Search, contentDescription = null, modifier = Modifier.size(22.dp), tint = tint)
+                    com.opticast.player.ui.components.AutoFitLabel("Search", maxSp = 12, color = tint,
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = if (searchOpen) FontWeight.Bold else FontWeight.Medium))
+                }
+            }
+        }
+    }
+}
+}
+}
 
 @Composable
 internal fun UpToDateCard(version: String, onDismiss: (() -> Unit)? = null) {

@@ -320,7 +320,6 @@ internal fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
     val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     val favoriteBounce = remember { Animatable(1f) }
     var lastFavoriteVersion by rememberSaveable { mutableStateOf(favoriteVersion) }
-    var lastFavoriteVersion by rememberSaveable { mutableStateOf(favoriteVersion) }
     LaunchedEffect(favoriteVersion) {
         if (favoriteVersion != lastFavoriteVersion) {
             lastFavoriteVersion = favoriteVersion
@@ -337,8 +336,6 @@ internal fun LibraryBottomBar(tab: String, onTabChange: (String) -> Unit,
     val countStyle = MaterialTheme.typography.labelSmall.copy(fontSize = 12.sp, fontWeight = FontWeight.Bold)
     val widestLabelPx = destinations.maxOf { textMeasurer.measure(it.second, countStyle, softWrap = false).size.width }
     val barHeight = 52.dp + 14.dp * (LocalDensity.current.fontScale - 1f).coerceAtLeast(0f)
-}
-}
 
 @Composable
 internal fun UpToDateCard(version: String, onDismiss: (() -> Unit)? = null) {

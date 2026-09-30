@@ -64,7 +64,8 @@ sealed class ApiResult<out T> {
 
 class TmdbProxyClient {
 
-    private val json = Json {
+    @PublishedApi
+    internal val json = Json {
         ignoreUnknownKeys = true
         isLenient = true
         coerceInputValues = true
@@ -78,7 +79,8 @@ class TmdbProxyClient {
         .retryOnConnectionFailure(true)
         .build()
 
-    private fun buildUrl(path: String, queryParams: Map<String, String?> = emptyMap()): String {
+    @PublishedApi
+    internal fun buildUrl(path: String, queryParams: Map<String, String?> = emptyMap()): String {
         val urlBuilder = (TmdbProxyConfig.BASE_URL + path.trimStart('/')).toHttpUrl().newBuilder()
         for ((k, v) in queryParams) {
             if (v != null) urlBuilder.addQueryParameter(k, v)
@@ -90,7 +92,8 @@ class TmdbProxyClient {
      * Core GET with retry for Render waking up (502/503/504 + SocketTimeout)
      * Returns raw JSON string or throws mapped ApiResult.Error
      */
-    private suspend fun getWithRetry(url: String): ApiResult<String> = withContext(Dispatchers.IO) {
+    @PublishedApi
+    internal suspend fun getWithRetry(url: String): ApiResult<String> = withContext(Dispatchers.IO) {
         var lastError: ApiResult.Error? = null
 
         repeat(TmdbProxyConfig.MAX_RETRIES) { attempt ->

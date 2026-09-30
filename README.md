@@ -23,13 +23,17 @@
 - **Easy updates** — Installs over existing app, in-app updates via FileProvider
 - **Clean design** — Adaptive poster grid, Continue Watching, Recently Added, Collections
 
-### Screenshots
+### Screenshots — Real App v2.6.104
 
-| Library | Detail | Player |
-|---------|--------|--------|
-| Adaptive grid, Continue Watching, Recently Added, Movies/TV, Collections | Poster, rating, story, genres, Watch Now, Subtitles | Edge-to-edge, gestures, PiP, speed, audio/subs |
+| Library | Movie Detail | TV Show |
+|---------|--------------|---------|
+| ![Library](docs/showcase/01-library-grid.jpg) | ![Detail](docs/showcase/02-detail-page.jpg) | ![TV Show](docs/showcase/03-tv-show.jpg) |
 
-*See [Releases](https://github.com/opticastplayer-dev/opticast/releases) for APK*
+| Player | Settings |
+|--------|----------|
+| ![Player](docs/showcase/04-player.jpg) | ![Settings](docs/showcase/05-settings.jpg) |
+
+*Real screenshots from OptiCast v2.6.104 — Library with Continue Watching, Featured, Recently Added, Movie Detail with cast, TV Show seasons, Player with gestures, Settings*
 
 ### Features
 

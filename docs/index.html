@@ -15,10 +15,12 @@ h1{font-size:2.4rem;margin:0 0 8px}
 .badge{display:inline-block;padding:4px 12px;border-radius:999px;background:#63daff22;color:#63daff;border:1px solid #63daff44;margin:4px;font-size:0.85rem}
 .btn{display:inline-block;margin:12px 8px;padding:14px 28px;border-radius:12px;background:#63daff;color:#000;font-weight:700;text-decoration:none}
 .btn.secondary{background:#ffffff14;color:#fff;border:1px solid #ffffff22}
-section{max-width:900px;margin:0 auto;padding:32px 24px}
+section{max-width:1000px;margin:0 auto;padding:32px 24px}
 h2{color:#63daff}
 footer{text-align:center;padding:32px;color:#888;font-size:0.9rem}
 .card{background:#1a1a2e;border:1px solid #ffffff11;border-radius:16px;padding:20px;margin:16px 0}
+.screenshots{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:24px 0}
+.screenshots img{width:100%;border-radius:16px;border:1px solid #ffffff22}
 </style>
 </head>
 <body>
@@ -48,6 +50,16 @@ footer{text-align:center;padding:32px;color:#888;font-size:0.9rem}
 <li>Easy updates — Installs over existing, in-app FileProvider</li>
 </ul>
 </div>
+
+<h2>Screenshots — Real App v2.6.104</h2>
+<div class="screenshots">
+<img src="showcase/01-library-grid.jpg" alt="Library - Continue Watching, Featured, Recently Added">
+<img src="showcase/02-detail-page.jpg" alt="Movie Detail - Mortal Kombat II">
+<img src="showcase/03-tv-show.jpg" alt="TV Show - Banshee Season 1">
+<img src="showcase/04-player.jpg" alt="Player - Gestures, PiP, Speed">
+<img src="showcase/05-settings.jpg" alt="Settings - UI, Playback, File Management">
+</div>
+
 <h2>What's New — v2.6.104</h2>
 <ul>
 <li>Audio Only removed — fixes blank video until seek</li>
@@ -56,6 +68,7 @@ footer{text-align:center;padding:32px;color:#888;font-size:0.9rem}
 <li>Offline-first — check once when internet detected, subtitles cached, Up To Date only when update available</li>
 <li>Install over existing — same JKS higher versionCode, full changelog visible</li>
 </ul>
+
 <h2>Installation</h2>
 <div class="card">
 <ol>
@@ -64,12 +77,15 @@ footer{text-align:center;padding:32px;color:#888;font-size:0.9rem}
 <li>Open → Grant permission → Auto-scan</li>
 </ol>
 </div>
+
 <h2>Privacy</h2>
 <p>No accounts, no tracking. See <a href="https://github.com/opticastplayer-dev/opticast/blob/main/docs/PRIVACY.md" style="color:#63daff">PRIVACY.md</a> and <a href="https://github.com/opticastplayer-dev/opticast/blob/main/docs/FAQ.md" style="color:#63daff">FAQ.md</a></p>
+
 <h2>Links</h2>
 <ul>
 <li><a href="https://github.com/opticastplayer-dev/opticast" style="color:#63daff">GitHub Source (GPL-3.0)</a></li>
 <li><a href="https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.104" style="color:#63daff">Latest Release v2.6.104</a></li>
+<li><a href="https://f-droid.org/packages/com.opticast.player" style="color:#63daff">F-Droid</a></li>
 </ul>
 </section>
 <footer>

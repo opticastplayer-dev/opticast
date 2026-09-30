@@ -1,0 +1,8 @@
+OptiCast v2.6.99 — Stable Build — RAM, heart, collapsible, audio instant
+
+- Improve RAM consumption — imageMemoryBudget 8/12/16/20 MB (was 12/16/24/32), disk 32/48/64/96 MB (was 48/96/128/192), metadata LRU 100->50
+- Remove heart confetti when video added to favorites — removed HeartBurst visual from LibraryBottomBar and LibraryScreen top, kept haptic + bounce only
+- Movies discovery carousel collapsible with no black bar — restored collapsible logic expanded = searching || minimal || movies !in collapsedSections with onToggle, fixed black bar by contentPadding bottom only 88dp no top modifier
+- Disabling audio only video displays instantly without seek — removed 150ms delay, instant enable + clearOverrides + prepare + playWhenReady + play(), AndroidView instant player reassign
+- Keep small poster animation fixed, blank screen fix, recently added corners fix
+- 148/2.6.99, 110 baseline locked, 9.5/10 Stable

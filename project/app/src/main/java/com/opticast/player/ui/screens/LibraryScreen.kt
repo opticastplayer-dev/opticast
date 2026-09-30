@@ -940,16 +940,6 @@ fun LibraryScreen(
             GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
         }
 
-        // Heart burst at top for visibility - moved from bottom bar (uses existing favVersion from favorites)
-        var showHeartTop by remember { mutableStateOf(false) }
-        LaunchedEffect(favVersion) {
-            if (favVersion > 0) {
-                showHeartTop = true
-                kotlinx.coroutines.delay(1200)
-                showHeartTop = false
-            }
-        }
-
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
             LazyVerticalGrid(
             state = gridState,
@@ -1185,9 +1175,9 @@ fun LibraryScreen(
                     "titles" -> {
             if ((currentTab == "movies" || searching) && movies.isNotEmpty()) {
                 item(key = "discovery-movies-header", span = { GridItemSpan(maxLineSpan) }) {
-                    DiscoveryHeader("Movies", "Your movie collection, ready to explore.", Color(0xFF63CFFF), movies.size, expanded = true, onToggle = null)
+                    DiscoveryHeader("Movies", "Your movie collection, ready to explore.", Color(0xFF63CFFF), movies.size, expanded = searching || design.style == "minimal" || "movies" !in collapsedSections, onToggle = if (searching || design.style == "minimal") null else ({ toggleSection("movies") }))
                 }
-                items(movies, key = { "movie-${it.video.id}" }, contentType = { "movie" }) { entry ->
+                if (searching || design.style == "minimal" || "movies" !in collapsedSections) items(movies, key = { "movie-${it.video.id}" }, contentType = { "movie" }) { entry ->
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = entry.video.id in selectedIds,
@@ -1210,9 +1200,9 @@ fun LibraryScreen(
             }
             if ((currentTab == "tv" || searching) && shows.isNotEmpty()) {
                 item(key = "discovery-shows-header", span = { GridItemSpan(maxLineSpan) }) {
-                    DiscoveryHeader("TV Shows", "Find your next episode.", Color(0xFFBB9FFF), shows.size, expanded = true, onToggle = null)
+                    DiscoveryHeader("TV Shows", "Find your next episode.", Color(0xFFBB9FFF), shows.size, expanded = searching || design.style == "minimal" || "shows" !in collapsedSections, onToggle = if (searching || design.style == "minimal") null else ({ toggleSection("shows") }))
                 }
-                items(shows.entries.toList(), key = { "show-${it.key}" }, contentType = { "show" }) { (name, episodes) ->
+                if (searching || design.style == "minimal" || "shows" !in collapsedSections) items(shows.entries.toList(), key = { "show-${it.key}" }, contentType = { "show" }) { (name, episodes) ->
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = episodes.any { it.video.id in selectedIds },

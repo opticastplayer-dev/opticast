@@ -1350,15 +1350,12 @@ fun PlayerScreen(
                 onReset = null,
                 onRelease = { view -> view.player = null },
                 update = { view ->
-                    if (view.player !== controller) view.player = controller
+                    view.player = controller
+                    view.useController = false
                     if (audioOnly) {
                         view.videoSurfaceView?.visibility = android.view.View.INVISIBLE
-                        view.visibility = android.view.View.INVISIBLE
                     } else {
                         view.videoSurfaceView?.visibility = android.view.View.VISIBLE
-                        view.visibility = android.view.View.VISIBLE
-                        // Robust reattach: reassign player to force surface reattach
-                        view.player = null
                         view.player = controller
                     }
                     view.resizeMode = surfaceResizeMode(resizeMode)

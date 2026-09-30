@@ -5,11 +5,11 @@ package com.opticast.player.data
  */
 internal fun imageMemoryBudgetBytes(lowRam: Boolean, memoryClass: Int = if (lowRam) 128 else 256): Int {
     val mb = when {
-        memoryClass <= 128 -> 12
-        memoryClass <= 192 -> 16
-        memoryClass <= 256 -> 24
-        lowRam -> 16
-        else -> 32
+        memoryClass <= 128 -> 8
+        memoryClass <= 192 -> 12
+        memoryClass <= 256 -> 16
+        lowRam -> 12
+        else -> 20
     }
     return mb * 1024 * 1024
 }
@@ -17,11 +17,11 @@ internal fun imageMemoryBudgetBytes(lowRam: Boolean, memoryClass: Int = if (lowR
 /** Disk cache budget for Coil - reduced for RAM, still offline posters */
 internal fun imageDiskBudgetBytes(lowRam: Boolean, memoryClass: Int = if (lowRam) 128 else 256): Long {
     val mb = when {
-        memoryClass <= 128 -> 48
-        memoryClass <= 192 -> 96
-        memoryClass <= 256 -> 128
-        lowRam -> 96
-        else -> 192
+        memoryClass <= 128 -> 32
+        memoryClass <= 192 -> 48
+        memoryClass <= 256 -> 64
+        lowRam -> 48
+        else -> 96
     }
     return mb * 1024 * 1024L
 }
@@ -35,6 +35,6 @@ internal fun posterDownloadConcurrency(lowRam: Boolean, memoryClass: Int = if (l
     }
 }
 
-internal const val METADATA_LRU_SIZE = 100
+internal const val METADATA_LRU_SIZE = 50
 internal const val ENTRY_ID_POOL_SIZE = 500
 internal const val MIN_VIDEO_DURATION_MS = 60_000L

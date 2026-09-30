@@ -864,8 +864,6 @@ fun LibraryScreen(
                         ) { padding ->
             val currentTab = tab
             val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
-            // Ultra-fast: pause image decoding during fling for 60fps on low-RAM 32-bit
-            val isScrolling by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.isScrollInProgress } }
             LaunchedEffect(query, searchScope) { if (searchOpen) gridState.scrollToItem(0) }
             val searching = searchOpen
             val tabFilter: (LibraryEntry) -> Boolean = { entry ->
@@ -1126,7 +1124,6 @@ fun LibraryScreen(
                         lazyItems(recentlyAdded, key = { "recent-${it.video.id}" }) { entry ->
                             SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp).clip(RoundedCornerShape(12.dp)), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
-                            isScrolling = isScrolling,
                                     sharedTransitionScope = sharedTransitionScope,
                                     animatedVisibilityScope = animatedVisibilityScope,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
@@ -1152,7 +1149,6 @@ fun LibraryScreen(
                         ) {
                         PosterCard(
                             entry = entry,
-                            isScrolling = isScrolling,
                             onClick = {
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else onOpenDetail(entry.video.id)
@@ -1179,7 +1175,6 @@ fun LibraryScreen(
                         ShowCard(
                             showTitle = name,
                             episodes = episodes,
-                            isScrolling = isScrolling,
                             onClick = {
                                 if (selectionMode) toggleSelectShow(episodes)
                                 else onOpenShow(name)
@@ -1205,7 +1200,6 @@ fun LibraryScreen(
                         ) {
                         PosterCard(
                             entry = entry,
-                            isScrolling = isScrolling,
                             onClick = {
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else onOpenDetail(entry.video.id)
@@ -1232,7 +1226,6 @@ fun LibraryScreen(
                         ShowCard(
                             showTitle = name,
                             episodes = episodes,
-                            isScrolling = isScrolling,
                             onClick = {
                                 if (selectionMode) toggleSelectShow(episodes)
                                 else onOpenShow(name)
@@ -1265,7 +1258,6 @@ fun LibraryScreen(
                         lazyItems(completedMovies, key = { "watched-movie-${it.video.id}" }) { entry ->
                             SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp).clip(RoundedCornerShape(12.dp)), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
-                            isScrolling = isScrolling,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
                                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)))
@@ -1273,7 +1265,7 @@ fun LibraryScreen(
                         }
                         lazyItems(completedShows.entries.toList(), key = { "watched-show-${it.key}" }) { (name, episodes) ->
                             SelectableCard(selectionMode, episodes.any { it.video.id in selectedIds }, Modifier.width(DiscoveryPosterDp.dp), onToggle = { toggleSelectShow(episodes) }) {
-                                ShowCard(showTitle = name, episodes = episodes, isScrolling = isScrolling,
+                                ShowCard(showTitle = name, episodes = episodes,
                                     onClick = { if (selectionMode) toggleSelectShow(episodes) else onOpenShow(name) },
                                     onLongClick = { if (selectionMode) toggleSelectShow(episodes) else { menuIsWholeShow = true; menuEntry = episodes.first() } },
                                     modifier = Modifier.fillMaxWidth())

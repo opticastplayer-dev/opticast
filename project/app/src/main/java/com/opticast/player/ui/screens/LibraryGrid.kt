@@ -10,10 +10,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import com.opticast.player.data.model.LibraryEntry
 import com.opticast.player.ui.components.PosterCard
@@ -32,6 +31,7 @@ fun LibraryGrid(
     entries: List<LibraryEntry>,
     libraryGrid: String,
     gridState: LazyGridState,
+    chromeScroll: androidx.compose.ui.input.nestedscroll.NestedScrollConnection,
     padding: PaddingValues,
     onPosterClick: (LibraryEntry) -> Unit,
     onPosterLongClick: (LibraryEntry) -> Unit,
@@ -46,12 +46,11 @@ fun LibraryGrid(
     val gridCells = remember(libraryGrid) {
         GridCells.Adaptive(libraryPosterMinimumDp(libraryGrid).dp)
     }
-    val isScrolling by remember { derivedStateOf { gridState.isScrollInProgress } }
     
     LazyVerticalGrid(
         state = gridState,
         columns = gridCells,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().nestedScroll(chromeScroll),
         contentPadding = PaddingValues(bottom = padding.calculateBottomPadding() + 12.dp)
     ) {
         item(span = { GridItemSpan(maxLineSpan) }, key = "header", contentType = "header") { headerContent() }
@@ -66,7 +65,6 @@ fun LibraryGrid(
             // Stability: animateItem for smooth grid changes, stable key prevents jank
             PosterCard(
                 entry = entry,
-                isScrolling = isScrolling,
                 onClick = { onPosterClick(entry) },
                 onLongClick = { onPosterLongClick(entry) },
                 modifier = Modifier.animateItem()

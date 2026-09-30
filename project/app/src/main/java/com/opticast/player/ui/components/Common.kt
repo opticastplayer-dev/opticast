@@ -276,9 +276,7 @@ fun rememberFrameArtwork(videoId: Long?): File? {
     return artwork
 }
 
-/** Loads a poster image with placeholder for buttery smooth scrolling on low-RAM 32-bit 3GB devices.
- * Ultra-fast: when isScrolling=true, skip decoding and show placeholder only - resumes when scroll stops.
- */
+/** Loads a poster image with placeholder for buttery smooth scrolling on low-RAM 32-bit 3GB devices. */
 @Composable
 fun PosterImage(
     url: String?,
@@ -287,7 +285,6 @@ fun PosterImage(
     cacheBust: Int = 0, // kept for compatibility but not used - causes choppiness
     remoteUrl: String? = null,
     videoId: Long? = null,
-    isScrolling: Boolean = false,
 ) {
     var useRemote by remember(url, remoteUrl) { mutableStateOf(false) }
     var failed by remember(url, remoteUrl) { mutableStateOf(false) }
@@ -303,10 +300,7 @@ fun PosterImage(
         )
     }
     Box(modifier.background(placeholderBrush)) {
-        // Ultra-fast: during fast fling, skip image decoding entirely - show fallback instantly
-        if (isScrolling) {
-            FallbackPoster(fallbackTitle)
-        } else if (effectiveUrl != null && !failed) {
+        if (effectiveUrl != null && !failed) {
             AsyncImage(
                 onError = {
                     if (!useRemote && remoteUrl != null && effectiveUrl != remoteUrl) {
@@ -367,9 +361,7 @@ private val PosterScrim = Brush.verticalGradient(
     listOf(Color.Transparent, Color.Black.copy(alpha = 0.88f)),
 )
 
-/** Poster grid card for a single movie / episode file.
- * Ultra-fast: isScrolling pauses image decoding during fling for 60fps on low-RAM 32-bit.
- */
+/** Poster grid card for a single movie / episode file. */
 @OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun PosterCard(
@@ -380,7 +372,6 @@ fun PosterCard(
     cacheBust: Int = 0,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
-    isScrolling: Boolean = false,
 ) {
     val metadata = entry.metadata
     val posterUrl = remember(entry.video.id, entry.metadata?.posterPath) { posterUrlFor(entry) }
@@ -410,7 +401,6 @@ fun PosterCard(
             cacheBust = cacheBust,
             remoteUrl = posterRemoteUrlFor(entry),
             videoId = entry.video.id,
-            isScrolling = isScrolling,
         )
 
         // Bottom scrim with labels
@@ -484,9 +474,7 @@ fun rememberShowFrameArtwork(episodes: List<LibraryEntry>): File? {
     return file
 }
 
-/** Card representing a whole TV show (grouped episodes).
- * Ultra-fast: isScrolling pauses decoding during fling.
- */
+/** Card representing a whole TV show (grouped episodes). */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShowCard(
@@ -496,7 +484,6 @@ fun ShowCard(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     cacheBust: Int = 0,
-    isScrolling: Boolean = false,
 ) {
     val representative = episodes.firstOrNull { it.metadata?.posterPath != null }
         ?: episodes.first()
@@ -542,7 +529,6 @@ fun ShowCard(
                 cacheBust = cacheBust,
                 remoteUrl = remotePoster,
                 videoId = fallbackVideoId,
-                isScrolling = isScrolling,
             )
         } else if (showFrame != null) {
             // Direct frame — already resolved across all episodes, not just the

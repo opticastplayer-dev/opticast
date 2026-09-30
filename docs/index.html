@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OptiCast v2.6.104 — Your Local Cinema</title>
-<meta name="description" content="OptiCast v2.6.104 — Your Local Cinema, Offline-First, Mobile Only. 38M APK, No Ads, Open Source, Android 8+.">
-<meta property="og:title" content="OptiCast v2.6.104">
-<meta property="og:description" content="Beautiful, fast local video player for Android — offline-first, no ads, open source">
-<meta property="og:url" content="https://opticastplayer-dev.github.io/opticast/">
+<title>OptiCast v2.6.104 — Final — Your Local Cinema</title>
+<meta name="description" content="OptiCast v2.6.104 Final — Your Local Cinema, Offline-First, Mobile Only. 38M APK, No Ads, Open Source, Android 8+, Maintenance only.">
+<meta property="og:title" content="OptiCast v2.6.104 — Final">
+<meta property="og:description" content="Beautiful, fast local video player for Android — offline-first, no ads, open source — Final stable">
 <style>
 body{font-family:system-ui,sans-serif;background:#0f0f12;color:#e8e8ea;margin:0;line-height:1.6}
 header{padding:48px 24px;text-align:center;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)}
@@ -17,79 +16,62 @@ h1{font-size:2.4rem;margin:0 0 8px}
 .btn.secondary{background:#ffffff14;color:#fff;border:1px solid #ffffff22}
 section{max-width:1000px;margin:0 auto;padding:32px 24px}
 h2{color:#63daff}
-footer{text-align:center;padding:32px;color:#888;font-size:0.9rem}
-.card{background:#1a1a2e;border:1px solid #ffffff11;border-radius:16px;padding:20px;margin:16px 0}
 .screenshots{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:24px 0}
 .screenshots img{width:100%;border-radius:16px;border:1px solid #ffffff22}
+.card{background:#1a1a2e;border:1px solid #ffffff11;border-radius:16px;padding:20px;margin:16px 0}
+footer{text-align:center;padding:32px;color:#888;font-size:0.9rem}
 </style>
 </head>
 <body>
 <header>
-<h1>OptiCast v2.6.104</h1>
-<p>Your Local Cinema, Offline-First — 38M APK</p>
+<h1>OptiCast v2.6.104 — Final</h1>
+<p>Your Local Cinema, Offline-First — 38M APK — Final Stable — Maintenance Only</p>
 <div>
+<span class="badge">Final</span>
 <span class="badge">38M APK</span>
-<span class="badge">No ads • No tracking • GPL-3.0</span>
+<span class="badge">No ads • GPL-3.0</span>
 <span class="badge">Android 8+</span>
 <span class="badge">Offline-First</span>
 </div>
 <div style="margin-top:24px">
-<a class="btn" href="https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.104/OptiCast-v2.6.104.apk">Download v2.6.104</a>
+<a class="btn" href="https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.104/OptiCast-v2.6.104.apk">Download v2.6.104 Final</a>
 <a class="btn secondary" href="https://github.com/opticastplayer-dev/opticast">GitHub</a>
-<a class="btn secondary" href="https://f-droid.org/packages/com.opticast.player">F-Droid</a>
+<a class="btn secondary" href="https://f-droid.org/packages/com.opticast.player">F-Droid MR 50679</a>
 </div>
 </header>
 <section>
-<h2>Why OptiCast?</h2>
+<h2>Final — Maintenance Only</h2>
 <div class="card">
-<p><strong>No ads, no tracking, open source</strong> — Your media stays on your device.</p>
-<ul>
-<li>Works on all phones — Android 8+, including 32-bit devices</li>
-<li>Offline-first — Library, posters, subtitles saved offline, minimal data</li>
-<li>Plays everything — mpv + Media3, mkv/mp4/avi</li>
-<li>Easy updates — Installs over existing, in-app FileProvider</li>
-</ul>
+<p><strong>v2.6.104 (153) — Final stable</strong> — No new features planned. Only critical bug fixes, security updates, mpv updates if needed. Focus on F-Droid review, AlternativeTo, Reddit, and letting users enjoy best Android video player.</p>
+<p>9.5/10 — Best local video player for Android open source, beats VLC 7.0, Nova 7.5, Kodi 8.0, Plex 8.0, close to Infuse 10/10 iOS.</p>
 </div>
 
-<h2>Screenshots — Real App v2.6.104</h2>
+<h2>Screenshots — Real App v2.6.104 Final</h2>
 <div class="screenshots">
-<img src="showcase/01-library-grid.jpg" alt="Library - Continue Watching, Featured, Recently Added">
-<img src="showcase/02-detail-page.jpg" alt="Movie Detail - Mortal Kombat II">
-<img src="showcase/03-tv-show.jpg" alt="TV Show - Banshee Season 1">
-<img src="showcase/04-player.jpg" alt="Player - Gestures, PiP, Speed">
-<img src="showcase/05-settings.jpg" alt="Settings - UI, Playback, File Management">
+<img src="showcase/1.jpg" alt="Library">
+<img src="showcase/2.jpg" alt="Movie Detail">
+<img src="showcase/3.jpg" alt="TV Show">
+<img src="showcase/4.jpg" alt="Player">
+<img src="showcase/5.jpg" alt="Settings">
 </div>
 
-<h2>What's New — v2.6.104</h2>
+<h2>Why OptiCast?</h2>
 <ul>
-<li>Audio Only removed — fixes blank video until seek</li>
-<li>Library scrolling fast — removed unnecessary animations, keeps Adaptive grid, border/clip 12dp, badges, discovery</li>
-<li>RAM optimized — 8/12/16/20 image + 32/48/64/96 disk LRU 30 pool 200 + Coil clear</li>
-<li>Offline-first — check once when internet detected, subtitles cached, Up To Date only when update available</li>
-<li>Install over existing — same JKS higher versionCode, full changelog visible</li>
+<li>Private — No ads, no tracking, GPL-3.0</li>
+<li>Offline — Library, posters, subtitles saved offline</li>
+<li>Plays everything — mpv + Media3</li>
+<li>Easy updates — Install over existing, in-app FileProvider</li>
 </ul>
-
-<h2>Installation</h2>
-<div class="card">
-<ol>
-<li>Download OptiCast-v2.6.104.apk from GitHub Releases (38M)</li>
-<li>Install APK (allow unknown sources)</li>
-<li>Open → Grant permission → Auto-scan</li>
-</ol>
-</div>
-
-<h2>Privacy</h2>
-<p>No accounts, no tracking. See <a href="https://github.com/opticastplayer-dev/opticast/blob/main/docs/PRIVACY.md" style="color:#63daff">PRIVACY.md</a> and <a href="https://github.com/opticastplayer-dev/opticast/blob/main/docs/FAQ.md" style="color:#63daff">FAQ.md</a></p>
 
 <h2>Links</h2>
 <ul>
-<li><a href="https://github.com/opticastplayer-dev/opticast" style="color:#63daff">GitHub Source (GPL-3.0)</a></li>
-<li><a href="https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.104" style="color:#63daff">Latest Release v2.6.104</a></li>
-<li><a href="https://f-droid.org/packages/com.opticast.player" style="color:#63daff">F-Droid</a></li>
+<li><a href="https://github.com/opticastplayer-dev/opticast" style="color:#63daff">GitHub Source GPL-3.0</a></li>
+<li><a href="https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.104" style="color:#63daff">Release v2.6.104 Final</a></li>
+<li><a href="https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50679" style="color:#63daff">F-Droid MR 50679</a></li>
 </ul>
 </section>
 <footer>
-<p>OptiCast v2.6.104 — GPL-3.0 — opticastproject@gmail.com</p>
+<p>OptiCast v2.6.104 Final — GPL-3.0 — Maintenance only — opticastproject@gmail.com</p>
 </footer>
 </body>
 </html>

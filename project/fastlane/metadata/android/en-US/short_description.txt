@@ -1,1 +1,1 @@
-Best local video player for Android — offline, no ads, open source
+Local video player, offline-first

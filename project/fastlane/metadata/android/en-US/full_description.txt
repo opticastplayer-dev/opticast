@@ -1,26 +1,32 @@
-OptiCast v2.6.104 — Your Local Cinema, Offline-First
+OptiCast — Your Local Cinema, Offline-First
 
-Beautiful, fast local video player for Android. Your own movies and TV shows, organized beautifully, playing perfectly offline.
+Beautiful, fast local video player. Your own movies and TV shows, organized beautifully, playing perfectly offline.
 
-No ads, no tracking, open source. 38M APK.
+No ads, no tracking. 38M APK.
 
 LIBRARY:
-Finds your videos automatically, adaptive poster grid, Continue Watching, Movies & TV Shows, Favorites, Recently Added, Collections, search.
+Finds your videos automatically, adaptive poster grid, Continue Watching, Movies & TV Shows, Favorites, Recently Added, Collections, search. Fast scrolling.
 
 MOVIE INFO:
-Recognizes movies/TV from filenames via TMDB, posters cached offline, blurred fallback.
+Recognizes movies/TV from filenames via TMDB, posters cached offline, blurred fallback never black.
 
 SUBTITLES:
-OpenSubtitles + SubDL, always saved offline, custom fonts, dual subs.
+OpenSubtitles + SubDL, always saved offline during scan, custom fonts, dual subs.
 
 PLAYER:
-mpv + Media3, edge-to-edge, gestures, PiP, speed, audio/subs.
+mpv + Media3, plays all formats mkv/mp4/avi, edge-to-edge, gestures, PiP auto-resume, speed, audio/subs picker.
 
 UPDATES:
-Checks once when internet detected, minimal data, in-app FileProvider, full changelog visible.
+Checks once when internet detected, minimal data, in-app FileProvider with progress, full changelog visible, Up To Date only when update available, What's New real new.
 
-Privacy: No accounts, no tracking, offline-first. See docs/PRIVACY.md
+OFFLINE:
+Works fully offline after posters/subtitles cached, minimal data.
 
-GPL-3.0 — opticastproject@gmail.com
+PRIVATE:
+No ads, no tracking, GPL-3.0, media stays on device, no accounts.
 
-v2.6.104 (153)
+WHAT'S NEW in 2.6.104:
+Audio Only removed fixes blank video, library scrolling fast, RAM 8/12/16/20 + 32/48/64/96 LRU 30 pool 200 + Coil clear, offline-first, install over existing same JKS.
+
+WORKS ON:
+Android 8+, all phones, offline-first, private

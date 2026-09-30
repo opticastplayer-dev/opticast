@@ -1,9 +1,0 @@
-v2.6.88 — Error Fixes — No Mistakes, All Versions Match, Easy to Read
-
-- Fixed baseline count mismatch: header said 65 but actual 70, fixed to 70 entries, now matches, no mismatch
-- Fixed gradlew not executable: was not executable, now executable for build
-- Fixed .git/config missing: recreated with user and remote, now exists for future pushes
-- Fixed showHeartBurst unused: defined but never displayed, now shows heart burst ❤️ with haptic when adding favorite like Infuse
-- Version consistency: all match 137 / 2.6.88 — build.gradle.kts 137/2.6.88, baseline 137/2.6.88 70 entries, README v2.6.88 build 137, docs/index.html Version 2.6.88 v2.6.88-optimized Download Latest v2.6.88, sitemap v2.6.88-optimized, fastlane 137.txt v2.6.88, APK versionName matches asset version, no mistakes
-- Polish to match Infuse: haptic feedback light tick changing tabs and searching, heart burst animation adding favorite, confetti celebration What's New, beautiful posters shimmer placeholder no white flash cached offline, search highlight bold yellow matching words, empty states beautiful cinema illustration gradient helpful message, stats engaging streak badge 🔥 days, fast and smooth quick startup smooth scrolling lightweight reliable handles damaged files saves crashes file keeps last 5, saves data small posters metered only downloads when not playing saves battery works fully offline subtitles always saved offline, plays everything powerful engine all formats beautiful player gestures loading never stuck
-- Mobile only, offline-first, no ads, open source, easy to understand for everyone, works on all Android phones, fast and smooth, beautiful design

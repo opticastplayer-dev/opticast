@@ -1,8 +1,0 @@
-• 🎬 Fixed black background in detail page — now shows blurred poster fallback when no backdrop (Afterburn 2025 fix)
-• 🔋 Offline-first: poster scaled 1.2x + alpha 0.6 + gradient overlay when no backdrop/frame cached
-• ✅ Up To Date card now shows installed 2.6.79 not old GitHub 2.6.78 — matches real app version
-• 🌐 Check once when internet detected (24h min, 7 days max) — minimal data, offline priority #1
-• 📝 Always cache subtitles during scan for offline playback
-• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 128, installs over existing
-• ✅ Baseline locked v2.6.79 with 54 entries, buttery smooth
-• 🔍 Google indexing: Pages enabled, SEO meta, sitemap, 19 topics

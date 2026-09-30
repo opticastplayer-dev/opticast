@@ -1,6 +1,0 @@
-• 🔧 Fixed version mismatch: APK now correctly shows 2.6.77 instead of 2.6.76 - versionName matches asset name
-• 🚀 9/10 improvements: optimized poster with placeholder (60fps on 3GB 32-bit), split LibraryScreen 2116 lines into Header/Cards/Grid, ViewModel with StateFlow
-• 🛡️ Ultra bulletproof 12 layers: prebuilt AAR mandatory 25M permanent, signing mandatory, versionCode must increase, package constant, install-over verification, CODEOWNERS
-• 📦 Full mpv 38M with libmpv True 24 .so, versionCode 126, installs over existing same signature
-• ✅ Baseline locked v2.6.77 with 51 entries for buttery smooth scrolling on low-RAM 32-bit
-• 🧪 Unit tests, version catalog, performance monitoring, accessibility, crash reporting, DI ServiceLocator, Proguard optimized

@@ -1,8 +1,8 @@
-OptiCast v2.6.105 — Secure proxy + honest simplicity
+OptiCast v2.6.105
 
-- Secure proxy: No API key needed — metadata via https://tmdb-proxy-xstu.onrender.com/api/ with retry for Render waking (35s connect, 60s read, 3 retries). Fixes Cannot GET /3/*, now uses /api/* confirmed working
-- AppContainer now uses proxy adapter, fetches automatically, no key in APK
-- Honest simplicity tone: Landing page rewritten — Your videos, beautifully organized, Why different (focused local playback, offline-first, private), Getting Started 30s, captioned screenshots, FAQ & Privacy links, no self-scoring
-- README rewritten to match — no beats VLC, focused local playback
-- First-run audited: Empty state Where are my videos? tooltip, quick tour swipe/search/long-press, PermissionGate private/offline/open source
-- F-Droid description updated to honest simplicity
+- No API key needed — metadata via proxy with retry for waking, confirmed working
+- Fetches automatically, no key in APK
+- Your videos, beautifully organized — Why different, Getting Started, captioned screenshots, FAQ & Privacy links
+- Focused local playback, offline-first, private
+- Empty state Where are my videos? tooltip, quick tour
+- F-Droid description updated

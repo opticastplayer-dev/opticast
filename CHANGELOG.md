@@ -1,18 +1,16 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.105 (154) — 2026-09-30 — Secure proxy + honest simplicity
+**Current:** v2.6.105 (154) — 2026-09-30
 
-## v2.6.105 (154) — 2026-09-30 — Secure proxy + honest simplicity
+## v2.6.105 (154) — 2026-09-30
 
-**Focus: automatic metadata, honest simplicity tone, no comparisons**
-
-- **Secure proxy**: No API key needed — metadata via https://tmdb-proxy-xstu.onrender.com/api/ with retry for Render waking (35s connect, 60s read, 3 retries exponential 2s/4s/8s). Fixes Cannot GET /3/search/movie — now uses /api/search/movie, /api/movie/550 etc. Confirmed working without key.
-- **AppContainer**: tmdb now uses TmdbApiProxyAdapter (no settings), drop-in replacement, fetches automatically
-- **Honest simplicity tone**: Landing page rewritten — header "Your videos, beautifully organized", hero "OptiCast is a local video player for Android...", Why it's different (focused local playback, offline-first, private & simple), Getting Started 30s, captioned screenshots, FAQ & Privacy links, stars/downloads badges, no self-scoring 9.5/10 removed, no beats VLC comparisons
-- **README**: rewritten to match tone — "Your videos, beautifully organized", Why different, Getting Started with Where are my videos tooltip, captioned screenshots, what people say (early tester quotes), no 9.5/10
-- **F-Droid**: full_description updated to honest simplicity, short_description "Your videos, beautifully organized. Offline, private, no ads."
-- **First-run audited**: PermissionGate — "Your videos, beautifully organized" + private/offline/open source; EmptyLibrary — "Where are my videos?" tooltip with excluded folders, hidden files, pull to refresh, quick tour swipe/search/long-press
-- **Landing page**: added Why it's different, Getting Started, captioned screenshots, FAQ/Privacy links, stars/downloads, testimonials, AlternativeTo/ProductHunt presence, first-run audit section
+- No API key needed — metadata via https://tmdb-proxy-xstu.onrender.com/api/ with retry for waking, confirmed working
+- AppContainer tmdb now uses proxy adapter, drop-in replacement, fetches automatically
+- Your videos, beautifully organized — header, Why it's different (focused local playback, offline-first, private & simple), Getting Started 30s, captioned screenshots, FAQ & Privacy links, stars/downloads
+- README rewritten to match — simple, focused
+- F-Droid full_description updated, short_description "Your videos, beautifully organized. Offline, private, no ads."
+- First-run: PermissionGate private/offline/open source, EmptyLibrary Where are my videos? tooltip + quick tour
+- Landing page: Why different, Getting Started, captioned screenshots, FAQ/Privacy links, stars/downloads, testimonials, presence
 
 ## v2.6.104 (153) — 2026-09-30 — Final
 

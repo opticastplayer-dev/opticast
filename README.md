@@ -11,7 +11,7 @@ OptiCast is a local video player for Android. It finds your movies and TV shows,
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build)](https://github.com/opticastplayer-dev/opticast/actions)
 [![Pages](https://img.shields.io/badge/Website-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.105 (154) — Secure proxy, no API key needed, honest simplicity
+**Current:** v2.6.105 (154)
 
 ### Why it's different
 
@@ -95,7 +95,7 @@ See [PRIVACY.md](docs/PRIVACY.md) and [FAQ.md](docs/FAQ.md)
 
 ### Links
 
-- Website: https://opticastplayer-dev.github.io/opticast/ — honest simplicity, why different, getting started, screenshots captioned, FAQ & Privacy links, stars/downloads
+- Website: https://opticastplayer-dev.github.io/opticast/ — simple, focused, why different, getting started, screenshots captioned, FAQ & Privacy links, stars/downloads
 - GitHub: https://github.com/opticastplayer-dev/opticast
 - Release: https://github.com/opticastplayer-dev/opticast/releases/latest
 - F-Droid MR: https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50679
@@ -112,7 +112,7 @@ Contact: opticastproject@gmail.com
 
 ### What's New in 2.6.105
 
-- **Secure proxy**: No API key needed — metadata via https://tmdb-proxy-xstu.onrender.com/api/ with retry for Render waking
-- **Honest simplicity tone**: Landing page rewritten — header "Your videos, beautifully organized", Why different, Getting Started, captioned screenshots, FAQ/Privacy links, no self-scoring
-- **First-run audited**: Empty state tooltip "Where are my videos?", quick tour tooltips, excluded folders helper
-- Maintenance: offline-first, install over existing, in-app updates
+- No API key needed — metadata via proxy with retry for waking, fetches automatically
+- Your videos, beautifully organized — Why different, Getting Started, captioned screenshots, FAQ & Privacy links
+- Empty state Where are my videos? tooltip, quick tour
+- Offline-first, install over existing, in-app updates

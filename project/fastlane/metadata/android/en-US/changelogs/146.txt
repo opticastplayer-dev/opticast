@@ -1,9 +1,0 @@
-OptiCast v2.6.97 — Stable Build — Fix remaining issues
-
-- Fix recently added posters sharp corners at top — PosterCard clip final after background + graphicsLayer clip=true, SelectableCard clip 12dp, PosterImage clip 12dp
-- Fix blank screen persisting, only disappears when poster covers full screen during scrolling — restored immediate posterCache.warmUp() at startup (was delayed 1500ms causing blank until scroll), LazyVerticalGrid contentPadding top uses Scaffold padding correctly, LibraryHeader wrapped in Box background
-- Fix disabling audio only still shows blank screen with only sound — robust reattach: clearOverridesOfType VIDEO, delay 100ms, prepare if not READY, playWhenReady true, clearVideoSurfaceView + setVideoSurfaceView reattach, visibility VISIBLE/INVISIBLE
-- Keep PiP instant, back swipe, bottom bar overlap, RAM 280MB, library smoothness fixes from 2.6.96
-- Simple naming: OptiCast v2.6.97 — Stable Build, 38M APK, 110 baseline locked, 9.4/10 Stable
-
-Best local video player for Android — offline, no ads, open source — Stable Build

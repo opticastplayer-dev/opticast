@@ -1,7 +1,0 @@
-OptiCast v2.6.98 — Stable Build — Fix blank, audio only, poster animation
-
-- Fix blank empty screen persisting — LazyVerticalGrid contentPadding bottom only 88dp, no top padding modifier, movies/tv headers always expanded not collapsible, loading padding 60->16dp, immediate posterCache.warmUp()
-- Fix disabling audio only not fixed — robust: clearOverridesOfType VIDEO, delay 150ms, prepare, seekTo pos, playWhenReady true, play(), player null reassign surface reattach
-- Fix unnecessary animation of small poster when entering media information page — removed sharedElement transition from PosterCard
-- Keep recently added sharp corners fix, PiP, back swipe, RAM, smoothness
-- 147/2.6.98, 110 baseline locked

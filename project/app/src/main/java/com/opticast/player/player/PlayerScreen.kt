@@ -1001,30 +1001,6 @@ fun PlayerScreen(
             kotlinx.coroutines.delay(1_000L)
         }
     }
-
-    // Audio-only: robust fix for blank video when exiting audio only
-    // Disable VIDEO track when audioOnly, re-enable + clearOverrides + prepare + playWhenReady + surface reattach when exiting
-    // Audio-only: instant video display when exiting audio only - no delay until seek
-    LaunchedEffect(audioOnly, controller) {
-        runCatching {
-            if (audioOnly) {
-                controller.trackSelectionParameters = controller.trackSelectionParameters
-                    .buildUpon()
-                    .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_VIDEO, true)
-                    .build()
-            } else {
-                controller.trackSelectionParameters = controller.trackSelectionParameters
-                    .buildUpon()
-                    .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_VIDEO, false)
-                    .clearOverridesOfType(androidx.media3.common.C.TRACK_TYPE_VIDEO)
-                    .build()
-                if (controller.playbackState != androidx.media3.common.Player.STATE_READY) {
-                    controller.prepare()
-                }
-                controller.playWhenReady = true
-                controller.play()
-            }
-        }
     }
 
     // One cancellable preparation owner for route changes, subtitles and subtitle offsets.

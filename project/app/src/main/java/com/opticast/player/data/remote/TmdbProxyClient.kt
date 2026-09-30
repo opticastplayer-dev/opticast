@@ -98,12 +98,20 @@ class TmdbProxyClient {
 
         repeat(TmdbProxyConfig.MAX_RETRIES) { attempt ->
             try {
+                // Secure: secret from BuildConfig (injected from local.properties, not hardcoded in GitHub)
+                val appSecret = try {
+                    com.opticast.player.BuildConfig.TMDB_PROXY_SECRET
+                } catch (_: Exception) {
+                    "" // fallback if BuildConfig not generated yet
+                }
                 val request = Request.Builder()
                     .url(url)
                     .header("Accept", "application/json")
                     .header("Content-Type", "application/json")
-                    // Optional: helps your Express log that it's from Android
                     .header("X-Client", "OptiCast-Android")
+                    .apply {
+                        if (appSecret.isNotBlank()) header("X-App-Secret", appSecret)
+                    }
                     .get()
                     .build()
 

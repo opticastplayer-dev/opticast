@@ -7,6 +7,13 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
+// Secure proxy secret from local.properties (not in GitHub) — for X-App-Secret header
+val localProps = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val proxySecret = localProps.getProperty("tmdb.proxy.secret") ?: System.getenv("TMDB_PROXY_SECRET") ?: ""
+
 android {
     namespace = "com.opticast.player"
     compileSdk = 36
@@ -24,6 +31,15 @@ android {
         versionCode = 154
         versionName = "2.6.105"
         vectorDrawables { useSupportLibrary = true }
+        // Secure proxy secret — injected as BuildConfig field, not plain string in code
+        // local.properties: tmdb.proxy.secret=YOUR_SECRET, or env TMDB_PROXY_SECRET
+        buildConfigField("String", "TMDB_PROXY_SECRET", "\"$proxySecret\"")
+        // Keep secret in BuildConfig, not in strings.xml, harder to extract than hardcoded URL
+        if (proxySecret.isBlank()) {
+            println("WARNING: tmdb.proxy.secret not set in local.properties — proxy will return 403. Set it for local builds.")
+        } else {
+            println("Proxy secret configured: ${proxySecret.take(4)}**** (${proxySecret.length} chars)")
+        }
     }
 
     signingConfigs {
@@ -100,6 +116,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         jniLibs {

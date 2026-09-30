@@ -1,0 +1,366 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 2.6.75-optimized)'
+        required: true
+        default: '2.6.75-optimized'
+      full_mpv:
+        description: 'Build full with mpv (true) or Media3-only (false)'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          yes | sdkmanager --licenses || true
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973" || true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Verify critical files exist (bulletproof)
+        run: |
+          echo "=== Verifying critical files that must never be deleted ==="
+          # Prebuilt AAR mandatory
+          if [ ! -f "project/native/prebuilt/opticast-mpv-runtime.aar" ]; then
+            echo "FATAL: Prebuilt AAR missing - would break install-over"
+            echo "File: project/native/prebuilt/opticast-mpv-runtime.aar"
+            echo "See project/native/prebuilt/README.md"
+            exit 1
+          fi
+          SIZE=$(stat -c%s "project/native/prebuilt/opticast-mpv-runtime.aar" || stat -f%z "project/native/prebuilt/opticast-mpv-runtime.aar")
+          if [ "$SIZE" -lt 10000000 ]; then
+            echo "FATAL: Prebuilt AAR too small $SIZE"
+            exit 1
+          fi
+          if ! unzip -l "project/native/prebuilt/opticast-mpv-runtime.aar" | grep -q libmpv; then
+            echo "FATAL: Prebuilt AAR missing libmpv"
+            exit 1
+          fi
+          echo "Prebuilt AAR OK: $SIZE bytes with libmpv"
+          
+          # Package name constant
+          if ! grep -q 'applicationId = "com.opticast.player"' project/app/build.gradle.kts; then
+            echo "FATAL: applicationId changed - breaks install-over"
+            grep applicationId project/app/build.gradle.kts
+            exit 1
+          fi
+          if ! grep -q 'namespace = "com.opticast.player"' project/app/build.gradle.kts; then
+            echo "FATAL: namespace changed - breaks install-over"
+            exit 1
+          fi
+          echo "Package name OK: com.opticast.player"
+          
+          # --- VERSION SAFEGUARD: Prevent misleading version issue (v2.6.105 showed 2.6.104) ---
+          echo "=== VERSION SAFEGUARD: Prevent versionCode mismatch ==="
+          # Check duplicate versionCode/versionName lines (should be exactly 1 each)
+          VC_COUNT=$(grep -c 'versionCode\s*=' project/app/build.gradle.kts || echo 0)
+          VN_COUNT=$(grep -c 'versionName\s*=' project/app/build.gradle.kts || echo 0)
+          echo "versionCode lines: $VC_COUNT, versionName lines: $VN_COUNT"
+          if [ "$VC_COUNT" -ne 1 ]; then
+            echo "FATAL: Found $VC_COUNT versionCode lines, expected 1 — duplicate causes mismatch, build would show older version"
+            grep -n 'versionCode' project/app/build.gradle.kts
+            exit 1
+          fi
+          if [ "$VN_COUNT" -ne 1 ]; then
+            echo "FATAL: Found $VN_COUNT versionName lines, expected 1 — duplicate causes mismatch"
+            grep -n 'versionName' project/app/build.gradle.kts
+            exit 1
+          fi
+          VC=$(grep -oP 'versionCode\s*=\s*\K\d+' project/app/build.gradle.kts | head -1)
+          VN=$(grep -oP 'versionName\s*=\s*\"\K[^\"]+' project/app/build.gradle.kts | head -1)
+          echo "versionCode=$VC versionName=$VN"
+          if [ -z "$VC" ]; then
+            echo "FATAL: versionCode not found"
+            exit 1
+          fi
+          if [ -z "$VN" ]; then
+            echo "FATAL: versionName not found"
+            exit 1
+          fi
+          if [ "$VC" -lt 124 ]; then
+            echo "FATAL: versionCode $VC < 124 - would not install over latest"
+            exit 1
+          fi
+          # Check versionName matches tag (e.g., tag v2.6.105 -> versionName 2.6.105)
+          TAG="${{ github.ref_name }}"
+          if [ -n "$TAG" ]; then
+            TAG_VER=${TAG#v}
+            echo "Tag: $TAG -> $TAG_VER, versionName: $VN"
+            if [ "$TAG_VER" != "$VN" ]; then
+              echo "FATAL: Tag version $TAG_VER does not match versionName $VN — would show older version after install, misleading"
+              echo "Fix: update build.gradle.kts versionName to match tag"
+              exit 1
+            fi
+          fi
+          # Check versionCode > previous release (prevent same versionCode as older)
+          # Allow rebuild of same tag (PREV_VC == current TAG_VER) — equal VC is OK for rebuild
+          PREV_VC=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/releases/latest | grep -oP '\"tag_name\":\s*\"v\K[^\"]+' | head -1 || echo "")
+          if [ -n "$PREV_VC" ]; then
+            echo "Previous latest tag: v$PREV_VC"
+            TAG_VER_CURRENT=${TAG_VER:-${TAG#v}}
+            if [ "$PREV_VC" = "$TAG_VER_CURRENT" ]; then
+              echo "Previous tag is same as current ($PREV_VC) — rebuild, skipping increasing check"
+            else
+              PREV_BUILD=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://raw.githubusercontent.com/${{ github.repository }}/refs/tags/v${PREV_VC}/project/app/build.gradle.kts 2>/dev/null | grep -oP 'versionCode\s*=\s*\K\d+' | head -1 || echo 0)
+              if [ -n "$PREV_BUILD" ] && [ "$PREV_BUILD" -ge "$VC" ] 2>/dev/null; then
+                echo "FATAL: New versionCode $VC <= previous versionCode $PREV_BUILD (tag v$PREV_VC) — would NOT install over, shows older version"
+                exit 1
+              fi
+              echo "Previous versionCode $PREV_BUILD, new $VC — OK (increasing)"
+            fi
+          fi
+          echo "versionCode OK: $VC versionName OK: $VN — single source of truth, matches tag, increasing"
+
+      - name: Restore signing key (BULLETPROOF - fail if missing for release)
+        run: |
+          mkdir -p signing
+          rm -f signing/opticast-release.jks signing/signing.properties
+          if [ -n "${{ secrets.SIGNING_JKS_BASE64 }}" ]; then
+            echo "Found SIGNING_JKS_BASE64 secret"
+            echo "${{ secrets.SIGNING_JKS_BASE64 }}" | tr -d ' \n\r\t' | base64 -d > signing/opticast-release.jks 2>&1 && echo "JKS decoded OK" || {
+              echo "${{ secrets.SIGNING_JKS_BASE64 }}" | base64 -d -i > signing/opticast-release.jks 2>&1 && echo "Decoded with -i" || {
+                echo "FATAL: Invalid base64 for signing key"
+                echo "This would cause debug signature that cannot install over release"
+                exit 1
+              }
+            }
+            if [ ! -f "signing/opticast-release.jks" ] || [ ! -s "signing/opticast-release.jks" ]; then
+              echo "FATAL: JKS file missing or empty after decode"
+              exit 1
+            fi
+            echo "storePassword=${{ secrets.SIGNING_STORE_PASSWORD }}" > signing/signing.properties
+            echo "keyAlias=${{ secrets.SIGNING_KEY_ALIAS }}" >> signing/signing.properties
+            echo "keyPassword=${{ secrets.SIGNING_KEY_PASSWORD }}" >> signing/signing.properties
+            ls -lh signing/
+            echo "Signing key OK"
+          else
+            echo "WARNING: No SIGNING_JKS_BASE64 secret"
+            if [ "${{ inputs.full_mpv }}" == "true" ] || [ -z "${{ inputs.full_mpv }}" ]; then
+              echo "FATAL: Signing key required for official release build"
+              echo "Without release key, APK would have debug signature and cannot install over existing release"
+              echo "Set SIGNING_JKS_BASE64 secret in GitHub repo settings"
+              exit 1
+            else
+              echo "Media3-only build allowed without signing key"
+              echo "storePassword=android" > signing/signing.properties
+              echo "keyAlias=androiddebugkey" >> signing/signing.properties
+              echo "keyPassword=android" >> signing/signing.properties
+            fi
+          fi
+
+      - name: Generate Gradle Wrapper if missing
+        run: |
+          cd project
+          if [ ! -f "gradlew" ]; then
+            gradle wrapper --gradle-version 8.11.1 || true
+          fi
+          chmod +x gradlew || true
+
+      - name: Restore native runtime AAR for full mpv (ULTRA BULLETPROOF)
+        if: ${{ inputs.full_mpv == 'true' || inputs.full_mpv == '' }}
+        run: |
+          echo "=== ULTRA BULLETPROOF: Prebuilt MANDATORY ==="
+          ls -lh project/native/prebuilt/ || { echo "FATAL: prebuilt dir missing"; exit 1; }
+          if [ ! -f "project/native/prebuilt/opticast-mpv-runtime.aar" ]; then
+            echo "FATAL: Prebuilt AAR missing - see README"
+            exit 1
+          fi
+          mkdir -p .cache/native-runtime
+          cp project/native/prebuilt/opticast-mpv-runtime.aar .cache/native-runtime/
+          ls -lh .cache/native-runtime/
+          if ! unzip -l .cache/native-runtime/opticast-mpv-runtime.aar | grep -q libmpv; then
+            echo "FATAL: Prebuilt AAR missing libmpv"
+            exit 1
+          fi
+          python3 project/native/restore-from-apk.py
+          if [ $? -ne 0 ]; then
+            echo "FATAL: Restore failed - refusing Media3-only"
+            exit 1
+          fi
+          if ! unzip -l .cache/native-runtime/opticast-mpv-runtime.aar | grep -q libmpv; then
+            echo "FATAL: AAR missing libmpv after restore"
+            exit 1
+          fi
+          echo "AAR verified has libmpv - OK"
+
+      - name: Inject TMDB proxy secret for metadata (fix v2.6.107 -> v2.6.108)
+        run: |
+          echo "=== Injecting TMDB proxy secret for BuildConfig ==="
+          SECRET="${{ secrets.TMDB_PROXY_SECRET }}"
+          if [ -z "$SECRET" ]; then
+            SECRET="${{ secrets.APP_SECRET }}"
+          fi
+          if [ -n "$SECRET" ]; then
+            echo "TMDB proxy secret found (${#SECRET} chars) — writing to local.properties and env"
+            # Write to project/local.properties for Gradle buildConfigField
+            echo "tmdb.proxy.secret=$SECRET" >> project/local.properties
+            echo "sdk.dir=$ANDROID_HOME" >> project/local.properties 2>/dev/null || true
+            # Also set env for build.gradle.kts fallback
+            echo "TMDB_PROXY_SECRET=$SECRET" >> $GITHUB_ENV
+            cat project/local.properties | grep -v secret | head -n 20
+            echo "Secret injected OK"
+          else
+            echo "WARNING: No TMDB_PROXY_SECRET or APP_SECRET secret set in GitHub — BuildConfig will use hardcoded fallback, metadata will still work but set secret for rotation"
+          fi
+
+      - name: Build APK
+        env:
+          TMDB_PROXY_SECRET: ${{ secrets.TMDB_PROXY_SECRET || secrets.APP_SECRET }}
+          APP_SECRET: ${{ secrets.APP_SECRET || secrets.TMDB_PROXY_SECRET }}
+        run: |
+          cd project
+          # Verify AAR exists before build
+          if [ ! -f "../.cache/native-runtime/opticast-mpv-runtime.aar" ] && [ ! -f "native/prebuilt/opticast-mpv-runtime.aar" ]; then
+            echo "FATAL: No AAR found for full mpv build"
+            exit 1
+          fi
+          if [ -f "native/prebuilt/opticast-mpv-runtime.aar" ] && [ ! -f "../.cache/native-runtime/opticast-mpv-runtime.aar" ]; then
+            mkdir -p ../.cache/native-runtime
+            cp native/prebuilt/opticast-mpv-runtime.aar ../.cache/native-runtime/
+          fi
+          echo "Building FULL with mpv"
+          ./gradlew assembleOfficialRelease --stacktrace --no-daemon || ./gradlew assembleRelease --stacktrace --no-daemon
+          # Verify official release was used, not debug
+          APK=$(find app/build/outputs/apk -name "*.apk" -type f | grep -E "official|release" | head -1)
+          if [ -z "$APK" ]; then
+            echo "FATAL: No official/release APK found, only debug?"
+            find app/build/outputs -name "*.apk" -type f -exec ls -lh {} \;
+            exit 1
+          fi
+          echo "Built $APK"
+
+      - name: Find APK
+        run: |
+          find project/app/build/outputs -name "*.apk" -type f -exec ls -lh {} \;
+
+      - name: Verify APK is full mpv and can install over (ULTRA BULLETPROOF)
+        if: ${{ inputs.full_mpv == 'true' || inputs.full_mpv == '' }}
+        run: |
+          APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | grep -E "official|release" | head -1)
+          if [ -z "$APK" ]; then
+            APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | head -1)
+          fi
+          echo "=== Verifying $APK ==="
+          if [ ! -f "$APK" ]; then
+            echo "FATAL: No APK found"
+            exit 1
+          fi
+          ls -lh "$APK"
+          SIZE=$(stat -c%s "$APK" || stat -f%z "$APK")
+          echo "Size: $SIZE bytes ($((SIZE/1024/1024))M)"
+          if [ "$SIZE" -lt 20000000 ]; then
+            echo "FATAL: APK too small $SIZE < 20MB - Media3-only, would break install-over"
+            unzip -l "$APK" | grep "lib/" | head -20
+            exit 1
+          fi
+          if ! unzip -l "$APK" | grep -q "libmpv"; then
+            echo "FATAL: APK missing libmpv.so"
+            unzip -l "$APK" | grep "lib/" | head -20
+            exit 1
+          fi
+          echo "Has libmpv: OK"
+          
+          # Check .so count (full mpv should have 24 .so, Media3-only has 4)
+          SO_COUNT=$(unzip -l "$APK" | grep -c "lib/.*\.so" || echo 0)
+          echo ".so count: $SO_COUNT"
+          if [ "$SO_COUNT" -lt 10 ]; then
+            echo "FATAL: Only $SO_COUNT .so files, expected 24 for full mpv"
+            exit 1
+          fi
+          
+          # Verify package name via aapt if available
+          if command -v aapt2 >/dev/null 2>&1; then
+            aapt2 dump badging "$APK" | grep package || true
+          fi
+          
+          # Run Python verification
+          python3 project/native/verify-install-over.py "$APK" || {
+            echo "FATAL: Install-over verification failed"
+            exit 1
+          }
+          
+          echo "SUCCESS: APK verified full mpv and install-over safe"
+
+      - name: Package (BULLETPROOF VERSION handling)
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="${{ github.ref_name }}"
+          fi
+          if [ -z "$VERSION" ]; then
+            VERSION="2.6.75-optimized"
+          fi
+          VERSION=${VERSION#v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Final VERSION: $VERSION"
+          mkdir -p releases
+          APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | grep -E "official|release" | head -1)
+          if [ -z "$APK" ]; then
+            APK=$(find project/app/build/outputs/apk -name "*.apk" -type f | head -1)
+          fi
+          echo "APK=$APK"
+          if [ ! -f "$APK" ]; then
+            echo "FATAL: No APK"
+            exit 1
+          fi
+          cp "$APK" "releases/OptiCast-v${VERSION}.apk"
+          ls -lh "releases/OptiCast-v${VERSION}.apk"
+          # Verify asset name matches version
+          if [ ! -f "releases/OptiCast-v${VERSION}.apk" ]; then
+            echo "FATAL: Asset naming failed"
+            exit 1
+          fi
+          if unzip -l "$APK" | grep -q "libmpv"; then
+            echo "FULL-mpv confirmed"
+          else
+            echo "FATAL: Expected full mpv but got Media3-only"
+            exit 1
+          fi
+          sha256sum "releases/OptiCast-v${VERSION}.apk" > "releases/SHA256SUMS-v${VERSION}.txt"
+          cat "releases/SHA256SUMS-v${VERSION}.txt"
+          ls -lh releases/
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OptiCast-APK
+          path: releases/*
+
+      - name: Create Release
+        if: always()
+        uses: softprops/action-gh-release@v2
+        with:
+          files: releases/*
+          generate_release_notes: true
+          tag_name: ${{ inputs.version }}
+          name: ${{ inputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

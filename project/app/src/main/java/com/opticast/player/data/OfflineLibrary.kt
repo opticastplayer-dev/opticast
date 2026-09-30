@@ -41,8 +41,11 @@ class OfflineLibrary(context: android.content.Context) {
             if (com.opticast.player.data.local.requiresRenameClue(video.name) && AppContainer.renameSuggestions.clue(video).title.isBlank()) return false
             return shouldAttemptUnmatched(attempts.getBoolean(initialAttemptKey(video), false), manual)
         }
-        return shouldUpgradeMetadata(metadata, key.isNotBlank(),
-            !manual && attempts.getString(attemptKey(video, metadata), null) == fingerprint(key))
+        // SECURE PROXY: now works without key, so hasKey is always true for tmdb source
+        // Old logic: hasKey = key.isNotBlank() — blocked proxy
+        // New: hasKey = true (proxy injects key server-side)
+        return shouldUpgradeMetadata(metadata, true,
+            !manual && attempts.getString(attemptKey(video, metadata), null) == fingerprint(key.ifBlank { "proxy" }))
     }
 
     private val matching = java.util.concurrent.ConcurrentHashMap<Long, Mutex>()
@@ -54,17 +57,18 @@ class OfflineLibrary(context: android.content.Context) {
     suspend fun match(video: LocalVideo, existing: Metadata? = null, manual: Boolean = false): Metadata? {
         return matching.getOrPut(video.id) { Mutex() }.withLock {
         if (!AppContainer.isOnline()) return@withLock existing
-        val key = AppContainer.settings.current().tmdbApiKey.trim()
+        val key = AppContainer.settings.current().tmdbApiKey.trim().ifBlank { "proxy" }
         if (!needsMatch(video, existing, key, manual)) return@withLock existing
-        // Never erase a working cached match when a key is invalid, the request
-        // fails, or TMDB has no result. Try a new/replaced key once per cached title.
+        // SECURE PROXY: Now always tries tmdb via proxy, no key needed
+        // Old: if (key.isNotBlank()) AppContainer.tmdb.autoMatch else null — blocked when key blank
+        // New: always call tmdb.autoMatch via proxy
         val clue = AppContainer.renameSuggestions.clue(video)
         val lookup = if (clue.title.isNotBlank()) video.copy(parsed = clue.parsed()) else video
         val result = resolveMetadata(existing,
-            tmdb = { if (key.isNotBlank()) AppContainer.tmdb.autoMatch(lookup) else null },
+            tmdb = { AppContainer.tmdb.autoMatch(lookup) },
             keyless = { AppContainer.keyless.autoMatch(lookup) },
             anime = { AppContainer.anilist.autoMatch(lookup) })
-        if (result != null && result.source != "tmdb" && key.isNotBlank()) {
+        if (result != null && result.source != "tmdb") {
             attempts.edit().putString(attemptKey(video, result), fingerprint(key)).apply()
         }
         if (result == null) {
@@ -82,19 +86,17 @@ class OfflineLibrary(context: android.content.Context) {
         var details = AppContainer.detailCache.get(videoId)
         if (metadata.source == "tmdb" && details == null) {
             val settings = AppContainer.settings.current()
-            if (settings.tmdbApiKey.isNotBlank()) {
-                // A failed primary request must not mark the title complete forever.
-                val cast = optional { AppContainer.tmdb.castFor(metadata.tmdbId, metadata.type == "tv") }
-                val imdb = optional { AppContainer.tmdb.imdbIdFor(metadata.tmdbId, metadata.type == "tv") }
-                val ratings = if (imdb != null && settings.omdbApiKey.isNotBlank())
-                    optional { AppContainer.omdb.byImdbId(imdb) } else null
-                val artwork = if (settings.fanartApiKey.isNotBlank() && !settings.dataSaverArtwork)
-                    optional { AppContainer.fanart.artworkFor(metadata.tmdbId, metadata.type == "tv") } else null
-                if (cast != null || imdb != null || ratings != null || artwork != null) {
-                    details = CachedDetails.from(imdbId = imdb, ratings = ratings, artwork = artwork,
-                        cast = cast.orEmpty(), previous = null)
-                    details?.let { AppContainer.detailCache.save(videoId, it) }
-                }
+            // SECURE PROXY: cast & imdb now work without key via proxy
+            val cast = optional { AppContainer.tmdb.castFor(metadata.tmdbId, metadata.type == "tv") }
+            val imdb = optional { AppContainer.tmdb.imdbIdFor(metadata.tmdbId, metadata.type == "tv") }
+            val ratings = if (imdb != null && settings.omdbApiKey.isNotBlank())
+                optional { AppContainer.omdb.byImdbId(imdb) } else null
+            val artwork = if (settings.fanartApiKey.isNotBlank() && !settings.dataSaverArtwork)
+                optional { AppContainer.fanart.artworkFor(metadata.tmdbId, metadata.type == "tv") } else null
+            if (cast != null || imdb != null || ratings != null || artwork != null) {
+                details = CachedDetails.from(imdbId = imdb, ratings = ratings, artwork = artwork,
+                    cast = cast.orEmpty(), previous = null)
+                details?.let { AppContainer.detailCache.save(videoId, it) }
             }
         }
         val urls = buildList {

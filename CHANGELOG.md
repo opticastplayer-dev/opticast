@@ -1,6 +1,11 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.107 (156) — 2026-09-30
+**Current:** v2.6.108 (157) — 2026-09-30
+
+## v2.6.108 (157) — 2026-09-30
+
+- Fix: metadata fetching failed in v2.6.106-107 vs v2.6.105 — root cause: secured proxy requires X-App-Secret, but CI builds had blank BuildConfig.TMDB_PROXY_SECRET (no TMDB_PROXY_SECRET env in workflow), so proxy returned 403 and metadata fetch failed. v2.6.105 worked because proxy was open (no secret required). Fix: workflow now injects secret from GitHub secrets TMDB_PROXY_SECRET / APP_SECRET into project/local.properties and env TMDB_PROXY_SECRET, build.gradle.kts now checks both TMDB_PROXY_SECRET and APP_SECRET env, BuildConfig gets secret AsGfhVhE0NxilwqMapsqLpE3bE7exg1n, proxy returns 200, metadata works like v2.6.105
+- Workflow: added Inject TMDB proxy secret step before Build APK, also fixed version safeguard to allow rebuild of same tag (equal VC OK)
 
 ## v2.6.107 (156) — 2026-09-30
 

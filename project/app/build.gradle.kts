@@ -8,11 +8,15 @@ plugins {
 }
 
 // Secure proxy secret from local.properties (not in GitHub) — for X-App-Secret header
+// CI: from env TMDB_PROXY_SECRET or APP_SECRET (GitHub secret)
 val localProps = Properties().apply {
     val file = rootProject.file("local.properties")
     if (file.exists()) file.inputStream().use { load(it) }
 }
-val proxySecret = localProps.getProperty("tmdb.proxy.secret") ?: System.getenv("TMDB_PROXY_SECRET") ?: ""
+val proxySecret = localProps.getProperty("tmdb.proxy.secret")
+    ?: System.getenv("TMDB_PROXY_SECRET")
+    ?: System.getenv("APP_SECRET")
+    ?: ""
 
 android {
     namespace = "com.opticast.player"
@@ -28,8 +32,8 @@ android {
         }
         // SINGLE SOURCE OF TRUTH: versionCode/versionName defined once — prevents mismatch
         // Bump both together: versionCode must always increase, versionName must match tag
-        versionCode = 156
-        versionName = "2.6.107"
+        versionCode = 157
+        versionName = "2.6.108"
         vectorDrawables { useSupportLibrary = true }
         // Secure proxy secret — injected as BuildConfig field, not plain string in code
         // local.properties: tmdb.proxy.secret=YOUR_SECRET, or env TMDB_PROXY_SECRET

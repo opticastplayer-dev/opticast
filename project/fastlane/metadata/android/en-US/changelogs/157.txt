@@ -1,0 +1,7 @@
+OptiCast v2.6.108
+
+- Fix: metadata fetching failed in v2.6.106-107 — secured proxy requires X-App-Secret, but CI builds had blank BuildConfig.TMDB_PROXY_SECRET, so proxy returned 403. Now injects secret from GitHub secrets TMDB_PROXY_SECRET / APP_SECRET into local.properties and env, BuildConfig gets secret, proxy returns 200, metadata works like v2.6.105
+- Build workflow: added Inject TMDB proxy secret step, writes tmdb.proxy.secret to project/local.properties and sets TMDB_PROXY_SECRET env, fallback to APP_SECRET
+- build.gradle.kts: now checks TMDB_PROXY_SECRET and APP_SECRET env vars
+- Keeps download fix from v2.6.107 (global scope survives navigation)
+- Secured proxy 9/10 safe still: 403 without secret, 200 with secret

@@ -35,6 +35,6 @@ internal fun posterDownloadConcurrency(lowRam: Boolean, memoryClass: Int = if (l
     }
 }
 
-internal const val METADATA_LRU_SIZE = 50
-internal const val ENTRY_ID_POOL_SIZE = 500
+internal const val METADATA_LRU_SIZE = 30
+internal const val ENTRY_ID_POOL_SIZE = 200
 internal const val MIN_VIDEO_DURATION_MS = 60_000L

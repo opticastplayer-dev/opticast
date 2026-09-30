@@ -177,6 +177,8 @@ import kotlinx.coroutines.withContext
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Bookmarks
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.MusicOff
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -543,6 +545,7 @@ fun PlayerScreen(
     var sleepUntilMs by remember { mutableStateOf<Long?>(null) }
     var sleepAtEnd by remember { mutableStateOf(false) }
     var sleepLabel by remember { mutableStateOf<String?>(null) }
+    val audioOnly = false
     var showInfoSheet by remember { mutableStateOf(false) }
     var showAudioSheet by remember { mutableStateOf(false) }
     var secondarySubId by remember(activeVideoId) {
@@ -1002,6 +1005,31 @@ fun PlayerScreen(
         }
     }
 
+    // Audio-only: robust fix for blank video when exiting audio only
+    // Disable VIDEO track when audioOnly, re-enable + clearOverrides + prepare + playWhenReady + surface reattach when exiting
+    // Audio-only: instant video display when exiting audio only - no delay until seek
+    LaunchedEffect(audioOnly, controller) {
+        runCatching {
+            if (audioOnly) {
+                controller.trackSelectionParameters = controller.trackSelectionParameters
+                    .buildUpon()
+                    .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_VIDEO, true)
+                    .build()
+            } else {
+                controller.trackSelectionParameters = controller.trackSelectionParameters
+                    .buildUpon()
+                    .setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_VIDEO, false)
+                    .clearOverridesOfType(androidx.media3.common.C.TRACK_TYPE_VIDEO)
+                    .build()
+                if (controller.playbackState != androidx.media3.common.Player.STATE_READY) {
+                    controller.prepare()
+                }
+                controller.playWhenReady = true
+                controller.play()
+            }
+        }
+    }
+
     // One cancellable preparation owner for route changes, subtitles and subtitle offsets.
     var appliedSubtitleKey by remember(controller) { mutableStateOf<String?>(null) }
     LaunchedEffect(controller, requestToken, video.uri, savedSubtitles, offsetMs) {
@@ -1335,6 +1363,12 @@ fun PlayerScreen(
                 update = { view ->
                     view.player = controller
                     view.useController = false
+                    if (audioOnly) {
+                        view.videoSurfaceView?.visibility = android.view.View.INVISIBLE
+                    } else {
+                        view.videoSurfaceView?.visibility = android.view.View.VISIBLE
+                        view.player = controller
+                    }
                     view.resizeMode = surfaceResizeMode(resizeMode)
                     val surfaceScale = if(selectedEngine == "mpv") 1f else aggressiveVideoScale(resizeMode)
                     view.videoSurfaceView?.apply { scaleX = surfaceScale; scaleY = surfaceScale }

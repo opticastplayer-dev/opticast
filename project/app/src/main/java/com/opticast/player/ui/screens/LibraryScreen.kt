@@ -1346,15 +1346,12 @@ fun LibraryScreen(
     }
 
 
-    // Floating multi-select action bar.
-    AnimatedVisibility(
-        visible = selectionMode,
-        modifier = Modifier
+    // Floating multi-select action bar - ultra fast no animation
+    if (selectionMode) Box(
+        Modifier
             .align(Alignment.BottomCenter)
-            .padding(bottom = with(layoutDensity) { bottomChromePx.toDp() } + 12.dp),
-        enter = fadeIn(tween(200)) + slideIn(tween(260)) { IntOffset(0, 90) },
-        exit = fadeOut(tween(160))
-                        ) {
+            .padding(bottom = 100.dp)
+    ) {
         Surface(
             shape = RoundedCornerShape(30.dp),
             color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f),

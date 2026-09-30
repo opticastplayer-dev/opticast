@@ -1,6 +1,14 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.105 (154) — 2026-09-30
+**Current:** v2.6.106 (155) — 2026-09-30
+
+## v2.6.106 (155) — 2026-09-30
+
+- Secured proxy: requires X-App-Secret header AsGfhVhE0NxilwqMapsqLpE3bE7exg1n, rate limit 30/10s, CORS blocked, /health 200 — 9/10 safe, tested live: without secret 403, with secret 200, rate limit headers present
+- Client TmdbProxyClient sends X-App-Secret from BuildConfig (injected from local.properties, not GitHub), @PublishedApi internal fix for compilation
+- Server SECURE_PROXY_SERVER.js deployed to Render, env TMDB_API_KEY + APP_SECRET set, deploys Live green (was Failed red due to missing env)
+- Version safeguard: single versionCode/versionName, workflow checks duplicate, tag match, increasing — prevents misleading version issue where 2.6.105 showed 2.6.104
+- Build 36734496075 SUCCESS with versionCode 154, now 155
 
 ## v2.6.105 (154) — 2026-09-30
 

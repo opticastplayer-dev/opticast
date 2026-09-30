@@ -1,0 +1,7 @@
+OptiCast v2.6.106
+
+- Secured proxy: now requires X-App-Secret header, rate limit 30/10s, CORS blocked, /health for keep-alive — 9/10 safe, only app can use quota
+- Proxy endpoint secured: without secret 403 forbidden, with secret 200 results — tested live
+- No API key in APK, key server-side in Render env, secret in BuildConfig from local.properties
+- Version safeguard: single versionCode/versionName, matches tag, increasing — prevents misleading version issue
+- Your videos, beautifully organized — offline-first, private, no ads

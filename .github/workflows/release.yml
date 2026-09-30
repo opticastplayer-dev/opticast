@@ -78,18 +78,60 @@ jobs:
           fi
           echo "Package name OK: com.opticast.player"
           
-          # VersionCode check
+          # --- VERSION SAFEGUARD: Prevent misleading version issue (v2.6.105 showed 2.6.104) ---
+          echo "=== VERSION SAFEGUARD: Prevent versionCode mismatch ==="
+          # Check duplicate versionCode/versionName lines (should be exactly 1 each)
+          VC_COUNT=$(grep -c 'versionCode\s*=' project/app/build.gradle.kts || echo 0)
+          VN_COUNT=$(grep -c 'versionName\s*=' project/app/build.gradle.kts || echo 0)
+          echo "versionCode lines: $VC_COUNT, versionName lines: $VN_COUNT"
+          if [ "$VC_COUNT" -ne 1 ]; then
+            echo "FATAL: Found $VC_COUNT versionCode lines, expected 1 — duplicate causes mismatch, build would show older version"
+            grep -n 'versionCode' project/app/build.gradle.kts
+            exit 1
+          fi
+          if [ "$VN_COUNT" -ne 1 ]; then
+            echo "FATAL: Found $VN_COUNT versionName lines, expected 1 — duplicate causes mismatch"
+            grep -n 'versionName' project/app/build.gradle.kts
+            exit 1
+          fi
           VC=$(grep -oP 'versionCode\s*=\s*\K\d+' project/app/build.gradle.kts | head -1)
-          echo "versionCode=$VC"
+          VN=$(grep -oP 'versionName\s*=\s*\"\K[^\"]+' project/app/build.gradle.kts | head -1)
+          echo "versionCode=$VC versionName=$VN"
           if [ -z "$VC" ]; then
             echo "FATAL: versionCode not found"
+            exit 1
+          fi
+          if [ -z "$VN" ]; then
+            echo "FATAL: versionName not found"
             exit 1
           fi
           if [ "$VC" -lt 124 ]; then
             echo "FATAL: versionCode $VC < 124 - would not install over latest"
             exit 1
           fi
-          echo "versionCode OK: $VC"
+          # Check versionName matches tag (e.g., tag v2.6.105 -> versionName 2.6.105)
+          TAG="${{ github.ref_name }}"
+          if [ -n "$TAG" ]; then
+            TAG_VER=${TAG#v}
+            echo "Tag: $TAG -> $TAG_VER, versionName: $VN"
+            if [ "$TAG_VER" != "$VN" ]; then
+              echo "FATAL: Tag version $TAG_VER does not match versionName $VN — would show older version after install, misleading"
+              echo "Fix: update build.gradle.kts versionName to match tag"
+              exit 1
+            fi
+          fi
+          # Check versionCode > previous release (prevent same versionCode as older)
+          PREV_VC=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/releases/latest | grep -oP '\"tag_name\":\s*\"v\K[^\"]+' | head -1 || echo "")
+          if [ -n "$PREV_VC" ]; then
+            echo "Previous latest tag: v$PREV_VC"
+            PREV_BUILD=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://raw.githubusercontent.com/${{ github.repository }}/refs/tags/v${PREV_VC}/project/app/build.gradle.kts 2>/dev/null | grep -oP 'versionCode\s*=\s*\K\d+' | head -1 || echo 0)
+            if [ -n "$PREV_BUILD" ] && [ "$PREV_BUILD" -ge "$VC" ] 2>/dev/null; then
+              echo "FATAL: New versionCode $VC <= previous versionCode $PREV_BUILD (tag v$PREV_VC) — would NOT install over, shows older version"
+              exit 1
+            fi
+            echo "Previous versionCode $PREV_BUILD, new $VC — OK (increasing)"
+          fi
+          echo "versionCode OK: $VC versionName OK: $VN — single source of truth, matches tag, increasing"
 
       - name: Restore signing key (BULLETPROOF - fail if missing for release)
         run: |

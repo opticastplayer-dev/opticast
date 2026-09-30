@@ -1001,7 +1001,6 @@ fun PlayerScreen(
             kotlinx.coroutines.delay(1_000L)
         }
     }
-    }
 
     // One cancellable preparation owner for route changes, subtitles and subtitle offsets.
     var appliedSubtitleKey by remember(controller) { mutableStateOf<String?>(null) }

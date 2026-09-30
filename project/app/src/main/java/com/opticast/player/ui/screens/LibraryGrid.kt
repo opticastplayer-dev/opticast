@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -44,7 +46,7 @@ fun LibraryGrid(
     val gridCells = remember(libraryGrid) {
         GridCells.Adaptive(libraryPosterMinimumDp(libraryGrid).dp)
     }
-    val isScrolling by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.isScrollInProgress } }
+    val isScrolling by remember { derivedStateOf { gridState.isScrollInProgress } }
     
     LazyVerticalGrid(
         state = gridState,

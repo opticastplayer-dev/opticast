@@ -394,10 +394,6 @@ fun PosterCard(
                 .aspectRatio(2f / 3f)
                 .graphicsLayer(scaleX = scale, scaleY = scale, clip = true)
                 .clip(RoundedCornerShape(12.dp))
-                .sharedElement(
-                    rememberSharedContentState(key = "poster-${entry.video.id}"),
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
                 .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(12.dp))
                 .combinedClickable(
                     interactionSource = interactionSource,

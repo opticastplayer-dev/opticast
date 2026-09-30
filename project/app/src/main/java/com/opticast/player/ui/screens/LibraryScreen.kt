@@ -1064,7 +1064,7 @@ fun LibraryScreen(
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .padding(60.dp),
+                            .padding(16.dp),
                         contentAlignment = Alignment.Center
                         ) {
                         com.opticast.player.ui.components.FastLoadingBar()
@@ -1185,9 +1185,9 @@ fun LibraryScreen(
                     "titles" -> {
             if ((currentTab == "movies" || searching) && movies.isNotEmpty()) {
                 item(key = "discovery-movies-header", span = { GridItemSpan(maxLineSpan) }) {
-                    DiscoveryHeader("Movies", "Your movie collection, ready to explore.", Color(0xFF63CFFF), movies.size, expanded = searching || design.style == "minimal" || "movies" !in collapsedSections, onToggle = if (searching || design.style == "minimal") null else ({ toggleSection("movies") }))
+                    DiscoveryHeader("Movies", "Your movie collection, ready to explore.", Color(0xFF63CFFF), movies.size, expanded = true, onToggle = null)
                 }
-                if (searching || design.style == "minimal" || "movies" !in collapsedSections) items(movies, key = { "movie-${it.video.id}" }, contentType = { "movie" }) { entry ->
+                items(movies, key = { "movie-${it.video.id}" }, contentType = { "movie" }) { entry ->
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = entry.video.id in selectedIds,
@@ -1195,8 +1195,6 @@ fun LibraryScreen(
                         ) {
                         PosterCard(
                             entry = entry,
-                                    sharedTransitionScope = sharedTransitionScope,
-                                    animatedVisibilityScope = animatedVisibilityScope,
                             onClick = {
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else onOpenDetail(entry.video.id)
@@ -1212,9 +1210,9 @@ fun LibraryScreen(
             }
             if ((currentTab == "tv" || searching) && shows.isNotEmpty()) {
                 item(key = "discovery-shows-header", span = { GridItemSpan(maxLineSpan) }) {
-                    DiscoveryHeader("TV Shows", "Find your next episode.", Color(0xFFBB9FFF), shows.size, expanded = searching || design.style == "minimal" || "shows" !in collapsedSections, onToggle = if (searching || design.style == "minimal") null else ({ toggleSection("shows") }))
+                    DiscoveryHeader("TV Shows", "Find your next episode.", Color(0xFFBB9FFF), shows.size, expanded = true, onToggle = null)
                 }
-                if (searching || design.style == "minimal" || "shows" !in collapsedSections) items(shows.entries.toList(), key = { "show-${it.key}" }, contentType = { "show" }) { (name, episodes) ->
+                items(shows.entries.toList(), key = { "show-${it.key}" }, contentType = { "show" }) { (name, episodes) ->
                     SelectableCard(
                         selectionMode = selectionMode,
                         selected = episodes.any { it.video.id in selectedIds },
@@ -1248,8 +1246,6 @@ fun LibraryScreen(
                         ) {
                         PosterCard(
                             entry = entry,
-                                    sharedTransitionScope = sharedTransitionScope,
-                                    animatedVisibilityScope = animatedVisibilityScope,
                             onClick = {
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else onOpenDetail(entry.video.id)
@@ -1308,8 +1304,6 @@ fun LibraryScreen(
                         lazyItems(completedMovies, key = { "watched-movie-${it.video.id}" }) { entry ->
                             SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp).clip(RoundedCornerShape(12.dp)), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
-                                    sharedTransitionScope = sharedTransitionScope,
-                                    animatedVisibilityScope = animatedVisibilityScope,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
                                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)))

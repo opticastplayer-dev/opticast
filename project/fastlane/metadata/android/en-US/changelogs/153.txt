@@ -1,10 +1,8 @@
-OptiCast v2.6.104 — Stable Build — Ultra Fast Scroll Restored + Audio Only Removed
+OptiCast v2.6.104
 
-- Audio Only removed completely from app — removed audioOnlyByDefault from SettingsRepository, var audioOnly + LaunchedEffect + AndroidView visibility + Audio only UI + PlayerActionButton audioonly from PlayerScreen (val audioOnly=false keeps structure balanced fixing align at 1840/2094 and top-level 2163), removed audioonly from playerControls and Start in audio-only mode from SettingsScreen, fixes blank video until seek by removing feature entirely
-- Scrolling through library ultra fast like episodes/settings — removed PosterCard press scale animateFloatAsState tween 100 + graphicsLayer scale + interactionSource, LibraryScreen nestedScroll chromeScroll + bottom bar AnimatedVisibility slide/fade tween 180/140 + haptic TextHandleMove/LongPress + snapFlingBehavior + FastScrollThumb overlay + chromeScroll NestedScrollConnection policy + snapshotFlow atTop + bottomChromePx/layoutDensity state, LibraryComponents favoriteBounce spring Animatable dampingRatio 0.38 stiffness 420 + haptic + HeartBurst, Common shimmer infiniteTransition NEW badge, multi-select fadeIn/slideIn tween 200/260 → if(selectionMode) Box 100dp fixed, all graphicsLayer animations removed — keeps Adaptive grid, border/clip 12dp, badges, discovery, progress, low-RAM 32-bit 3GB fast
-- Reverted v2.6.102 fling pause that hid posters during scroll — posters always visible now, clean Infuse polish
-- RAM 8/12/16/20 image + 32/48/64/96 disk LRU 30 pool 200 + Coil clear on playback, blank bar fixed, heart removed, collapsible no black bar, poster animation fixed, grid changeable fixed, startup library responsiveness matches settings
-- Offline-first #1: check updates once when internet detected not every 6h, minimal data, subtitles cached during scan, Up To Date card only when real update available not every startup, dismiss entirely after X 48dp, What's New card shows real new not old when fully updated
-- Install over existing same JKS higher versionCode, in-app download FileProvider with progress auto install, full changelog visible not truncated link, APK versionName matches asset version
-- Mobile only, no Android TV, manual ServiceLocator DI 0KB, 110 baseline locked
-- 153/2.6.104, 9.7/10 Stable Ultra Fast
+- Audio Only removed — fixes blank video until seek
+- Library scrolling fast — removed unnecessary animations, keeps Adaptive grid, border/clip 12dp, badges, discovery, progress
+- RAM 8/12/16/20 + 32/48/64/96 LRU 30 pool 200 + Coil clear
+- Offline-first: check once when internet detected, subtitles cached, Up To Date only when update available
+- Install over existing same JKS higher versionCode, in-app FileProvider, full changelog visible
+- 153/2.6.104

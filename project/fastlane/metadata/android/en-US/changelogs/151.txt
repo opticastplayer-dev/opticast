@@ -1,0 +1,6 @@
+OptiCast v2.6.102 — Stable Build — Ultra Fast Scroll Fling Pause
+
+- Next improvement: pause poster decoding during fast fling for 60fps on low-RAM 32-bit — added isScrolling derivedStateOf gridState.isScrollInProgress, PosterImage now shows FallbackPoster instantly when isScrolling=true skipping AsyncImage decode, resumes when scroll stops, PosterCard and ShowCard accept isScrolling param, LibraryScreen passes isScrolling to all 4 PosterCard and 3 ShowCard usages, LibraryGrid updated same
+- Keeps RAM 8/12/16/20 + 32/48/64/96 LRU 30 pool 200 + Coil clear, no press animation graphicsLayer scale, no nestedScroll chromeScroll, no bottom bar slide/fade haptic snapFling FastScrollThumb, no favoriteBounce spring HeartBurst, no shimmer infiniteTransition
+- Audio Only removed completely, blank video fixed, install over existing same JKS higher versionCode
+- 151/2.6.102, 110 baseline locked, 9.8/10 Stable Ultra Fast Fling

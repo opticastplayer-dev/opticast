@@ -1,92 +1,50 @@
-# AlternativeTo Listing — OptiCast Video Player
+# AlternativeTo — OptiCast v2.6.104
 
-**Ready to submit to https://alternativeto.net/ — Easy to understand for everyone**
+**Ready to submit to https://alternativeto.net/**
 
 ## Basic Info
 
 **Name:** OptiCast Video Player
-**Tagline:** Best local video player for Android — offline, no ads, open source
+**Tagline:** Local video player for Android — offline, no ads, open source
 **Website:** https://opticastplayer-dev.github.io/opticast/
-**Source Code:** https://github.com/opticastplayer-dev/opticast
-**License:** Open Source (GPL-3.0)
-**Platforms:** Android 8 and newer, all phones
+**Source:** https://github.com/opticastplayer-dev/opticast
+**License:** GPL-3.0
+**Platforms:** Android 8+, all phones
 **Price:** Free, no ads, no tracking
 
-## Full Description (Simple, Universal)
+## Full Description
 
 OptiCast — Your Local Cinema, Offline-First
 
 Beautiful, fast local video player for Android. Your own movies and TV shows, organized beautifully, playing perfectly offline.
 
-No ads, no tracking, completely free, open source. Plays your own media, no movies included.
+No ads, no tracking, open source. 38M APK.
 
-**LIBRARY:**
-Finds your videos automatically, beautiful poster grid you can customize, Continue Watching, Movies & TV Shows organized, Favorites, Recently Added, Collections, search, easy sharing. Fast and smooth on all Android phones.
+LIBRARY: Finds videos automatically, adaptive poster grid, Continue Watching, Movies & TV Shows, Favorites, Recently Added, Collections, search. Fast scrolling.
 
-**MOVIE INFO:**
-Automatically recognizes movies and TV shows from filenames, fetches posters and information, saves for offline viewing, beautiful fallback never shows black background. Ratings, cast, genres, runtime, story.
+MOVIE INFO: Recognizes movies/TV from filenames via TMDB, posters cached offline, blurred fallback never black. Ratings, cast, genres, runtime, story.
 
-**SUBTITLES:**
-Finds and saves subtitles for offline viewing, supports two languages at once, easy sync adjustment, all formats supported. Always saved offline.
+SUBTITLES: Finds and saves subtitles offline during scan, supports two languages, sync adjustment, all formats. Always saved offline.
 
-**VIDEO PLAYER — PLAYS EVERYTHING:**
-Powerful engine plays all video formats (mkv, mp4, avi, etc.). Beautiful player: easy controls, speed control, aspect ratio, subtitle/audio picker. Gestures: double-tap to seek, swipe for volume/brightness, pinch to zoom, hold for fast forward, scrub preview. Sleep timer, auto-play next episode, chapters, notification controls, Picture-in-Picture that auto-resumes.
+PLAYER: mpv + Media3, plays all formats mkv/mp4/avi, edge-to-edge, gestures double-tap swipe pinch hold, scrub preview, speed, aspect, audio/subs picker, sleep timer, auto-play next, chapters, PiP auto-resume.
 
-**UPDATES:**
-Works offline-first: checks for updates only when internet is available, uses minimal data. Easy updates inside app with progress bar, no browser needed. Clearly shows what's new.
+UPDATES: Checks once when internet detected, minimal data, in-app FileProvider with progress, full changelog visible, Up To Date only when update available, What's New real new.
 
-**WORKS OFFLINE:**
-Works fully offline after saving posters and subtitles, uses minimal data.
+OFFLINE: Works fully offline after posters/subtitles cached.
 
-**FAST & SMOOTH:**
-Quick startup, smooth scrolling, lightweight, reliable.
+PRIVATE: No ads, no tracking, GPL-3.0, media stays on device, no accounts.
 
-**PRIVATE:**
-No ads, no tracking, open source, your media stays on your device, no accounts needed.
+WHAT'S NEW in 2.6.104: Audio Only removed fixes blank video, library scrolling fast, RAM 8/12/16/20 + 32/48/64/96 LRU 30 pool 200 + Coil clear, offline-first, install over existing.
 
-**WHAT'S NEW in 2.6.84:**
-Mobile only — focused on phones for best experience, removed TV support to keep app small and fast. Improved: faster, smoother, grid layout changeable, better file handling. Compact What's New card shows real changes.
+WORKS ON: Android 8+, all phones, offline-first, private
+LICENSE: GPL-3.0
 
-**WORKS ON:** Android 8 and newer, all phones, offline-first, private
-**LICENSE:** Open source
-**SIZE:** Small download, efficient
+## Tags
 
-## Tags (Simple)
-
-video-player, local-video-player, offline, offline-video-player, no-ads, open-source, free, android, movie-player, tv-show-player, mkv-player, mp4-player, subtitle-player, private, fast, beautiful, easy-to-use, mobile, phone, free-movie-player
-
-## Alternatives to Compare
-
-- VLC for Android — OptiCast has more beautiful library and movie info
-- MX Player — OptiCast has no ads and is open source
-- Infuse (iPhone) — OptiCast is similar but for Android
-- Kodi — OptiCast is simpler and faster for local videos
-- Nova Video Player — Similar but OptiCast is more polished
-
-## Screenshots
-
-- Library — Beautiful poster grid, Continue Watching, Movies & TV Shows
-- Movie Detail — Poster, rating, story, Watch Now
-- TV Show — Episodes with progress
-- Player — Beautiful player, gestures, subtitles
-- Settings — Simple, offline-friendly
+video-player, local-video-player, offline, no-ads, open-source, android, movie-player, private, fast, beautiful, offline-first, mobile
 
 ## Links
 
-- Official Site: https://opticastplayer-dev.github.io/opticast/
-- GitHub: https://github.com/opticastplayer-dev/opticast
-- Latest Release: https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.104-optimized
-- F-Droid: https://f-droid.org/packages/com.opticast.player
-- FAQ: https://github.com/opticastplayer-dev/opticast/blob/main/docs/FAQ.md
-- Privacy: https://github.com/opticastplayer-dev/opticast/blob/main/docs/PRIVACY.md
+GitHub, Website, F-Droid, FAQ, Privacy, CHANGELOG, CONTRIBUTING, SECURITY
 
-## How to Submit
-
-1. Go to https://alternativeto.net/
-2. Search OptiCast, if not exists create new
-3. Fill Name, Tagline, Description, Tags, Links, Platforms, License, Price, Screenshots
-4. Submit — usually approved in 1-3 days
-
-## Contact
-
-opticastproject@gmail.com
+Contact: opticastproject@gmail.com

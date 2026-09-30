@@ -10,66 +10,44 @@ Changelog: https://github.com/opticastplayer-dev/opticast/releases
 
 Name: OptiCast Video Player
 AutoName: OptiCast Video Player
-Summary: Best local video player for Android — offline, no ads, open source — 9.3/10 stable
+Summary: Local video player for Android — offline, no ads, open source
 Description: |
-  OptiCast — Your Local Cinema, Offline-First, Mobile Only — Stable 9.3/10
-Summary: Best local video player for Android — offline, no ads, open source — 9.3/10 stable
-Description: |
-  OptiCast — Your Local Cinema, Offline-First, Mobile Only — Stable 9.3/10
+  OptiCast — Your Local Cinema, Offline-First
 
-  Beautiful, fast local video player for Android. Your own movies and TV shows, organized beautifully, playing perfectly offline. Infuse-style polish for Android, 38M APK, 110 baseline locked.
+  Beautiful, fast local video player for Android. Your own movies and TV shows, organized beautifully, playing perfectly offline.
 
-  No ads, no tracking, completely free, open source GPL-3.0.
+  No ads, no tracking, open source. 38M APK.
 
-  LIBRARY: Finds your videos automatically, beautiful poster grid you can customize (Compact/Comfortable), fast-scroll thumb appears only when scrolling >20 items — Infuse-like overlay GPU 0 recomposition low-RAM safe, Continue Watching, Movies & TV Shows organized, Favorites, Recently Added, Collections, search, easy sharing, shared element transition Library→Detail poster hero spring 0.96f. Fast and smooth 60fps matches Settings.
+  LIBRARY: Finds your videos automatically, adaptive poster grid, Continue Watching, Movies & TV Shows, Favorites, Recently Added, Collections, search. Fast scrolling.
 
-  MOVIE INFO: Automatically recognizes movies and TV shows from filenames, fetches posters and information, saves for offline viewing, beautiful blurred poster fallback never shows black background, shimmer NEW only. Ratings, cast, genres, runtime, story, backdrop parallax.
+  MOVIE INFO: Recognizes movies/TV from filenames via TMDB, posters cached offline, blurred fallback never black.
 
-  SUBTITLES: Finds and saves subtitles for offline viewing during scan and caches them, supports two languages at once, easy sync adjustment, all formats, custom fonts picker offline .ttf/.otf 10MB max private. Always saved offline.
+  SUBTITLES: OpenSubtitles + SubDL, always saved offline during scan, custom fonts, dual subs.
 
-  VIDEO PLAYER — PLAYS EVERYTHING: Powerful mpv engine (local default) + Media3 fallback plays all video formats (mkv, mp4, avi, etc.). Beautiful player: easy controls, speed control, aspect ratio, subtitle/audio picker. Gestures: double-tap to seek, swipe for volume/brightness, pinch to zoom, hold for fast forward, scrub preview. Sleep timer, auto-play next episode, chapters, notification controls, Picture-in-Picture that auto-resumes fixed for 32-bit, predictive back Android 14+ swipe preview. Loading spinner never gets stuck.
+  PLAYER: mpv + Media3, plays all formats mkv/mp4/avi, edge-to-edge, gestures, PiP auto-resume, speed, audio/subs picker.
 
-  UPDATES: Works offline-first: checks for updates only when internet is available (7 days, 24h min), uses minimal data. Easy updates inside app with progress bar via FileProvider, no browser needed. Clearly shows what's new in each update, What's New card only after update not every startup.
+  UPDATES: Checks once when internet detected, minimal data, in-app FileProvider with progress, full changelog visible, Up To Date only when update available, What's New real new.
 
-  WORKS OFFLINE: Works fully offline after saving posters and subtitles, uses minimal data. Subtitles always saved during scan, posters saved, movie info saved. Offline-first #1 priority.
+  OFFLINE: Works fully offline after posters/subtitles cached, minimal data.
 
-  FAST & SMOOTH: Quick startup <300ms, smooth scrolling 60fps, lightweight 38M, reliable 9.3/10 stable, handles damaged files gracefully. Mobile only: designed for phones, easy to use, saves 18KB.
+  PRIVATE: No ads, no tracking, GPL-3.0, media stays on device, no accounts.
 
-  PRIVATE: No ads, no tracking, open source GPL-3.0, your media stays on your device, no accounts needed.
+  WHAT'S NEW in 2.6.104: Audio Only removed fixes blank video, library scrolling fast, RAM 8/12/16/20 + 32/48/64/96 LRU 30 pool 200 + Coil clear, offline-first, install over existing same JKS.
 
-  WHAT'S NEW in 2.6.93 — Stable 9.3/10: Fast-scroll thumb like Infuse, shared element Library→Detail hero, library smoothness fixed without removing features grid changeable works, baseline 99→110 locked 110 entries, predictive back, custom fonts picker, mobile only, offline-first minimal data, fixes X dismiss 48dp, loading animation persisting, What's New real new, versionName matches asset version, 38M APK.
-  FAST & SMOOTH: Quick startup <300ms, smooth scrolling 60fps, lightweight 38M, reliable 9.3/10 stable, handles damaged files gracefully. Mobile only: designed for phones, easy to use, saves 18KB.
-
-  PRIVATE: No ads, no tracking, open source GPL-3.0, your media stays on your device, no accounts needed.
-
-  WHAT'S NEW in 2.6.93 — Stable 9.3/10: Fast-scroll thumb like Infuse, shared element Library→Detail hero, library smoothness fixed without removing features grid changeable works, baseline 99→110 locked 110 entries, predictive back, custom fonts picker, mobile only, offline-first minimal data, fixes X dismiss 48dp, loading animation persisting, What's New real new, versionName matches asset version, 38M APK.
-
-  WORKS ON: Android 8 and newer, all phones, offline-first, private, 159 files 25.4k lines
-  LICENSE: Open source GPL-3.0 — complete source with full mpv
+  WORKS ON: Android 8+, all phones, offline-first, private
 
 RepoType: git
 Repo: https://github.com/opticastplayer-dev/opticast.git
 
 Builds:
-  - versionName: 2.6.93
-    versionCode: 141
-    commit: v2.6.93-optimized
-  - versionName: 2.6.93
-    versionCode: 141
-    commit: v2.6.93-optimized
+  - versionName: 2.6.104
+    versionCode: 153
+    commit: v2.6.104
     subdir: project
     gradle:
       - yes
 
-  - versionName: 2.6.84
-    versionCode: 133
-    commit: v2.6.84-optimized
-    subdir: project
-    gradle:
-      - yes
-
-AutoUpdateMode: Version v%v-optimized
+AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
-CurrentVersion: 2.6.93
-CurrentVersion: 2.6.93
-CurrentVersionCode: 141
+CurrentVersion: 2.6.104
+CurrentVersionCode: 153

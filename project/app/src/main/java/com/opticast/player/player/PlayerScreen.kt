@@ -319,6 +319,16 @@ fun PlayerScreen(
         if(connected==null) connectFailed=true else controllerState=connected
     }
 
+
+    // RAM: Clear Coil memory cache when entering playback to save RAM during video playing
+    LaunchedEffect(controllerState) {
+        if (controllerState != null) {
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                runCatching { coil.Coil.imageLoader(context).memoryCache?.clear() }
+            }
+        }
+    }
+
     LaunchedEffect(requestedId,controllerState) {
         if(controllerState!=null) {
             PlayerStats.markStartup(requestedId.toString(),StartupStage.CONNECTED)

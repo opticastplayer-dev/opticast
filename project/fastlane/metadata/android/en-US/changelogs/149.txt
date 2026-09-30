@@ -1,0 +1,6 @@
+OptiCast v2.6.100 — Stable Build — RAM playback + audio instant
+
+- Improve RAM consumption when video in playing — StartupLoadControl buffer reduced low-RAM 1s min 10s max 0.5s playback/rebuffer (was 50s max), normal 1.5s min 30s max 1s playback/rebuffer, backBuffer 0, Coil memory cache cleared on entering playback, imageMemoryBudget 8/12/16/20 MB disk 32/48/64/96 MB LRU 50
+- Fix switching to Audio Only then disabling it video doesn't automatically appear until seek — instant re-enable: clearVideoSurfaceView() when audioOnly true, setVideoSurfaceView(surfaceView) when false, clearOverridesOfType VIDEO, prepare if not READY, playWhenReady true, play(), AndroidView instant reassign
+- Keep blank bar fixed, small poster animation fixed, recently added corners fixed, heart confetti removed, movies collapsible no black bar
+- 149/2.6.100, 110 baseline locked, 9.6/10 Stable

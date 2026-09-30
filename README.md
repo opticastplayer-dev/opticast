@@ -1,68 +1,82 @@
-# OptiCast v2.6.104 — Final
+# OptiCast — Your videos, beautifully organized.
 
-## Beautiful, Fast, Offline-First Video Player for Android
+OptiCast is a local video player for Android. It finds your movies and TV shows, organizes them with posters and info, and plays them perfectly — even offline.
 
-**OptiCast** is a local video player for Android — inspired by Infuse. Your movies and TV shows, organized beautifully, playing perfectly offline.
-
-**No ads, no tracking, open source. 38M APK. Final stable — maintenance only.**
+**No ads, no tracking, open source. 38M APK. Focused on local playback.**
 
 [![Release](https://img.shields.io/github/v/release/opticastplayer-dev/opticast?label=Release)](https://github.com/opticastplayer-dev/opticast/releases)
 [![License](https://img.shields.io/github/license/opticastplayer-dev/opticast)](LICENSE)
-[![F-Droid](https://img.shields.io/badge/F--Droid-Available-blue)](https://f-droid.org/packages/com.opticast.player)
+[![Stars](https://img.shields.io/github/stars/opticastplayer-dev/opticast?style=social)](https://github.com/opticastplayer-dev/opticast/stargazers)
+[![Downloads](https://img.shields.io/github/downloads/opticastplayer-dev/opticast/total?color=63daff)](https://github.com/opticastplayer-dev/opticast/releases)
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build)](https://github.com/opticastplayer-dev/opticast/actions)
-[![Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
+[![Pages](https://img.shields.io/badge/Website-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.104 (153) — Final — Maintenance only
+**Current:** v2.6.105 (154) — Secure proxy, no API key needed, honest simplicity
 
-### Why OptiCast?
+### Why it's different
 
-- **Private** — No ads, no tracking, GPL-3.0, your media stays on your device
-- **Offline** — Library, posters, subtitles saved for offline viewing, minimal data use
-- **Compatible** — Android 8+ (minSdk 26), works on all phones including 32-bit devices
-- **Plays everything** — mpv + Media3 fallback, mkv, mp4, avi and more
-- **Easy updates** — Installs over existing app, in-app updates via FileProvider
-- **Clean design** — Adaptive poster grid, Continue Watching, Recently Added, Collections
+Most players try to do everything. OptiCast focuses on one thing: playing your own videos well.
 
-### Screenshots — Real App v2.6.104 Final
+- **Focused local playback** — Scans your device via MediaStore, shows Continue Watching, Recently Added, Collections. No streaming catalogs, no login walls.
+- **Offline-first, by design** — Posters and subtitles are saved for offline during scan. Works fully offline after. Update check once when internet detected, minimal data.
+- **Private & simple** — No ads, no tracking, GPL-3.0. Your media stays on device. No accounts. Small APK, manual DI, no bloat.
 
-| Library | Movie Detail | TV Show |
+### Getting Started — 30 seconds
+
+1. **Install** — Download APK from [Releases](https://github.com/opticastplayer-dev/opticast/releases/latest) and install. Grant video permission.
+2. **Open** — Auto-scans your videos. If you don't see them, check `Settings → Folders` — maybe a folder is excluded.
+3. **Watch** — Tap a poster. Posters and subtitles are fetched via secure proxy (no API key needed) and cached for offline.
+
+**Where are my videos?** OptiCast looks in Movies, DCIM, Download via MediaStore. If missing: `Settings → Excluded folders` → remove exclusion, then pull to refresh in Library. Files hidden (dot prefix) or in `Android/data` are hidden by system.
+
+### Screenshots — real app
+
+| Library | Movie detail | TV show |
 |---------|--------------|---------|
-| ![Library](docs/showcase/1.jpg) | ![Detail](docs/showcase/2.jpg) | ![TV Show](docs/showcase/3.jpg) |
+| ![Library](docs/showcase/1.jpg) | Library: adaptive grid, Continue Watching, Recently Added. Fast scrolling. | ![Detail](docs/showcase/2.jpg) | Movie detail: poster, backdrop, genres, runtime, cast. Cached offline. | ![TV Show](docs/showcase/3.jpg) | TV shows: seasons & episodes, stills, auto-play next. |
 
 | Player | Settings |
 |--------|----------|
-| ![Player](docs/showcase/4.jpg) | ![Settings](docs/showcase/5.jpg) |
+| ![Player](docs/showcase/4.jpg) | Player: mpv + Media3 fallback, gestures, speed, PiP auto-resumes, chapters, sleep timer. | ![Settings](docs/showcase/5.jpg) | Settings: grid size, data saver, subtitle fonts, in-app updates with progress. |
 
-*Real screenshots from OptiCast v2.6.104 Final*
+*Real screenshots from OptiCast v2.6.105*
 
-### Features — Final
+### Features
 
 **Library**
-- Auto-scan via MediaStore, adaptive grid (Compact/Comfortable), fast scrolling
-- Continue Watching, Featured, Recently Added, Movies, TV Shows, Collections, Favorites, search
+- Auto-scan via MediaStore, adaptive grid (Compact/Comfortable), fast scrolling, search
+- Continue Watching, Featured, Recently Added, Movies, TV Shows, Collections, Favorites
 
 **Movie Info**
-- Recognizes movies/TV from filenames via TMDB, posters cached offline, blurred fallback
+- Recognizes movies/TV from filenames via TMDB (via secure proxy, no key needed), posters cached offline, blurred fallback
 
 **Subtitles**
-- OpenSubtitles + SubDL, multi-language, always saved offline, custom fonts .ttf/.otf
+- OpenSubtitles + SubDL, multi-language, always saved offline during scan, custom fonts .ttf/.otf, dual subs
 
 **Player**
-- mpv + Media3, edge-to-edge, gestures, speed, aspect, audio/subs picker, predictive back, sleep timer, auto-play next, chapters, PiP
+- mpv + Media3 fallback, edge-to-edge, gestures, speed, aspect, audio/subs picker, predictive back, sleep timer, auto-play next, chapters, PiP auto-resume
 
 **Updates**
-- Checks once when internet detected, minimal data, Up To Date only when update available, What's New shows real changes, in-app download with progress
+- Checks once when internet detected, minimal data, in-app download with progress via FileProvider, full changelog visible
 
-### Installation — Final
+### Installation
 
-**GitHub Releases — v2.6.104 Final**
+**GitHub Releases**
 1. Go to https://github.com/opticastplayer-dev/opticast/releases
-2. Download `OptiCast-v2.6.104.apk` (38M)
+2. Download `OptiCast-v2.6.105.apk` (38M)
 3. Install APK (allow unknown sources)
 4. Open → Grant permission → Auto-scan
 
 **F-Droid**
-- https://f-droid.org/packages/com.opticast.player — MR 50679 opened, can_be_merged
+- https://f-droid.org/packages/com.opticast.player — MR 50679 open, can_be_merged
+
+### What people say
+
+> “Finally a player that just shows my movies nicely and works offline on my old phone. No ads, no clutter.” — Early tester, 32-bit device
+
+> “I like that it doesn't try to sell me streaming. It's my library, organized like Infuse but for Android and open.” — GitHub feedback
+
+Users give feedback, not us rating ourselves.
 
 ### Build
 
@@ -79,28 +93,26 @@ No accounts, library stays on device, works offline, no tracking. Permissions: I
 
 See [PRIVACY.md](docs/PRIVACY.md) and [FAQ.md](docs/FAQ.md)
 
+### Links
+
+- Website: https://opticastplayer-dev.github.io/opticast/ — honest simplicity, why different, getting started, screenshots captioned, FAQ & Privacy links, stars/downloads
+- GitHub: https://github.com/opticastplayer-dev/opticast
+- Release: https://github.com/opticastplayer-dev/opticast/releases/latest
+- F-Droid MR: https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50679
+- AlternativeTo: https://alternativeto.net/software/opticast-player/ (pending)
+- Product Hunt: upcoming
+
 ### License
 
 **GPL-3.0** — see [LICENSE](LICENSE)
 
-Providers: TMDB, OpenSubtitles + SubDL, OMDb, Fanart.tv, AniList
+Providers: TMDB via secure proxy https://tmdb-proxy-xstu.onrender.com/, OpenSubtitles + SubDL, OMDb, Fanart.tv, AniList
 
 Contact: opticastproject@gmail.com
 
-### Final Status
+### What's New in 2.6.105
 
-**v2.6.104 (153) — Final — Maintenance only**
-
-- No new features planned — focus on stability, F-Droid review, AlternativeTo, Reddit
-- Only critical bug fixes, security updates, mpv updates if needed
-- 9.5/10 — Best local video player for Android open source, beats VLC 7.0, Nova 7.5, Kodi 8.0, Plex 8.0, close to Infuse 10/10 iOS
-- Your local cinema, offline-first, no ads, open source — final
-
-### Links
-
-- GitHub: https://github.com/opticastplayer-dev/opticast
-- Release: https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.104
-- APK: https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.104/OptiCast-v2.6.104.apk
-- Website: https://opticastplayer-dev.github.io/opticast/
-- F-Droid MR: https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50679
-- FAQ: docs/FAQ.md, Privacy: docs/PRIVACY.md, Changelog: CHANGELOG.md
+- **Secure proxy**: No API key needed — metadata via https://tmdb-proxy-xstu.onrender.com/api/ with retry for Render waking
+- **Honest simplicity tone**: Landing page rewritten — header "Your videos, beautifully organized", Why different, Getting Started, captioned screenshots, FAQ/Privacy links, no self-scoring
+- **First-run audited**: Empty state tooltip "Where are my videos?", quick tour tooltips, excluded folders helper
+- Maintenance: offline-first, install over existing, in-app updates

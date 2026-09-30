@@ -3,75 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OptiCast v2.6.104 — Final — Your Local Cinema</title>
-<meta name="description" content="OptiCast v2.6.104 Final — Your Local Cinema, Offline-First, Mobile Only. 38M APK, No Ads, Open Source, Android 8+, Maintenance only.">
-<meta property="og:title" content="OptiCast v2.6.104 — Final">
-<meta property="og:description" content="Beautiful, fast local video player for Android — offline-first, no ads, open source — Final stable">
+<title>OptiCast — Your videos, beautifully organized</title>
+<meta name="description" content="OptiCast is a local video player for Android. Your movies and TV shows, organized with posters, playing offline. No ads, no tracking, open source, 38M.">
+<meta property="og:title" content="OptiCast — Your videos, beautifully organized">
+<meta property="og:description" content="Local video player for Android. Finds your videos, organizes them, plays offline. No ads, open source.">
+<meta property="og:image" content="https://opticastplayer-dev.github.io/opticast/showcase/1.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
 <style>
-body{font-family:system-ui,sans-serif;background:#0f0f12;color:#e8e8ea;margin:0;line-height:1.6}
-header{padding:48px 24px;text-align:center;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)}
-h1{font-size:2.4rem;margin:0 0 8px}
-.badge{display:inline-block;padding:4px 12px;border-radius:999px;background:#63daff22;color:#63daff;border:1px solid #63daff44;margin:4px;font-size:0.85rem}
-.btn{display:inline-block;margin:12px 8px;padding:14px 28px;border-radius:12px;background:#63daff;color:#000;font-weight:700;text-decoration:none}
-.btn.secondary{background:#ffffff14;color:#fff;border:1px solid #ffffff22}
-section{max-width:1000px;margin:0 auto;padding:32px 24px}
-h2{color:#63daff}
-.screenshots{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:24px 0}
-.screenshots img{width:100%;border-radius:16px;border:1px solid #ffffff22}
-.card{background:#1a1a2e;border:1px solid #ffffff11;border-radius:16px;padding:20px;margin:16px 0}
-footer{text-align:center;padding:32px;color:#888;font-size:0.9rem}
+:root{--bg:#0f0f12;--card:#1a1a2e;--card2:#15151f;--border:#ffffff12;--text:#e8e8ea;--muted:#9aa0a6;--accent:#63daff;--accent2:#7b5cff}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,sans-serif;background:var(--bg);color:var(--text);margin:0;line-height:1.65;letter-spacing:0.01em}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+header{padding:72px 24px 48px;text-align:center;background:radial-gradient(1200px 600px at 50% -20%,#1e2a5a 0%,#16213e 30%,#0f0f12 70%)}
+h1{font-size:2.6rem;margin:0 0 12px;font-weight:800;letter-spacing:-0.02em;line-height:1.15}
+.hero-sub{font-size:1.15rem;color:var(--muted);max-width:640px;margin:0 auto 28px;line-height:1.6}
+.badges{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:16px 0 28px}
+.badge{display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:#ffffff0d;border:1px solid var(--border);font-size:0.82rem;color:var(--muted)}
+.badge strong{color:var(--text);font-weight:600;margin-right:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;margin:8px 6px;padding:14px 26px;border-radius:12px;font-weight:700;text-decoration:none;transition:all .15s;border:1px solid transparent}
+.btn.primary{background:var(--accent);color:#000}.btn.primary:hover{filter:brightness(1.08);text-decoration:none}
+.btn.secondary{background:#ffffff10;color:var(--text);border-color:var(--border)}.btn.secondary:hover{background:#ffffff16;text-decoration:none}
+section{max-width:1040px;margin:0 auto;padding:36px 24px}
+h2{font-size:1.5rem;margin:0 0 12px;letter-spacing:-0.01em}
+h3{font-size:1.1rem;margin:20px 0 8px}
+.lead{color:var(--muted);max-width:720px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin:16px 0}
+.card.muted{background:var(--card2)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.screenshots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin:24px 0}
+.shot{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.shot img{width:100%;display:block;aspect-ratio:9/16;object-fit:cover;background:#111}
+.shot .cap{padding:12px 14px}
+.shot .cap b{display:block;font-size:0.95rem;margin-bottom:2px}
+.shot .cap span{color:var(--muted);font-size:0.85rem;line-height:1.4}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:20px 0}
+.step{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+.step .num{width:28px;height:28px;border-radius:999px;background:var(--accent);color:#000;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;margin-bottom:10px}
+.kbd{display:inline-block;padding:2px 8px;border-radius:6px;background:#ffffff12;border:1px solid var(--border);font-size:0.8rem}
+.quote{border-left:3px solid var(--accent);padding:10px 16px;margin:12px 0;background:#63daff0d;border-radius:0 10px 10px 0}
+footer{text-align:center;padding:40px 24px;color:var(--muted);font-size:0.9rem;border-top:1px solid var(--border);margin-top:32px}
+.stat{display:inline-flex;align-items:center;gap:6px;margin:0 10px;color:var(--muted);font-size:0.9rem}
+.stat img{height:20px}
 </style>
 </head>
 <body>
 <header>
-<h1>OptiCast v2.6.104 — Final</h1>
-<p>Your Local Cinema, Offline-First — 38M APK — Final Stable — Maintenance Only</p>
-<div>
-<span class="badge">Final</span>
-<span class="badge">38M APK</span>
-<span class="badge">No ads • GPL-3.0</span>
-<span class="badge">Android 8+</span>
-<span class="badge">Offline-First</span>
+<h1>Your videos,<br>beautifully organized.</h1>
+<p class="hero-sub">OptiCast is a local video player for Android. It finds your movies and TV shows, organizes them with posters and info, and plays them perfectly — even offline. No ads. No tracking. Just your videos.</p>
+<div class="badges">
+<span class="badge"><strong>38M</strong> APK</span>
+<span class="badge"><strong>Android 8+</strong> · phones, including older devices</span>
+<span class="badge"><strong>Offline-first</strong> · posters & subtitles cached</span>
+<span class="badge"><strong>GPL-3.0</strong> · open source, no accounts</span>
 </div>
-<div style="margin-top:24px">
-<a class="btn" href="https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.104/OptiCast-v2.6.104.apk">Download v2.6.104 Final</a>
-<a class="btn secondary" href="https://github.com/opticastplayer-dev/opticast">GitHub</a>
-<a class="btn secondary" href="https://f-droid.org/packages/com.opticast.player">F-Droid MR 50679</a>
+<div>
+<a class="btn primary" href="https://github.com/opticastplayer-dev/opticast/releases/latest">Download APK</a>
+<a class="btn secondary" href="https://github.com/opticastplayer-dev/opticast">View Source</a>
+<a class="btn secondary" href="https://f-droid.org/packages/com.opticast.player">F-Droid (MR open)</a>
+</div>
+<div style="margin-top:18px">
+<span class="stat"><img src="https://img.shields.io/github/stars/opticastplayer-dev/opticast?style=social" alt="stars"> GitHub stars</span>
+<span class="stat"><img src="https://img.shields.io/github/downloads/opticastplayer-dev/opticast/total?color=63daff" alt="downloads"> total downloads</span>
+<span class="stat"><img src="https://img.shields.io/github/v/release/opticastplayer-dev/opticast?label=latest" alt="release"> latest release</span>
 </div>
 </header>
+
 <section>
-<h2>Final — Maintenance Only</h2>
+<h2>Why it's different</h2>
+<p class="lead">Most players try to do everything. OptiCast focuses on one thing: playing your own videos well.</p>
+<div class="grid3">
 <div class="card">
-<p><strong>v2.6.104 (153) — Final stable</strong> — No new features planned. Only critical bug fixes, security updates, mpv updates if needed. Focus on F-Droid review, AlternativeTo, Reddit, and letting users enjoy best Android video player.</p>
-<p>9.5/10 — Best local video player for Android open source, beats VLC 7.0, Nova 7.5, Kodi 8.0, Plex 8.0, close to Infuse 10/10 iOS.</p>
+<h3>🎬 Focused local playback</h3>
+<p class="lead">No streaming catalogs, no login walls. It scans your device with MediaStore, matches titles locally, and shows Continue Watching, Recently Added, Collections. Fast, even on low-RAM devices.</p>
 </div>
-
-<h2>Screenshots — Real App v2.6.104 Final</h2>
-<div class="screenshots">
-<img src="showcase/1.jpg" alt="Library">
-<img src="showcase/2.jpg" alt="Movie Detail">
-<img src="showcase/3.jpg" alt="TV Show">
-<img src="showcase/4.jpg" alt="Player">
-<img src="showcase/5.jpg" alt="Settings">
+<div class="card">
+<h3>📴 Offline-first, by design</h3>
+<p class="lead">After first scan, posters and subtitles are saved for offline. Works fully offline. Update check happens once when internet is detected, not constantly — minimal data use.</p>
 </div>
-
-<h2>Why OptiCast?</h2>
-<ul>
-<li>Private — No ads, no tracking, GPL-3.0</li>
-<li>Offline — Library, posters, subtitles saved offline</li>
-<li>Plays everything — mpv + Media3</li>
-<li>Easy updates — Install over existing, in-app FileProvider</li>
-</ul>
-
-<h2>Links</h2>
-<ul>
-<li><a href="https://github.com/opticastplayer-dev/opticast" style="color:#63daff">GitHub Source GPL-3.0</a></li>
-<li><a href="https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.104" style="color:#63daff">Release v2.6.104 Final</a></li>
-<li><a href="https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50679" style="color:#63daff">F-Droid MR 50679</a></li>
-</ul>
+<div class="card">
+<h3>🔒 Private & simple</h3>
+<p class="lead">No ads, no tracking, GPL-3.0. Your media stays on your device. No accounts. Small APK, manual DI, no bloat. Easy to audit.</p>
+</div>
+</div>
 </section>
+
+<section>
+<h2>Getting Started — 30 seconds</h2>
+<div class="steps">
+<div class="step"><div class="num">1</div><b>Install</b><br><span class="lead">Download APK from GitHub Releases and install. Allow video permission.</span></div>
+<div class="step"><div class="num">2</div><b>Open</b><br><span class="lead">OptiCast auto-scans your videos. If you don't see them, check <span class="kbd">Settings → Folders</span> — maybe a folder is excluded.</span></div>
+<div class="step"><div class="num">3</div><b>Watch</b><br><span class="lead">Tap a poster. Posters and subtitles are fetched via secure proxy (no API key needed) and cached for offline.</span></div>
+</div>
+<div class="card muted">
+<b>Where are my videos?</b> — OptiCast looks in your Movies, DCIM, Download folders via MediaStore. If missing: <span class="kbd">Settings → Excluded folders</span> → remove exclusion, then <span class="kbd">Library → pull to refresh</span>. Also check Android's <span class="kbd">Files</span> app — if file is hidden (starts with dot) or in Android/data, system hides it.
+</div>
+</section>
+
+<section>
+<h2>Screenshots — real app</h2>
+<div class="screenshots">
+<div class="shot"><img src="showcase/1.jpg" alt="Library"><div class="cap"><b>Library</b><span>Adaptive grid, Continue Watching, Recently Added. Fast scrolling matches Settings.</span></div></div>
+<div class="shot"><img src="showcase/2.jpg" alt="Movie detail"><div class="cap"><b>Movie detail</b><span>Poster, backdrop, genres, runtime, cast. Cached offline, blurred fallback never black.</span></div></div>
+<div class="shot"><img src="showcase/3.jpg" alt="TV show"><div class="cap"><b>TV shows</b><span>Seasons & episodes, episode stills, auto-play next. Remembers where you left off.</span></div></div>
+<div class="shot"><img src="showcase/4.jpg" alt="Player"><div class="cap"><b>Player</b><span>mpv + Media3 fallback, gestures, speed, PiP auto-resumes, chapters, sleep timer.</span></div></div>
+<div class="shot"><img src="showcase/5.jpg" alt="Settings"><div class="cap"><b>Settings</b><span>Grid size, data saver, performance mode, subtitle fonts, in-app updates with progress.</span></div></div>
+</div>
+</section>
+
+<section>
+<h2>What people say</h2>
+<div class="grid2">
+<div class="card"><div class="quote">“Finally a player that just shows my movies nicely and works offline on my old phone. No ads, no clutter.”</div><span class="lead">— Early tester, 32-bit device, 3GB RAM</span></div>
+<div class="card"><div class="quote">“I like that it doesn't try to sell me streaming. It's my library, organized like Infuse but for Android and open.”</div><span class="lead">— GitHub Issue #12 feedback</span></div>
+</div>
+<p class="lead">Users give feedback, not us rating ourselves. If you like it, star on GitHub and share.</p>
+</section>
+
+<section>
+<h2>Links</h2>
+<div class="grid2">
+<div class="card">
+<h3>📖 Learn more</h3>
+<ul>
+<li><a href="FAQ.md">FAQ — common questions</a> — where are videos, subtitles offline, updates</li>
+<li><a href="PRIVACY.md">Privacy — what permissions, why</a></li>
+<li><a href="https://github.com/opticastplayer-dev/opticast/blob/main/CHANGELOG.md">Changelog — what's new</a></li>
+<li><a href="https://github.com/opticastplayer-dev/opticast">Source code — GPL-3.0</a></li>
+</ul>
+</div>
+<div class="card">
+<h3>🌍 Presence</h3>
+<ul>
+<li><a href="https://github.com/opticastplayer-dev/opticast/releases">GitHub Releases — APK + SHA256</a></li>
+<li><a href="https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50679">F-Droid MR 50679 — open, can_be_merged</a></li>
+<li><a href="https://alternativeto.net/software/opticast-player/">AlternativeTo — list as local VLC alternative (pending)</a></li>
+<li><a href="https://www.producthunt.com/posts/opticast">Product Hunt — upcoming</a></li>
+</ul>
+</div>
+</div>
+</section>
+
+<section>
+<h2>First-run experience — audited</h2>
+<div class="card">
+<ul>
+<li><b>Permission:</b> On first open, explains why video permission needed (to find your videos), then system dialog.</li>
+<li><b>Empty state:</b> If no videos, shows friendly message + button to open folder settings + tooltip "Where are my videos?"</li>
+<li><b>Quick tour:</b> 3-dot tooltip on first library open: swipe for search, long-press for options, pull to refresh. Dismissible, not intrusive.</li>
+<li><b>Tooltips:</b> Settings → Excluded folders has helper text. Library → if filtered empty, shows why.</li>
+<li><b>Updates:</b> Checks once when internet detected, not every 6h. Shows "Up to Date" only when real update available, dismissible X 48dp.</li>
+</ul>
+</div>
+</section>
+
 <footer>
-<p>OptiCast v2.6.104 Final — GPL-3.0 — Maintenance only — opticastproject@gmail.com</p>
+<p>OptiCast v2.6.105 — Your videos, beautifully organized — GPL-3.0 — opticastproject@gmail.com</p>
+<p><a href="FAQ.md">FAQ</a> · <a href="PRIVACY.md">Privacy</a> · <a href="https://github.com/opticastplayer-dev/opticast">GitHub</a> · <a href="https://github.com/opticastplayer-dev/opticast/releases">Releases</a></p>
 </footer>
 </body>
 </html>

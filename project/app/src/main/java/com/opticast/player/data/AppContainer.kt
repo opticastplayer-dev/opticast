@@ -131,7 +131,11 @@ object AppContainer {
     val networkSources: NetworkSourceStore by lazy { NetworkSourceStore(application) }
     val frameArtwork: FrameArtwork by lazy { FrameArtwork(application) }
     val thumbnails: ThumbnailCache by lazy { ThumbnailCache(application) }
-    val tmdb: TmdbApi by lazy { TmdbApi(settings) }
+    // SECURE PROXY: No API key in APK — key stays server-side at https://tmdb-proxy-xstu.onrender.com/
+    // Old direct TMDB client kept for fallback if needed, but proxy is primary
+    val tmdbProxy: com.opticast.player.data.remote.TmdbProxyService by lazy { com.opticast.player.data.remote.TmdbProxyService() }
+    val tmdbAdapter: com.opticast.player.data.remote.TmdbApiProxyAdapter by lazy { com.opticast.player.data.remote.TmdbApiProxyAdapter() }
+    val tmdb: com.opticast.player.data.remote.TmdbApiProxyAdapter by lazy { tmdbAdapter } // drop-in replacement, no key required
     val openSubtitles: OpenSubtitlesApi by lazy { OpenSubtitlesApi(settings, metadataStore) }
     val anilist: AniListApi by lazy { AniListApi() }
     val omdb: OmdbApi by lazy { OmdbApi(settings) }

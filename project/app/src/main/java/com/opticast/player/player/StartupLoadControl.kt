@@ -11,7 +11,7 @@ import com.opticast.player.data.AppContainer
  *  Normal: min 1.5s, max 30s (was 50s), playback 1s, rebuffer 1s — saves RAM while keeping smooth local playback
  */
 internal class StartupLoadControl : DefaultLoadControl(
-    Builder()
+    DefaultLoadControl.Builder()
         .setBufferDurationsMs(
             if (AppContainer.lowRamMode) 1000 else 1500,
             if (AppContainer.lowRamMode) 10000 else 30000,

@@ -75,7 +75,7 @@ video-player, local-video-player, offline, offline-video-player, no-ads, open-so
 
 - Official Site: https://opticastplayer-dev.github.io/opticast/
 - GitHub: https://github.com/opticastplayer-dev/opticast
-- Latest Release: https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.84-optimized
+- Latest Release: https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.104-optimized
 - F-Droid: https://f-droid.org/packages/com.opticast.player
 - FAQ: https://github.com/opticastplayer-dev/opticast/blob/main/docs/FAQ.md
 - Privacy: https://github.com/opticastplayer-dev/opticast/blob/main/docs/PRIVACY.md

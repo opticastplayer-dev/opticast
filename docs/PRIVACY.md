@@ -1,6 +1,6 @@
 # Privacy Policy — OptiCast Video Player
 
-**Version:** v2.6.84 — No Ads, No Tracking, Open Source
+**Version:** v2.6.104 — No Ads, No Tracking, Open Source
 
 **Last updated:** 2026-09-29
 

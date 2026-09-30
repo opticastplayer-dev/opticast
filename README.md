@@ -27,11 +27,11 @@
 
 | Library | Movie Detail | TV Show |
 |---------|--------------|---------|
-| ![Library](docs/showcase/01-library-grid.jpg) | ![Detail](docs/showcase/02-detail-page.jpg) | ![TV Show](docs/showcase/03-tv-show.jpg) |
+| ![Library](docs/showcase/1.jpg) | ![Detail](docs/showcase/2.jpg) | ![TV Show](docs/showcase/3.jpg) |
 
 | Player | Settings |
 |--------|----------|
-| ![Player](docs/showcase/04-player.jpg) | ![Settings](docs/showcase/05-settings.jpg) |
+| ![Player](docs/showcase/4.jpg) | ![Settings](docs/showcase/5.jpg) |
 
 *Real screenshots from OptiCast v2.6.104 — Library with Continue Watching, Featured, Recently Added, Movie Detail with cast, TV Show seasons, Player with gestures, Settings*
 

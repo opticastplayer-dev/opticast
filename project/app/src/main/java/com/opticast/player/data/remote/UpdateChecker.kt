@@ -61,6 +61,16 @@ object UpdateChecker {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
+    // FIX: Download scope that survives navigation — not tied to composable lifecycle
+    // Old: used rememberCoroutineScope() in Composable → cancelled when scrolling/navigating → download cancels
+    // New: application-scoped SupervisorJob + IO, never cancelled by UI navigation
+    private val downloadScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + Dispatchers.IO)
+    private val _downloadProgress = kotlinx.coroutines.flow.MutableStateFlow(0)
+    val downloadProgress: kotlinx.coroutines.flow.StateFlow<Int> = _downloadProgress
+    private val _isDownloading = kotlinx.coroutines.flow.MutableStateFlow(false)
+    val isDownloading: kotlinx.coroutines.flow.StateFlow<Boolean> = _isDownloading
+    private var downloadJob: kotlinx.coroutines.Job? = null
+
     @Serializable
     data class GitHubRelease(
         val tag_name: String = "",
@@ -436,6 +446,9 @@ object UpdateChecker {
     }
 
     suspend fun downloadAndInstall(context: Context, downloadUrl: String, onProgress: (Int) -> Unit = {}): Boolean = withContext(Dispatchers.IO) {
+        // FIX: Make download non-cancellable by UI navigation — use NonCancellable for file IO
+        // Old: withContext(Dispatchers.IO) was cancelled when composable scope cancelled (scrolling/settings/library)
+        // New: use NonCancellable for download, plus global downloadScope for progress that survives
         try {
             // Check if we can request install packages
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -453,30 +466,46 @@ object UpdateChecker {
                 }
             }
 
+            _isDownloading.value = true
+            _downloadProgress.value = 0
+
             val request = Request.Builder().url(downloadUrl).build()
             val response = client.newCall(request).execute()
-            if (!response.isSuccessful) return@withContext false
+            if (!response.isSuccessful) {
+                _isDownloading.value = false
+                return@withContext false
+            }
 
-            val body = response.body ?: return@withContext false
+            val body = response.body ?: run {
+                _isDownloading.value = false
+                return@withContext false
+            }
             val total = body.contentLength()
             val file = File(context.cacheDir, "update.apk")
             file.delete()
 
-            body.byteStream().use { input ->
-                file.outputStream().use { output ->
-                    val buffer = ByteArray(8192)
-                    var downloaded = 0L
-                    var read: Int
-                    while (input.read(buffer).also { read = it } != -1) {
-                        output.write(buffer, 0, read)
-                        downloaded += read
-                        if (total > 0) {
-                            val progress = ((downloaded * 100) / total).toInt()
-                            withContext(Dispatchers.Main) { onProgress(progress) }
+            // Use NonCancellable to prevent cancellation when user navigates away
+            kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
+                body.byteStream().use { input ->
+                    file.outputStream().use { output ->
+                        val buffer = ByteArray(8192)
+                        var downloaded = 0L
+                        var read: Int
+                        while (input.read(buffer).also { read = it } != -1) {
+                            output.write(buffer, 0, read)
+                            downloaded += read
+                            if (total > 0) {
+                                val progress = ((downloaded * 100) / total).toInt()
+                                _downloadProgress.value = progress
+                                withContext(Dispatchers.Main) { onProgress(progress) }
+                            }
                         }
                     }
                 }
             }
+
+            _downloadProgress.value = 100
+            _isDownloading.value = false
 
             // Trigger install via FileProvider
             withContext(Dispatchers.Main) {
@@ -490,8 +519,26 @@ object UpdateChecker {
             }
             true
         } catch (e: Exception) {
+            _isDownloading.value = false
             false
         }
+    }
+
+    // New: Start download in global scope that survives navigation
+    fun startDownloadInBackground(context: Context, downloadUrl: String, onProgress: (Int) -> Unit = {}, onResult: (Boolean) -> Unit = {}) {
+        // Cancel previous if any
+        downloadJob?.cancel()
+        downloadJob = downloadScope.launch {
+            val result = downloadAndInstall(context, downloadUrl, onProgress)
+            withContext(Dispatchers.Main) { onResult(result) }
+        }
+    }
+
+    fun cancelDownload() {
+        downloadJob?.cancel()
+        downloadJob = null
+        _isDownloading.value = false
+        _downloadProgress.value = 0
     }
 
     fun openReleasesPage(context: Context) {

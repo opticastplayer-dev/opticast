@@ -11,7 +11,7 @@ OptiCast is a local video player for Android. It finds your movies and TV shows,
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build)](https://github.com/opticastplayer-dev/opticast/actions)
 [![Pages](https://img.shields.io/badge/Website-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.106 (155) — Secured proxy 9/10 safe
+**Current:** v2.6.107 (156) — Download fix + secured proxy
 
 ### Why it's different
 
@@ -110,12 +110,17 @@ Providers: TMDB via secure proxy https://tmdb-proxy-xstu.onrender.com/, OpenSubt
 
 Contact: opticastproject@gmail.com
 
+### What's New in 2.6.107
+
+- Fix: in-app download no longer cancels when scrolling settings or going to library — now uses global scope that survives navigation + NonCancellable
+- Download progress continues even if you scroll or go to Library
+- Secured proxy: 403 without secret, 200 with secret, rate limit, /health
+
 ### What's New in 2.6.106
 
-- Secured proxy: requires X-App-Secret, rate limit 30/10s, CORS blocked, /health — 9/10 safe, tested: without secret 403, with secret 200
-- No API key in APK, key server-side, secret in BuildConfig from local.properties (gitignored)
-- Version safeguard: single versionCode/versionName, prevents misleading version
-- Your videos, beautifully organized — offline-first, private, no ads
+- Secured proxy: requires X-App-Secret, rate limit 30/10s, CORS blocked, /health — 9/10 safe
+- No API key in APK, key server-side, secret in BuildConfig
+- Version safeguard: single versionCode/versionName
 
 ### What's New in 2.6.105
 

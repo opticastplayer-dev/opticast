@@ -1,6 +1,12 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.106 (155) — 2026-09-30
+**Current:** v2.6.107 (156) — 2026-09-30
+
+## v2.6.107 (156) — 2026-09-30
+
+- Fix: in-app download no longer cancels when scrolling settings or going to library — root cause: rememberCoroutineScope tied to composable lifecycle, cancelled on navigation. Fixed with global downloadScope SupervisorJob IO that survives navigation + NonCancellable file IO, progress via StateFlow that survives
+- UI: UpdateCheckOption now observes globalDownloading + globalProgress StateFlow, shows "Downloading: X% — continues even if you scroll or go to Library"
+- Both download buttons now use startDownloadInBackground instead of scope.launch downloadAndInstall directly
 
 ## v2.6.106 (155) — 2026-09-30
 

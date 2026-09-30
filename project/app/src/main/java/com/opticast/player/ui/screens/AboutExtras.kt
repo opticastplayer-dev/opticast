@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -23,6 +24,9 @@ internal fun UpdateCheckOption(version: String) {
     var error by remember { mutableStateOf<String?>(null) }
     var downloading by remember { mutableStateOf(false) }
     var progress by remember { mutableIntStateOf(0) }
+    // Observe global download state that survives navigation
+    val globalDownloading by UpdateChecker.isDownloading.collectAsState()
+    val globalProgress by UpdateChecker.downloadProgress.collectAsState()
 
     var autoCheckEnabled by remember { mutableStateOf(UpdateChecker.isAutoCheckEnabled(context)) }
 
@@ -123,9 +127,12 @@ internal fun UpdateCheckOption(version: String) {
         error?.let {
             Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
         }
-        if (downloading) {
-            LinearProgressIndicator(progress = { progress / 100f }, modifier = Modifier.fillMaxWidth())
-            Text("Downloading: $progress%", style = MaterialTheme.typography.bodySmall)
+        // Show global downloading that survives navigation + local
+        val showDownloading = downloading || globalDownloading
+        val showProgress = if (globalDownloading) globalProgress else progress
+        if (showDownloading) {
+            LinearProgressIndicator(progress = { showProgress / 100f }, modifier = Modifier.fillMaxWidth())
+            Text("Downloading: $showProgress% — continues even if you scroll or go to Library", style = MaterialTheme.typography.bodySmall)
         }
     }
 
@@ -169,19 +176,21 @@ internal fun UpdateCheckOption(version: String) {
                 if (info.isNewer) {
                     TextButton(
                         onClick = {
-                            scope.launch {
-                                downloading = true
-                                progress = 0
-                                show = false
-                                val success = UpdateChecker.downloadAndInstall(
-                                    context,
-                                    info.downloadUrl
-                                ) { p -> progress = p }
-                                downloading = false
-                                if (!success) {
-                                    UpdateChecker.openReleasePage(context, info.htmlUrl)
+                            // FIX: Use background scope that survives navigation — old used rememberCoroutineScope which cancels on scroll/library navigation
+                            downloading = true
+                            progress = 0
+                            show = false
+                            UpdateChecker.startDownloadInBackground(
+                                context,
+                                info.downloadUrl,
+                                onProgress = { p -> progress = p },
+                                onResult = { success ->
+                                    downloading = false
+                                    if (!success) {
+                                        UpdateChecker.openReleasePage(context, info.htmlUrl)
+                                    }
                                 }
-                            }
+                            )
                         }
                     ) { Text("Download & Install") }
                 } else {
@@ -354,17 +363,22 @@ internal fun AutoUpdateDialog() {
             confirmButton = {
                 TextButton(
                     onClick = {
-                        scope.launch {
-                            downloading = true
-                            progress = 0
-                            val success = UpdateChecker.downloadAndInstall(context, info.downloadUrl) { p -> progress = p }
-                            downloading = false
-                            if (success) {
-                                show = false
-                            } else {
-                                UpdateChecker.openReleasePage(context, info.htmlUrl)
+                        // FIX: Use background scope that survives navigation
+                        downloading = true
+                        progress = 0
+                        UpdateChecker.startDownloadInBackground(
+                            context,
+                            info.downloadUrl,
+                            onProgress = { p -> progress = p },
+                            onResult = { success ->
+                                downloading = false
+                                if (success) {
+                                    show = false
+                                } else {
+                                    UpdateChecker.openReleasePage(context, info.htmlUrl)
+                                }
                             }
-                        }
+                        )
                     },
                     enabled = !downloading
                 ) { Text("Download & Install") }

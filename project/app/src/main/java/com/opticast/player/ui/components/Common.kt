@@ -241,7 +241,7 @@ private fun StatusBadge(status: PosterBadge, modifier: Modifier = Modifier, sing
     Surface(modifier = modifier, shape = RoundedCornerShape(7.dp),
         color = Color.Transparent, contentColor = BadgeInk,
         border = BorderStroke(1.dp, Color.White.copy(alpha = if(minimal) 0.16f else 0.75f)), shadowElevation = if(minimal) 0.dp else 2.dp) {
-        Row(Modifier.background(gradient).graphicsLayer(alpha = shimmerAlpha).padding(horizontal = 4.dp, vertical = 2.dp),
+        Row(Modifier.background(gradient).padding(horizontal = 4.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(3.dp)) {
             // Reserve the narrow portrait badge for the full two-line resume label.
@@ -378,48 +378,19 @@ fun PosterCard(
     val remotePosterUrl = remember(entry.metadata?.posterPath) { posterRemoteUrlFor(entry) }
     val fallbackTitle = remember(entry.video.name, entry.video.parsed.title) { entry.video.parsed.title.ifBlank { entry.video.name } }
     val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) }
-    // Infuse polish: spring animation on press - low-RAM safe with remember + graphicsLayer (GPU, no recomposition)
-    val interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
-    val pressed by interactionSource.collectIsPressedAsState()
-    val scale by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = if (pressed) 0.96f else 1f,
-        animationSpec = androidx.compose.animation.core.tween(100),
-        label = "posterScale"
-    )
 
-    val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
-        with(sharedTransitionScope) {
-            modifier
-                .fillMaxWidth()
-                .aspectRatio(2f / 3f)
-                .graphicsLayer(scaleX = scale, scaleY = scale, clip = true)
-                .clip(RoundedCornerShape(12.dp))
-                .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(12.dp))
-                .combinedClickable(
-                    interactionSource = interactionSource,
-                    indication = null,
-                    onClick = onClick,
-                    onLongClick = onLongClick
-                )
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .clip(RoundedCornerShape(12.dp))
-        }
-    } else {
-        modifier
-            .fillMaxWidth()
-            .aspectRatio(2f / 3f)
-            .graphicsLayer(scaleX = scale, scaleY = scale, clip = true)
-            .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(12.dp))
-            .combinedClickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick,
-                onLongClick = onLongClick
-            )
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .clip(RoundedCornerShape(12.dp))
-    }
+    // Ultra-fast: no press animation, no graphicsLayer scale - instant, no recomposition during scroll
+    val sharedModifier = modifier
+        .fillMaxWidth()
+        .aspectRatio(2f / 3f)
+        .clip(RoundedCornerShape(12.dp))
+        .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(12.dp))
+        .combinedClickable(
+            onClick = onClick,
+            onLongClick = onLongClick
+        )
+        .background(MaterialTheme.colorScheme.surfaceContainer)
+        .clip(RoundedCornerShape(12.dp))
     Box(
         modifier = sharedModifier,
     ) {

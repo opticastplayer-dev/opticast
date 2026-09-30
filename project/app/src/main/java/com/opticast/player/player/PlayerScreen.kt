@@ -177,8 +177,6 @@ import kotlinx.coroutines.withContext
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.Bookmarks
-import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.MusicOff
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -545,7 +543,6 @@ fun PlayerScreen(
     var sleepUntilMs by remember { mutableStateOf<Long?>(null) }
     var sleepAtEnd by remember { mutableStateOf(false) }
     var sleepLabel by remember { mutableStateOf<String?>(null) }
-    var audioOnly by remember { mutableStateOf(appSettings.audioOnlyByDefault) }
     var showInfoSheet by remember { mutableStateOf(false) }
     var showAudioSheet by remember { mutableStateOf(false) }
     var secondarySubId by remember(activeVideoId) {
@@ -1363,12 +1360,6 @@ fun PlayerScreen(
                 update = { view ->
                     view.player = controller
                     view.useController = false
-                    if (audioOnly) {
-                        view.videoSurfaceView?.visibility = android.view.View.INVISIBLE
-                    } else {
-                        view.videoSurfaceView?.visibility = android.view.View.VISIBLE
-                        view.player = controller
-                    }
                     view.resizeMode = surfaceResizeMode(resizeMode)
                     val surfaceScale = if(selectedEngine == "mpv") 1f else aggressiveVideoScale(resizeMode)
                     view.videoSurfaceView?.apply { scaleX = surfaceScale; scaleY = surfaceScale }
@@ -1457,27 +1448,6 @@ fun PlayerScreen(
                 }
             }
         }
-
-        if (audioOnly) {
-            Column(
-                Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Icon(
-                    Icons.Filled.MusicNote,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(56.dp),
-                )
-                Spacer(Modifier.height(10.dp))
-                Text("Audio only", style = MaterialTheme.typography.titleMedium)
-                Text(
-                    "Video is switched off to save data and battery",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
         }
 
         // ------------------------------ gesture layer — pleasant & easy ------------------------------
@@ -1942,10 +1912,6 @@ fun PlayerScreen(
                     verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(Modifier.weight(1f).horizontalScroll(actionRailScroll),
                         horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                        if (appSettings.playerControls.contains("audioonly")) PlayerActionButton(onClick = { audioOnly = !audioOnly; poke() }) {
-                            Icon(if (audioOnly) Icons.Filled.MusicOff else Icons.Filled.MusicNote,
-                                if (audioOnly) "Show video" else "Audio only", tint = if (audioOnly) MaterialTheme.colorScheme.primary else Color.White)
-                        }
                         PlayerActionButton(onClick = {
                             screenLocked = true; unlockVisible = true; controlsVisible = false; tapState.singleTapJob?.cancel()
                         }) { Icon(Icons.Filled.Lock, "Lock screen", tint = Color.White) }

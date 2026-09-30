@@ -56,7 +56,6 @@ data class AppSettings(
         "sleep", "audioonly",
     ),
     /** Start every video with the picture off: saves data and battery. */
-    val audioOnlyByDefault: Boolean = false,
     // Appearance / library
     val appTheme: String = "cast", // cast | midnight | ocean
     val libraryGrid: String = DEFAULT_LIBRARY_GRID, // compact | medium | comfortable
@@ -116,7 +115,6 @@ class SettingsRepository(private val context: Context) {
     private val chapterStampsKey = booleanPreferencesKey("show_chapter_stamps")
     private val progressBarStyleKey = stringPreferencesKey("progress_bar_style")
     private val playerControlsKey = stringSetPreferencesKey("player_controls")
-    private val audioOnlyKey = booleanPreferencesKey("audio_only_default")
     private val themeKey = stringPreferencesKey("app_theme")
     private val gridKey = stringPreferencesKey("library_grid")
 
@@ -161,7 +159,6 @@ class SettingsRepository(private val context: Context) {
             embeddedSubtitleLanguage = prefs[embeddedLanguageKey].orEmpty(),
             embeddedSubtitleMode = prefs[embeddedModeKey]?.takeIf { it in listOf("default", "forced", "full", "off") } ?: "default",
             avoidCommentary = prefs[avoidCommentaryKey] ?: true,
-            audioOnlyByDefault = prefs[audioOnlyKey] ?: false,
             audioPreset = prefs[audioPresetKey] ?: "flat",
             dialogueBoost = prefs[dialogueBoostKey] ?: false,
             autoNextEpisode = prefs[autoNextKey] ?: true,
@@ -297,10 +294,6 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setUseExternalPlayer(enabled: Boolean) {
         context.settingsDataStore.edit { it[externalPlayerKey] = enabled }
-    }
-
-    suspend fun setAudioOnlyByDefault(enabled: Boolean) {
-        context.settingsDataStore.edit { it[audioOnlyKey] = enabled }
     }
 
     suspend fun setLocalBufferTrial(enabled: Boolean) { context.settingsDataStore.edit { it[localBufferTrialKey] = enabled } }

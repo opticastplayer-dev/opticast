@@ -1198,7 +1198,6 @@ private fun PlayerLayoutSettingsCard(settings: AppSettings, scope: CoroutineScop
             "lock" to "Lock controls",
             "aspect" to "Aspect ratio",
             "sleep" to "Sleep timer",
-            "audioonly" to "Audio-only mode",
         ).forEach { (id, label) ->
             PrefToggle(
                 label = label,
@@ -1277,13 +1276,6 @@ private fun GestureSettingsCard(settings: AppSettings, scope: CoroutineScope) {
 @Composable
 private fun BehaviourSettingsCard(settings: AppSettings, scope: CoroutineScope) {
     SettingsCard(icon = Icons.Filled.PlayArrow, title = "Playback behaviour") {
-        PrefToggle(
-            label = "Start in audio-only mode",
-            description = "Start with sound only. Turn the picture back on in the player.",
-            checked = settings.audioOnlyByDefault,
-        ) { enabled -> scope.launch { AppContainer.settings.setAudioOnlyByDefault(enabled) } }
-
-
         PrefToggle(
             label = "Start in landscape",
             description = "Pressing play rotates straight to landscape fullscreen — no waiting, no taps.",

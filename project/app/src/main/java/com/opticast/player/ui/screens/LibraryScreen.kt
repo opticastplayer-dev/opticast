@@ -533,8 +533,6 @@ fun LibraryScreen(
     val recentQueries = remember(designRevision) { designStore.history() }
     var query by rememberSaveable { mutableStateOf("") }
     var searchOpen by rememberSaveable { mutableStateOf(false) }
-    var bottomChromePx by remember { androidx.compose.runtime.mutableIntStateOf(0) }
-    val layoutDensity = LocalDensity.current
     val searchFocus = remember { androidx.compose.ui.focus.FocusRequester() }
     val keyboard = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
@@ -839,20 +837,6 @@ fun LibraryScreen(
             favorites.filter { it.video.isEpisode || it.metadata?.type == "tv" }
                 .map { it.metadata?.showTitle ?: it.video.parsed.title.ifBlank { it.video.name } }.distinct().size
     }
-
-    var scrollChromeVisible by remember { mutableStateOf(true) }
-    val chromeScroll = remember(layoutDensity) {
-        val policy = ScrollChromePolicy(with(layoutDensity) { 24.dp.toPx() })
-        object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
-            override fun onPostScroll(consumed: androidx.compose.ui.geometry.Offset, available: androidx.compose.ui.geometry.Offset,
-                source: androidx.compose.ui.input.nestedscroll.NestedScrollSource): androidx.compose.ui.geometry.Offset {
-                policy.consume(consumed.y)?.let { scrollChromeVisible = it }
-                return androidx.compose.ui.geometry.Offset.Zero
-            }
-        }
-    }
-    LaunchedEffect(tab, searchOpen, selectionMode) { scrollChromeVisible = true }
-
     androidx.compose.runtime.CompositionLocalProvider(LocalMinimalStyle provides (design.style == "minimal")) {
     com.opticast.player.ui.layout.KeyboardAwareViewport {
     Scaffold(
@@ -868,27 +852,11 @@ fun LibraryScreen(
             }
         },
         bottomBar = {
-            // Reserve measured geometry: slide/fade only, never remeasure the grid every frame.
-            Box(Modifier.fillMaxWidth().heightIn(min = with(layoutDensity) { bottomChromePx.toDp() }), contentAlignment = Alignment.BottomCenter) {
-                androidx.compose.animation.AnimatedVisibility(
-                    visible = scrollChromeVisible || searchOpen || selectionMode,
-                    enter = androidx.compose.animation.slideInVertically(tween(180)) { it } + androidx.compose.animation.fadeIn(tween(140)),
-                    exit = androidx.compose.animation.slideOutVertically(tween(180)) { it } + androidx.compose.animation.fadeOut(tween(140))
-                        ) {
-                    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
-                    LibraryBottomBar(favoriteVersion = favVersion, tab = tab,
-                        onTabChange = {
-                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                            closeSearch(); tab = it
-                        },
-                        movieCount = stats.movies, showCount = stats.shows, favoriteCount = favoriteTitleCount,
-                        searchOpen = searchOpen, onSearch = {
-                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                            if (searchOpen) closeSearch() else searchOpen = true
-                        },
-                        modifier = Modifier.onSizeChanged { bottomChromePx = it.height })
-                }
-            }
+            LibraryBottomBar(favoriteVersion = favVersion, tab = tab,
+                onTabChange = { closeSearch(); tab = it },
+                movieCount = stats.movies, showCount = stats.shows, favoriteCount = favoriteTitleCount,
+                searchOpen = searchOpen, onSearch = { if (searchOpen) closeSearch() else searchOpen = true },
+                modifier = Modifier)
         },
         containerColor = MaterialTheme.colorScheme.background,
         // Edge-to-edge: content scrolls under the status bar.
@@ -896,10 +864,6 @@ fun LibraryScreen(
                         ) { padding ->
             val currentTab = tab
             val gridState = androidx.compose.foundation.lazy.grid.rememberLazyGridState()
-            LaunchedEffect(gridState) {
-                androidx.compose.runtime.snapshotFlow { gridState.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0 }
-                    .collect { atTop -> if (atTop) scrollChromeVisible = true }
-            }
             LaunchedEffect(query, searchScope) { if (searchOpen) gridState.scrollToItem(0) }
             val searching = searchOpen
             val tabFilter: (LibraryEntry) -> Boolean = { entry ->
@@ -948,7 +912,7 @@ fun LibraryScreen(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .fillMaxSize()
-                .nestedScroll(chromeScroll)
+                
                 .background(MaterialTheme.colorScheme.background)
                 .consumeWindowInsets(padding),
             contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = 88.dp)
@@ -1105,7 +1069,7 @@ fun LibraryScreen(
                     val carouselState = rememberLazyListState()
                     LazyRow(
                         state = carouselState,
-                        flingBehavior = rememberSnapFlingBehavior(carouselState),
+
                         contentPadding = PaddingValues(horizontal = DiscoveryGutterDp.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(DiscoveryGapDp.dp)
                         ) {
@@ -1153,7 +1117,7 @@ fun LibraryScreen(
                     val carouselState = rememberLazyListState()
                     LazyRow(
                         state = carouselState,
-                        flingBehavior = rememberSnapFlingBehavior(carouselState),
+
                         contentPadding = PaddingValues(horizontal = DiscoveryGutterDp.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.spacedBy(DiscoveryGapDp.dp)
                         ) {
@@ -1340,10 +1304,6 @@ fun LibraryScreen(
                 }
             }
         }
-            FastScrollThumb(
-                gridState = gridState,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
         }
     }
 

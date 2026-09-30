@@ -1,0 +1,6 @@
+OptiCast v2.6.101 — Stable Build — Remove Audio Only + Ultra Fast Scroll
+
+- Remove Audio Only completely from app — removed audioOnlyByDefault from SettingsRepository, var audioOnly + LaunchedEffect + AndroidView visibility + Audio only UI + PlayerActionButton audioonly from PlayerScreen, removed audioonly from playerControls and Start in audio-only mode from SettingsScreen
+- Scrolling ultra fast like episodes/settings — removed PosterCard press scale animateFloatAsState tween 100 + graphicsLayer scale + interactionSource, LibraryScreen nestedScroll chromeScroll + bottom bar AnimatedVisibility slide/fade + haptic + snapFlingBehavior + FastScrollThumb + chromeScroll policy + snapshotFlow, LibraryComponents favoriteBounce spring Animatable, Common shimmer infiniteTransition NEW badge, multi-select fadeIn/slideIn, all graphicsLayer animations
+- Keep RAM 8/12/16/20 + 32/48/64/96 LRU 30 pool 200 + Coil clear, blank bar fixed, heart removed, collapsible no black bar, poster animation fixed
+- 150/2.6.101, 110 baseline locked, 9.7/10 Stable Ultra Fast

@@ -1,0 +1,49 @@
+OptiCast Video Player - Local video player, offline-first, no ads, open source
+
+Package: com.opticast.player
+Version: 2.6.104 (153)
+License: GPL-3.0-only
+Source: https://github.com/opticastplayer-dev/opticast
+Website: https://opticastplayer-dev.github.io/opticast/
+Issues: https://github.com/opticastplayer-dev/opticast/issues
+Changelog: https://github.com/opticastplayer-dev/opticast/releases
+
+Description:
+Beautiful, fast local video player. Your own movies and TV shows, organized beautifully, playing perfectly offline. No ads, no tracking. 38M APK.
+
+LIBRARY: Finds videos automatically, adaptive poster grid, Continue Watching, Movies and TV Shows, Favorites, Recently Added, Collections, search. Fast scrolling.
+MOVIE INFO: Recognizes movies/TV from filenames via TMDB, posters cached offline, blurred fallback never black.
+SUBTITLES: OpenSubtitles + SubDL, always saved offline during scan, custom fonts, dual subs.
+PLAYER: mpv + Media3, plays all formats mkv/mp4/avi, edge-to-edge, gestures, PiP auto-resume, speed, audio/subs picker.
+UPDATES: Checks once when internet detected, minimal data, in-app FileProvider with progress, full changelog visible.
+OFFLINE: Works fully offline after posters/subtitles cached.
+PRIVATE: No ads, no tracking, GPL-3.0, media stays on device, no accounts.
+WHAT'S NEW in 2.6.104: Audio Only removed fixes blank video, library scrolling fast, RAM optimized, offline-first, install over existing.
+
+Permissions: Internet, Network State, Video Library, Notifications, Background Playback, Install Updates, Wake Lock
+
+Fastlane: title, short_description, full_description, changelogs/153.txt, images 5 PNGs 1080p Library Detail TV Show Player Settings
+Lint: fdroid lint com.opticast.player passes
+
+Builds: versionName 2.6.104 versionCode 153 commit v2.6.104 subdir project gradle yes
+AutoUpdateMode Version v%v UpdateCheckMode Tags CurrentVersion 2.6.104 CurrentVersionCode 153
+Complete source with full mpv 27MB zip + SHA256SUMS in GitHub release
+Same JKS, higher versionCode, APK versionName matches asset version
+
+Links:
+GitHub https://github.com/opticastplayer-dev/opticast
+Release https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.104
+APK https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.104/OptiCast-v2.6.104.apk
+Website https://opticastplayer-dev.github.io/opticast/
+FAQ https://github.com/opticastplayer-dev/opticast/blob/main/docs/FAQ.md
+Privacy https://github.com/opticastplayer-dev/opticast/blob/main/docs/PRIVACY.md
+
+Checklist:
+- Package never changes, signing consistent
+- GPL-3.0-only, no ads, no tracking, offline-first
+- Fastlane ready, 5 screenshots real, minimal permissions
+- Source includes full mpv, builds with gradle
+- AutoUpdateMode Version v%v, UpdateCheckMode Tags
+
+Contact: opticastproject@gmail.com
+Thank you for reviewing!

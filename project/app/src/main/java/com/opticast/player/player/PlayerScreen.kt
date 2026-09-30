@@ -1457,6 +1457,27 @@ fun PlayerScreen(
                 }
             }
         }
+
+        if (audioOnly) {
+            Column(
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Icon(
+                    Icons.Filled.MusicNote,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(56.dp),
+                )
+                Spacer(Modifier.height(10.dp))
+                Text("Audio only", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "Video is switched off to save data and battery",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
 
         // ------------------------------ gesture layer — pleasant & easy ------------------------------

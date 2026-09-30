@@ -275,14 +275,6 @@ jobs:
           fi
           sha256sum "releases/OptiCast-v${VERSION}.apk" > "releases/SHA256SUMS-v${VERSION}.txt"
           cat "releases/SHA256SUMS-v${VERSION}.txt"
-          # Verify complete source contains prebuilt
-          git archive --format=zip -o "releases/OptiCast-v${VERSION}-complete-source.zip" HEAD
-          if ! unzip -l "releases/OptiCast-v${VERSION}-complete-source.zip" | grep -q "prebuilt.*aar"; then
-            echo "WARNING: Complete source missing prebuilt AAR"
-            # Not fatal but warning
-          else
-            echo "Complete source contains prebuilt AAR - OK"
-          fi
           ls -lh releases/
 
       - name: Upload APK artifact

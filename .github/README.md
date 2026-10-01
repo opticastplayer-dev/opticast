@@ -1,4 +1,4 @@
-# OptiCast GitHub — v2.6.109 Stable Ultra Fast
+# OptiCast — Your videos, beautifully organized.
 
 [![Release](https://img.shields.io/github/v/release/opticastplayer-dev/opticast?label=Release)](https://github.com/opticastplayer-dev/opticast/releases)
 [![License](https://img.shields.io/github/license/opticastplayer-dev/opticast)](../LICENSE)
@@ -6,7 +6,7 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build&branch=main)](https://github.com/opticastplayer-dev/opticast/actions)
 [![Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**OptiCast v2.6.109 (158) — Secret rotated + secured proxy 9/10 safe — Metadata fix, Download fix, Offline-First #1, No Ads**
+**Current:** v2.6.109 (158) — Secret rotated + secured proxy
 
 Infuse-style local video player for Android — beautiful, fast, offline-first, no ads, open source.
 

@@ -121,15 +121,21 @@ jobs:
             fi
           fi
           # Check versionCode > previous release (prevent same versionCode as older)
+          # Allow rebuild of same tag (PREV_VC == current TAG_VER) — equal VC is OK for rebuild
           PREV_VC=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/releases/latest | grep -oP '\"tag_name\":\s*\"v\K[^\"]+' | head -1 || echo "")
           if [ -n "$PREV_VC" ]; then
             echo "Previous latest tag: v$PREV_VC"
-            PREV_BUILD=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://raw.githubusercontent.com/${{ github.repository }}/refs/tags/v${PREV_VC}/project/app/build.gradle.kts 2>/dev/null | grep -oP 'versionCode\s*=\s*\K\d+' | head -1 || echo 0)
-            if [ -n "$PREV_BUILD" ] && [ "$PREV_BUILD" -ge "$VC" ] 2>/dev/null; then
-              echo "FATAL: New versionCode $VC <= previous versionCode $PREV_BUILD (tag v$PREV_VC) — would NOT install over, shows older version"
-              exit 1
+            TAG_VER_CURRENT=${TAG_VER:-${TAG#v}}
+            if [ "$PREV_VC" = "$TAG_VER_CURRENT" ]; then
+              echo "Previous tag is same as current ($PREV_VC) — rebuild, skipping increasing check"
+            else
+              PREV_BUILD=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://raw.githubusercontent.com/${{ github.repository }}/refs/tags/v${PREV_VC}/project/app/build.gradle.kts 2>/dev/null | grep -oP 'versionCode\s*=\s*\K\d+' | head -1 || echo 0)
+              if [ -n "$PREV_BUILD" ] && [ "$PREV_BUILD" -ge "$VC" ] 2>/dev/null; then
+                echo "FATAL: New versionCode $VC <= previous versionCode $PREV_BUILD (tag v$PREV_VC) — would NOT install over, shows older version"
+                exit 1
+              fi
+              echo "Previous versionCode $PREV_BUILD, new $VC — OK (increasing)"
             fi
-            echo "Previous versionCode $PREV_BUILD, new $VC — OK (increasing)"
           fi
           echo "versionCode OK: $VC versionName OK: $VN — single source of truth, matches tag, increasing"
 
@@ -205,7 +211,30 @@ jobs:
           fi
           echo "AAR verified has libmpv - OK"
 
+      - name: Inject TMDB proxy secret for metadata (fix v2.6.107 -> v2.6.108)
+        run: |
+          echo "=== Injecting TMDB proxy secret for BuildConfig ==="
+          SECRET="${{ secrets.TMDB_PROXY_SECRET }}"
+          if [ -z "$SECRET" ]; then
+            SECRET="${{ secrets.APP_SECRET }}"
+          fi
+          if [ -n "$SECRET" ]; then
+            echo "TMDB proxy secret found (${#SECRET} chars) — writing to local.properties and env"
+            # Write to project/local.properties for Gradle buildConfigField
+            echo "tmdb.proxy.secret=$SECRET" >> project/local.properties
+            echo "sdk.dir=$ANDROID_HOME" >> project/local.properties 2>/dev/null || true
+            # Also set env for build.gradle.kts fallback
+            echo "TMDB_PROXY_SECRET=$SECRET" >> $GITHUB_ENV
+            cat project/local.properties | grep -v secret | head -n 20
+            echo "Secret injected OK"
+          else
+            echo "WARNING: No TMDB_PROXY_SECRET or APP_SECRET secret set in GitHub — BuildConfig will use hardcoded fallback, metadata will still work but set secret for rotation"
+          fi
+
       - name: Build APK
+        env:
+          TMDB_PROXY_SECRET: ${{ secrets.TMDB_PROXY_SECRET || secrets.APP_SECRET }}
+          APP_SECRET: ${{ secrets.APP_SECRET || secrets.TMDB_PROXY_SECRET }}
         run: |
           cd project
           # Verify AAR exists before build

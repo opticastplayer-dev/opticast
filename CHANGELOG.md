@@ -10,7 +10,7 @@
 
 ## v2.6.108 (157) — 2026-09-30
 
-- Fix: metadata fetching failed in v2.6.106-107 vs v2.6.105 — root cause: secured proxy requires X-App-Secret, but CI builds had blank BuildConfig.TMDB_PROXY_SECRET (no TMDB_PROXY_SECRET env in workflow), so proxy returned 403 and metadata fetch failed. v2.6.105 worked because proxy was open (no secret required). Fix: workflow now injects secret from GitHub secrets TMDB_PROXY_SECRET / APP_SECRET into project/local.properties and env TMDB_PROXY_SECRET, build.gradle.kts now checks both TMDB_PROXY_SECRET and APP_SECRET env, BuildConfig gets secret AsGfhVhE0NxilwqMapsqLpE3bE7exg1n, proxy returns 200, metadata works like v2.6.105
+- Fix: metadata fetching failed in v2.6.106-107 vs v2.6.105 — root cause: secured proxy requires X-App-Secret, but CI builds had blank BuildConfig (no env in workflow), so proxy returned 403 and metadata fetch failed. v2.6.105 worked because proxy was open. Fix: workflow now injects secret from GitHub secrets into project/local.properties and env, BuildConfig gets secret, proxy returns 200, metadata works like v2.6.105
 - Workflow: added Inject TMDB proxy secret step before Build APK, also fixed version safeguard to allow rebuild of same tag (equal VC OK)
 
 ## v2.6.107 (156) — 2026-09-30
@@ -21,7 +21,7 @@
 
 ## v2.6.106 (155) — 2026-09-30
 
-- Secured proxy: requires X-App-Secret header AsGfhVhE0NxilwqMapsqLpE3bE7exg1n, rate limit 30/10s, CORS blocked, /health 200 — 9/10 safe, tested live: without secret 403, with secret 200, rate limit headers present
+- Secured proxy: requires X-App-Secret header, rate limit 30/10s, CORS blocked, /health 200 — 9/10 safe, tested live: without secret 403, with secret 200, rate limit headers present
 - Client TmdbProxyClient sends X-App-Secret from BuildConfig (injected from local.properties, not GitHub), @PublishedApi internal fix for compilation
 - Server SECURE_PROXY_SERVER.js deployed to Render, env TMDB_API_KEY + APP_SECRET set, deploys Live green (was Failed red due to missing env)
 - Version safeguard: single versionCode/versionName, workflow checks duplicate, tag match, increasing — prevents misleading version issue where 2.6.105 showed 2.6.104

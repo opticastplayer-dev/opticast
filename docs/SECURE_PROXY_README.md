@@ -11,7 +11,7 @@ After: Secret header + rate limit + CORS → 9/10
 
 ```bash
 openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c32
-# Example: AsGfhVhE0NxilwqMapsqLpE3bE7exg1n
+# Example: YOUR_SECRET_HERE
 ```
 
 ## 2. Render Env Vars
@@ -21,7 +21,7 @@ Go to https://dashboard.render.com/ → your service tmdb-proxy-xstu → Environ
 Add:
 ```
 TMDB_API_KEY=your_real_tmdb_api_key_here
-APP_SECRET=AsGfhVhE0NxilwqMapsqLpE3bE7exg1n
+APP_SECRET=YOUR_SECRET_HERE
 ```
 
 Save → Render auto redeploys.
@@ -53,7 +53,7 @@ buildFeatures { buildConfig = true }
 
 `project/local.properties` (NOT in GitHub, local only):
 ```
-tmdb.proxy.secret=AsGfhVhE0NxilwqMapsqLpE3bE7exg1n
+tmdb.proxy.secret=YOUR_SECRET_HERE
 ```
 
 `TmdbProxyClient.kt`:
@@ -74,7 +74,7 @@ curl https://tmdb-proxy-xstu.onrender.com/api/search/movie?query=Inception
 
 With secret (should 200):
 ```bash
-curl -H "X-App-Secret: AsGfhVhE0NxilwqMapsqLpE3bE7exg1n" https://tmdb-proxy-xstu.onrender.com/api/search/movie?query=Inception
+curl -H "X-App-Secret: YOUR_SECRET_HERE" https://tmdb-proxy-xstu.onrender.com/api/search/movie?query=Inception
 # → {"page":1,"results":[...]}
 ```
 

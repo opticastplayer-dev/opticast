@@ -11,7 +11,7 @@ OptiCast is a local video player for Android. It finds your movies and TV shows,
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build)](https://github.com/opticastplayer-dev/opticast/actions)
 [![Pages](https://img.shields.io/badge/Website-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.108 (157) — Metadata fix + download fix + secured proxy
+**Current:** v2.6.109 (158) — Secret rotated + secured proxy
 
 ### Why it's different
 
@@ -109,6 +109,12 @@ See [PRIVACY.md](docs/PRIVACY.md) and [FAQ.md](docs/FAQ.md)
 Providers: TMDB via secure proxy https://tmdb-proxy-xstu.onrender.com/, OpenSubtitles + SubDL, OMDb, Fanart.tv, AniList
 
 Contact: opticastproject@gmail.com
+
+### What's New in 2.6.109
+
+- Security: rotate proxy secret — old secret was public in repo history and APK, now rotated to new secret stored in GitHub secrets + Render env, old secret revoked
+- Remove hardcoded public secret from build.gradle.kts — no fallback in public repo, secret from env only, prevents future public leak
+- Keeps metadata fix + download fix + secured proxy 9/10 safe: 403 without secret, 200 with secret
 
 ### What's New in 2.6.108
 

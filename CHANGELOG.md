@@ -1,6 +1,12 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.108 (157) — 2026-09-30
+**Current:** v2.6.109 (158) — 2026-10-01
+
+## v2.6.109 (158) — 2026-10-01
+
+- Security: rotate proxy secret — old secret was public in repo history (build.gradle.kts fallback) and APK, now rotated to new secret (stored in GitHub secrets TMDB_PROXY_SECRET + APP_SECRET via API 204 and Render env), old secret revoked
+- Remove hardcoded public secret from build.gradle.kts — now no fallback in public repo, secret comes only from local.properties or env, prevents secret being public in repo history, workflow injection ensures metadata works
+- Keeps metadata fix + download fix + secured proxy 9/10 safe: 403 without secret, 200 with secret
 
 ## v2.6.108 (157) — 2026-09-30
 

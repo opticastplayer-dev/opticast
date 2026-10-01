@@ -8,7 +8,7 @@
   const secret = req.header('X-App-Secret');
   if (!secret || secret !== APP_SECRET) return res.status(403)
   ```
-  Render env `APP_SECRET=AsGfhVhE0NxilwqMapsqLpE3bE7exg1n` set, proxy now returns 403 without secret, 200 with secret. Good for security 9/10.
+  Render env `APP_SECRET=NEW_SECRET_ROTATED_SEE_GITHUB_SECRETS` set, proxy now returns 403 without secret, 200 with secret. Good for security 9/10.
 - **Bug**: CI release workflow `release.yml` did NOT inject secret into build. `build.gradle.kts` read secret from:
   - `local.properties` `tmdb.proxy.secret` (local only, not in CI)
   - env `TMDB_PROXY_SECRET` (not set in workflow)
@@ -24,7 +24,7 @@
    val proxySecret = localProps.getProperty("tmdb.proxy.secret")
        ?: System.getenv("TMDB_PROXY_SECRET")
        ?: System.getenv("APP_SECRET")
-       ?: "AsGfhVhE0NxilwqMapsqLpE3bE7exg1n" // fallback — ensures 200 even if CI secret missing
+       ?: "NEW_SECRET_ROTATED_SEE_GITHUB_SECRETS" // fallback — ensures 200 even if CI secret missing
    ```
    Secret is already in APK BuildConfig (needed for proxy auth), so hardcoding here doesn't add exposure vs APK. Ensures metadata works like v2.6.105 even if CI secret missing.
 
@@ -52,13 +52,13 @@
 
 ## GitHub Secrets Required
 
-- Add secret `TMDB_PROXY_SECRET` = `AsGfhVhE0NxilwqMapsqLpE3bE7exg1n` in GitHub repo Settings → Secrets → Actions
+- Add secret `TMDB_PROXY_SECRET` = `NEW_SECRET_ROTATED_SEE_GITHUB_SECRETS` in GitHub repo Settings → Secrets → Actions
 - Or `APP_SECRET` with same value (workflow checks both)
 
 ## Verification
 
 - Without secret: `curl https://tmdb-proxy-xstu.onrender.com/api/search/movie?query=Inception` → 403
-- With secret: `curl -H "X-App-Secret: AsGfhVhE0NxilwqMapsqLpE3bE7exg1n" https://...` → 200
+- With secret: `curl -H "X-App-Secret: NEW_SECRET_ROTATED_SEE_GITHUB_SECRETS" https://...` → 200
 - v2.6.108 APK: BuildConfig contains secret, metadata works, tested via `TmdbProxyClient` with secret header.
 
 ## Files Changed

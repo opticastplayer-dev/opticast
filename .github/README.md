@@ -8,7 +8,7 @@
 
 **Current:** v2.6.109 (158)
 
-Infuse-style local video player for Android — beautiful, fast, offline-first, no ads, open source.
+Infuse-style local video player for Android — beautiful, offline-first, no ads, open source.
 
 See root [README.md](../README.md) for full showcase, [docs/index.html](https://opticastplayer-dev.github.io/opticast/) for website, [Releases](https://github.com/opticastplayer-dev/opticast/releases/latest) for APK.
 

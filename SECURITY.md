@@ -1,15 +1,15 @@
 # Security Policy — OptiCast
 
-**Current:** v2.6.104 (153) Stable 9.7/10 — Offline-first, no ads, no tracking, GPL-3.0
+**Current:** v2.6.109 (158)
 
 ## Supported Versions
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.6.104 | :white_check_mark: |
-| < 2.6.104 | :x: (please update) |
+| 2.6.109 | :white_check_mark: |
+| < 2.6.109 | :x: (please update) |
 
-We support only latest stable release. Previous releases deleted from GitHub — only v2.6.104 kept.
+We support only latest stable release. Previous releases deleted from GitHub — only v2.6.109 kept.
 
 ## Reporting a Vulnerability
 

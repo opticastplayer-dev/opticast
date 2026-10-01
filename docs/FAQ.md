@@ -1,6 +1,6 @@
 # OptiCast FAQ — Common Questions
 
-**Current:** v2.6.104 — Fast, smooth, mobile only, offline-first
+**Current:** v2.6.109 (158)
 
 ### Is OptiCast for TV?
 **No — designed for phones.** This is a phone app for Android 8 and newer. It works great on all phones including older ones. No TV support — focused on making the phone experience perfect.

@@ -1,8 +1,8 @@
 # Contributing to OptiCast
 
-Thank you for considering contributing to OptiCast — beautiful, fast, offline-first, no ads, open source local video player for Android.
+Thank you for considering contributing to OptiCast — beautiful, offline-first, no ads, open source local video player for Android.
 
-**Current:** v2.6.104 (153) Stable 9.7/10 Ultra Fast — Mobile only, offline-first #1, manual DI 0KB
+**Current:** v2.6.109 (158)
 
 ## How to Contribute
 

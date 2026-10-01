@@ -1,6 +1,6 @@
 # Code of Conduct — OptiCast
 
-**OptiCast v2.6.104 — Stable Ultra Fast — No Ads, Open Source, Offline-First**
+**OptiCast v2.6.109 (158)**
 
 ## Our Pledge
 

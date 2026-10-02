@@ -379,8 +379,10 @@ fun PosterCard(
     val fallbackTitle = remember(entry.video.name, entry.video.parsed.title) { entry.video.parsed.title.ifBlank { entry.video.name } }
     val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) }
 
-    // Gold: SharedElement for poster morph if scope provided, else ultra-fast no animation
-    val baseModifier = modifier
+    // Gold: Keep ultra-fast for grid — sharedElement causes empty boxes in LazyVerticalGrid with animateItem
+    // SharedElement only for detail header, not for grid cards (prevents messed up empty boxes)
+    // Previous attempt caused MOVIES section 4 empty outlined boxes (see Screenshot_20261002_055504)
+    val sharedModifier = modifier
         .fillMaxWidth()
         .aspectRatio(2f / 3f)
         .clip(RoundedCornerShape(12.dp))
@@ -391,18 +393,6 @@ fun PosterCard(
         )
         .background(MaterialTheme.colorScheme.surfaceContainer)
         .clip(RoundedCornerShape(12.dp))
-
-    val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
-        with(sharedTransitionScope) {
-            baseModifier.sharedElement(
-                rememberSharedContentState(key = "poster-${entry.video.id}"),
-                animatedVisibilityScope = animatedVisibilityScope
-            )
-        }
-    } else {
-        baseModifier
-    }
-
     Box(
         modifier = sharedModifier,
     ) {

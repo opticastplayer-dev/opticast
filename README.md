@@ -11,7 +11,7 @@ OptiCast is a local video player for Android. It finds your movies and TV shows,
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build)](https://github.com/opticastplayer-dev/opticast/actions)
 [![Pages](https://img.shields.io/badge/Website-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.111 (160)
+**Current:** v2.6.112 (161)
 
 ### Why it's different
 

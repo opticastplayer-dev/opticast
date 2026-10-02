@@ -1,6 +1,12 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.111 (160) — 2026-10-02
+**Current:** v2.6.112 (161) — 2026-10-02
+
+## v2.6.112 (161) — 2026-10-02
+
+- Fix: library messed up — MOVIES section showed 4 empty outlined boxes instead of posters (Screenshot_20261002_055504_OptiCast.jpg). Root cause: PosterCard sharedElement + animateItem in LazyVerticalGrid caused empty boxes. Fixed by removing sharedElement from grid cards, keeping ultra-fast baseModifier, SharedElement only for detail header (safe no-op). Grid now shows all 27 movies correctly like v2.6.110
+- Keeps Gold Step 2 EmptyState premium: spring animation, 96dp Surface primaryContainer, bold title — for library empty, search no results, offline
+- Keeps fail-fast, secret rotation, metadata fix, download fix, baseline 110 locked
 
 ## v2.6.111 (160) — 2026-10-02
 

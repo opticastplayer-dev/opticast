@@ -1,0 +1,31 @@
+{
+  "name": "OptiCast — Your videos, beautifully organized",
+  "short_name": "OptiCast",
+  "description": "Local video player, offline-first — your videos, beautifully organized, plays flawlessly offline. Direct APK download.",
+  "start_url": "/opticast/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#5ee1ff",
+  "icons": [
+    {
+      "src": "showcase/1.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    }
+  ],
+  "categories": ["multimedia", "video", "entertainment"],
+  "screenshots": [
+    {
+      "src": "showcase/1.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "showcase/2.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg",
+      "form_factor": "narrow"
+    }
+  ]
+}

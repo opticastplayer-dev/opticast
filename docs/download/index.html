@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direct Download — OptiCast APK</title>
+<meta name="description" content="Direct APK download for OptiCast Video Player — offline-first, no ads, open source. Latest version direct link.">
+<link rel="canonical" href="https://opticastplayer-dev.github.io/opticast/download/">
+<meta http-equiv="refresh" content="5;url=https://github.com/opticastplayer-dev/opticast/releases/latest">
+<style>
+:root{--bg:#0a0a0f;--card:#15151f;--border:#ffffff14;--text:#f0f0f3;--muted:#9aa0b0;--accent:#5ee1ff}
+*{box-sizing:border-box}body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);margin:0;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px;text-align:center}
+.card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px 28px;max-width:520px;width:100%}
+h1{font-size:1.8rem;font-weight:800;margin:0 0 12px;letter-spacing:-0.02em}
+.lead{color:var(--muted);margin:0 0 24px;line-height:1.6}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:16px 28px;border-radius:14px;font-weight:800;background:linear-gradient(100deg,var(--accent),#22d3ee);color:#000;text-decoration:none;margin:8px}
+.btn.sec{background:#ffffff0a;color:var(--text);border:1px solid var(--border)}
+.small{font-size:0.85rem;color:var(--muted);margin-top:16px;word-break:break-all}
+.verified{display:inline-flex;gap:6px;padding:6px 12px;background:#22c55e14;border:1px solid #22c55e33;border-radius:999px;color:#86efac;font-size:0.85rem;font-weight:600;margin:12px 0}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>⬇ Direct Download</h1>
+<p class="lead">Fetching latest APK from GitHub Releases...<br>If not redirected in 5 seconds, tap button below.</p>
+<div class="verified">✓ Verified · GPL-3.0 · f7e5ba26...3f0240</div>
+<div id="info" class="small">Loading latest version...</div>
+<div style="margin-top:20px">
+<a class="btn" id="dlBtn" href="https://github.com/opticastplayer-dev/opticast/releases/latest">Download APK Direct</a><br>
+<a class="btn sec" href="https://opticastplayer-dev.github.io/opticast/">← Back to website</a>
+<a class="btn sec" href="https://github.com/opticastplayer-dev/opticast/releases/latest">All Releases</a>
+</div>
+<div class="small" style="margin-top:20px">OptiCast — Your videos, beautifully organized.<br>Offline-first, no ads, open source. Android 8+ ARM64+ARM32.<br>Signing: CN=Luma App Release RSA/3072 SHA256 f7e5ba2643181fbe2327f29ad814c0de8c937fab9ae276c2957f7ddc1d3f0240</div>
+</div>
+<script>
+(async()=>{
+  const info=document.getElementById('info');
+  const btn=document.getElementById('dlBtn');
+  try{
+    const res=await fetch('https://api.github.com/repos/opticastplayer-dev/opticast/releases/latest');
+    const data=await res.json();
+    const apk=(data.assets||[]).find(a=>a.name.endsWith('.apk')&&a.name.toLowerCase().includes('optic'))||(data.assets||[]).find(a=>a.name.endsWith('.apk'));
+    if(apk){
+      info.innerHTML='Latest: <strong>'+data.tag_name+'</strong> · '+(apk.size/1024/1024).toFixed(1)+' MB · '+new Date(data.published_at).toISOString().slice(0,10)+'<br>Direct: <a href="'+apk.browser_download_url+'" style="color:#5ee1ff">'+apk.browser_download_url+'</a>';
+      btn.href=apk.browser_download_url;
+      btn.textContent='⬇ Download '+data.tag_name+' ('+(apk.size/1024/1024).toFixed(1)+' MB)';
+      // Auto redirect after 1s
+      setTimeout(()=>{window.location.href=apk.browser_download_url},1000);
+    }else{
+      info.textContent='Latest: '+data.tag_name+' — redirecting to releases page';
+      setTimeout(()=>{window.location.href='https://github.com/opticastplayer-dev/opticast/releases/latest'},1500);
+    }
+  }catch(e){
+    info.textContent='Could not fetch latest — redirecting to releases page in 3s';
+    setTimeout(()=>{window.location.href='https://github.com/opticastplayer-dev/opticast/releases/latest'},3000);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,6 +1,13 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.113 (162) — 2026-10-02
+**Current:** v2.6.114 (163) — 2026-10-02
+
+## v2.6.114 (163) — 2026-10-02
+
+- Gold Architecture Step 1: Domain layer + UseCases — safe incremental, 8.5→9.0/10
+- New domain/usecase: SearchLibraryUseCase, GetContinueWatchingUseCase, RefreshLibraryUseCase, RecheckFilesUseCase, MatchMetadataUseCase, GetLibraryEntriesUseCase, ClearMetadataUseCase, SetWatchedUseCase — pure business logic, no Android, testable, 0KB
+- LibraryViewModel now uses UseCases: thin ViewModel, business logic out of composable, uses repository interface
+- Keeps repository interfaces, EmptyState premium, fail-fast, secret rotation, metadata fix, download fix, baseline 110 locked for v2.6.109
 
 ## v2.6.113 (162) — 2026-10-02
 

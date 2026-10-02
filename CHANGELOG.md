@@ -1,6 +1,11 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.109 (158) — 2026-10-01
+**Current:** v2.6.110 (159) — 2026-10-01
+
+## v2.6.110 (159) — 2026-10-01
+
+- Gold Step 1: fail-fast check — prevents silent metadata failure like v2.6.106-107. If TMDB proxy secret blank, official release build now throws FATAL immediately instead of building APK that returns 403. Ensures metadata always works, never ships broken build. Build checks isOfficialRelease && proxySecret.isBlank() → throw GradleException
+- Keeps secret rotation, metadata fix, download fix, secured proxy 9/10 safe, simple professional docs
 
 ## v2.6.109 (158) — 2026-10-01
 

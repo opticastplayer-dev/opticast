@@ -11,7 +11,7 @@ plugins {
 // CI: from env TMDB_PROXY_SECRET or APP_SECRET (GitHub secrets, injected by workflow)
 // SECURITY: No hardcoded fallback in public repo — secret is in GitHub secrets + Render env + APK BuildConfig only
 // Workflow injects secret via project/local.properties and env, so BuildConfig gets secret and proxy returns 200
-// If secret missing, build warns but still builds (metadata will fail with 403, like v2.6.106-107 bug) — workflow ensures injection
+// FAIL-FAST: Prevent v2.6.106-107 regression — blank secret = 403 = metadata fails, fail build immediately
 val localProps = Properties().apply {
     val file = rootProject.file("local.properties")
     if (file.exists()) file.inputStream().use { load(it) }
@@ -20,6 +20,19 @@ val proxySecret = localProps.getProperty("tmdb.proxy.secret")
     ?: System.getenv("TMDB_PROXY_SECRET")
     ?: System.getenv("APP_SECRET")
     ?: "" // no hardcoded public secret — must come from local.properties or env
+
+// FAIL-FAST for gold standard — never ship APK with blank secret that would cause silent 403
+val isOfficialRelease = gradle.startParameter.taskNames.any { 
+    it.contains("OfficialRelease") || it.contains("Release") 
+}
+if (isOfficialRelease && proxySecret.isBlank()) {
+    throw GradleException(
+        "FATAL: TMDB proxy secret blank — BuildConfig.TMDB_PROXY_SECRET would be empty, " +
+        "proxy will return 403, metadata will fail like v2.6.106-107 vs v2.6.105. " +
+        "Set tmdb.proxy.secret in local.properties or TMDB_PROXY_SECRET/APP_SECRET env. " +
+        "GitHub secrets: TMDB_PROXY_SECRET + APP_SECRET must exist. See docs/METADATA_FIX_v2.6.108.md"
+    )
+}
 
 android {
     namespace = "com.opticast.player"
@@ -35,8 +48,8 @@ android {
         }
         // SINGLE SOURCE OF TRUTH: versionCode/versionName defined once — prevents mismatch
         // Bump both together: versionCode must always increase, versionName must match tag
-        versionCode = 158
-        versionName = "2.6.109"
+        versionCode = 159
+        versionName = "2.6.110"
         vectorDrawables { useSupportLibrary = true }
         // Secure proxy secret — injected as BuildConfig field, not plain string in code
         // local.properties: tmdb.proxy.secret=YOUR_SECRET, or env TMDB_PROXY_SECRET

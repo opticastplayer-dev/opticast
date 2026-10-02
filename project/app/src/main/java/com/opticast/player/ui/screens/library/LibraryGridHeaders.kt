@@ -31,11 +31,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.opticast.player.ui.components.DiscoveryGutterDp
+import com.opticast.player.ui.screens.DiscoveryGutterDp
 import com.opticast.player.ui.screens.FilterChipsRow
 import com.opticast.player.ui.screens.LibraryHeader
 import com.opticast.player.ui.screens.StatsCard
 import com.opticast.player.ui.screens.WhatsNewCard
+import com.opticast.player.ui.screens.LibraryDesignStore
+import com.opticast.player.ui.screens.LibraryStats
 
 /**
  * Gold Standard — Grid headers extracted from LibraryScreen.kt
@@ -43,7 +45,7 @@ import com.opticast.player.ui.screens.WhatsNewCard
  * Was 150+ lines inside LazyVerticalGrid, now reusable
  */
 
-fun LazyGridScope.libraryHeader(
+internal fun LazyGridScope.libraryHeader(
     scanning: Boolean,
     onOpenSettings: () -> Unit,
     onCustomize: () -> Unit,
@@ -61,7 +63,7 @@ fun LazyGridScope.libraryHeader(
     }
 }
 
-fun LazyGridScope.libraryWhatsNew(
+internal fun LazyGridScope.libraryWhatsNew(
     context: android.content.Context,
     onDismiss: (String?) -> Unit
 ) {
@@ -76,7 +78,7 @@ fun LazyGridScope.libraryWhatsNew(
     }
 }
 
-fun LazyGridScope.librarySearchControls(
+internal fun LazyGridScope.librarySearchControls(
     searchScope: String,
     onSearchScopeChange: (String) -> Unit,
     query: String,
@@ -111,7 +113,7 @@ fun LazyGridScope.librarySearchControls(
     }
 }
 
-fun LazyGridScope.libraryFileAvailability(
+internal fun LazyGridScope.libraryFileAvailability(
     missingCount: Int,
     fileScanError: String?,
     checkingFiles: Boolean,
@@ -146,7 +148,7 @@ fun LazyGridScope.libraryFileAvailability(
     }
 }
 
-fun LazyGridScope.libraryMatching(
+internal fun LazyGridScope.libraryMatching(
     isMatching: Boolean,
     matchingDone: Int,
     matchingTotal: Int
@@ -171,7 +173,7 @@ fun LazyGridScope.libraryMatching(
     }
 }
 
-fun LazyGridScope.libraryStatsAndFilters(
+internal fun LazyGridScope.libraryStatsAndFilters(
     showStats: Boolean,
     stats: com.opticast.player.ui.screens.LibraryStats,
     sortBy: String,

@@ -23,19 +23,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.opticast.player.data.model.LibraryEntry
-import com.opticast.player.ui.components.DiscoveryCollectionDp
-import com.opticast.player.ui.components.DiscoveryGapDp
-import com.opticast.player.ui.components.DiscoveryGutterDp
+import com.opticast.player.ui.screens.DiscoveryCollectionDp
+import com.opticast.player.ui.screens.DiscoveryGapDp
+import com.opticast.player.ui.screens.DiscoveryGutterDp
+import com.opticast.player.ui.screens.DiscoveryPosterDp
+import com.opticast.player.ui.screens.DiscoveryResumeDp
 import com.opticast.player.ui.components.DiscoveryHeader
-import com.opticast.player.ui.components.DiscoveryPosterDp
-import com.opticast.player.ui.components.DiscoveryResumeDp
 import com.opticast.player.ui.screens.CollectionCover
-import com.opticast.player.ui.screens.ContinueWatchingCard
+import com.opticast.player.ui.components.ContinueWatchingCard
 import com.opticast.player.ui.screens.HeroPager
-import com.opticast.player.ui.screens.PosterCard
+import com.opticast.player.ui.components.PosterCard
 import com.opticast.player.ui.screens.SelectableCard
 import com.opticast.player.ui.screens.ShowCard
 import com.opticast.player.ui.screens.discoveryHeading
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import com.opticast.player.ui.screens.PersonalCollection
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.AnimatedVisibilityScope
 
 /**
  * Gold Standard — Discovery content extracted from LibraryScreen.kt
@@ -43,7 +48,7 @@ import com.opticast.player.ui.screens.discoveryHeading
  * Was 300+ lines inside LazyVerticalGrid, now reusable
  */
 
-fun LazyGridScope.continueWatchingSection(
+internal fun LazyGridScope.continueWatchingSection(
     continueWatching: List<ContinueWatchingData>,
     collapsed: Boolean,
     onToggle: () -> Unit,
@@ -94,19 +99,19 @@ fun LazyGridScope.continueWatchingSection(
     }
 }
 
-data class ContinueWatchingData(
+internal data class ContinueWatchingData(
     val entry: LibraryEntry,
     val playback: com.opticast.player.data.local.PlaybackState
 )
 
-fun Long.formatDuration(): String {
+internal fun Long.formatDuration(): String {
     val totalSeconds = this / 1000
     val hours = totalSeconds / 3600
     val minutes = (totalSeconds % 3600) / 60
     return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
 }
 
-fun LazyGridScope.featuredSection(
+internal fun LazyGridScope.featuredSection(
     featured: List<LibraryEntry>,
     collapsed: Boolean,
     onToggle: () -> Unit,
@@ -135,7 +140,7 @@ fun LazyGridScope.featuredSection(
     }
 }
 
-fun LazyGridScope.recentlyAddedSection(
+internal fun LazyGridScope.recentlyAddedSection(
     recentlyAdded: List<LibraryEntry>,
     collapsed: Boolean,
     onToggle: () -> Unit,
@@ -175,7 +180,7 @@ fun LazyGridScope.recentlyAddedSection(
     }
 }
 
-fun LazyGridScope.collectionsSection(
+internal fun LazyGridScope.collectionsSection(
     allCollections: List<com.opticast.player.ui.screens.PersonalCollection>,
     libraryEntriesById: Map<Long, LibraryEntry>,
     selectionMode: Boolean,

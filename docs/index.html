@@ -202,41 +202,40 @@ footer{text-align:center;padding:48px 24px;color:#cbd5e1;font-size:0.92rem;borde
 </div>
 </div>
 </div>
-<div class="card muted"><b>Where are my videos?</b> — OptiCast looks in Movies, DCIM, Download via MediaStore. If missing: <span class="kbd">Settings → Excluded folders</span> → remove exclusion, then <span class="kbd">Library → pull to refresh</span>. If file hidden (starts with dot) or in Android/data, system hides it.</div>
+<div class="card muted"><b>Where are my videos?</b> — OptiCast looks in your Movies, DCIM, and Download folders. If you don't see a video, check Settings → Excluded folders and make sure the folder is not excluded, then pull to refresh in your Library.</div>
 </section>
 
 <section>
 <h2>Screenshots — real app</h2>
 <div class="screenshots">
-<div class="shot"><img src="showcase/1.jpg" alt="Library" loading="lazy"><div class="cap"><b>Library</b><span>Adaptive grid, Continue Watching, Recently Added. Fast scrolling.</span></div></div>
-<div class="shot"><img src="showcase/2.jpg" alt="Movie detail" loading="lazy"><div class="cap"><b>Movie detail</b><span>Poster, backdrop, genres, runtime, cast. Cached offline, blurred fallback never black.</span></div></div>
-<div class="shot"><img src="showcase/3.jpg" alt="TV show" loading="lazy"><div class="cap"><b>TV shows</b><span>Seasons & episodes, stills, auto-play next. Remembers where you left off.</span></div></div>
-<div class="shot"><img src="showcase/4.jpg" alt="Player" loading="lazy"><div class="cap"><b>Player</b><span>mpv + Media3 fallback, gestures, speed, PiP auto-resumes, chapters, sleep timer.</span></div></div>
-<div class="shot"><img src="showcase/5.jpg" alt="Settings" loading="lazy"><div class="cap"><b>Settings</b><span>Grid size, data saver, performance, subtitle fonts, in-app updates with progress.</span></div></div>
+<div class="shot"><img src="showcase/1.jpg" alt="Library" loading="lazy"><div class="cap"><b>Library</b><span>Your collection at a glance. Continue watching and recently added titles.</span></div></div>
+<div class="shot"><img src="showcase/2.jpg" alt="Movie detail" loading="lazy"><div class="cap"><b>Movie detail</b><span>Posters, cast, genres, and runtime. Saved for offline viewing.</span></div></div>
+<div class="shot"><img src="showcase/3.jpg" alt="TV show" loading="lazy"><div class="cap"><b>TV shows</b><span>Browse seasons and episodes. Automatically remembers your progress.</span></div></div>
+<div class="shot"><img src="showcase/4.jpg" alt="Player" loading="lazy"><div class="cap"><b>Player</b><span>Simple controls, adjustable speed, picture-in-picture, and sleep timer.</span></div></div>
+<div class="shot"><img src="showcase/5.jpg" alt="Settings" loading="lazy"><div class="cap"><b>Settings</b><span>Customize your experience, manage subtitles, and check for updates.</span></div></div>
 </div>
 </section>
 
 <section>
 <h2>Features — offline-first</h2>
 <div class="grid3">
-<div class="card"><h3>📚 Library</h3><p class="lead">Finds videos automatically, adaptive poster grid, Continue Watching, Movies/TV Shows, Favorites, Recently Added, Collections, search.</p></div>
-<div class="card"><h3>🎨 Movie Info</h3><p class="lead">Recognizes movies/TV from filenames, posters cached offline for instant loading. Blurred fallback.</p></div>
-<div class="card"><h3>💬 Subtitles</h3><p class="lead">OpenSubtitles + SubDL, always saved offline during scan, custom fonts, dual subtitles.</p></div>
-<div class="card"><h3>▶️ Player</h3><p class="lead">mpv + Media3, plays mkv/mp4/avi, gestures, PiP, audio/subtitle selection, chapters.</p></div>
-<div class="card"><h3>🔄 Updates</h3><p class="lead">Checks once when internet detected, in-app updates with progress + full changelog visible.</p></div>
-<div class="card"><h3>📴 Offline</h3><p class="lead">Works fully offline after posters/subs cached. No internet needed to watch.</p></div>
+<div class="card"><h3>📚 Library</h3><p class="lead">Your videos organized automatically. Continue watching, browse by category, and find any title with fast search.</p></div>
+<div class="card"><h3>🎨 Movie Info</h3><p class="lead">Clear posters and details for your movies and shows, saved for offline viewing.</p></div>
+<div class="card"><h3>💬 Subtitles</h3><p class="lead">Multiple languages, saved offline, with customizable fonts and dual subtitle support.</p></div>
+<div class="card"><h3>▶️ Player</h3><p class="lead">Plays your videos smoothly with intuitive gesture controls and picture-in-picture.</p></div>
+<div class="card"><h3>🔄 Updates</h3><p class="lead">Stay up to date with in-app updates and a clear view of what's new.</p></div>
+<div class="card"><h3>📴 Offline</h3><p class="lead">Works fully offline after setup. No internet needed to watch your collection.</p></div>
 </div>
 </section>
 
 <section>
 <h2>FAQ — quick answers</h2>
 <div class="details">
-<div class="details-item"><summary>Is it for TV?</summary><div class="content">No — designed for phones. Android 8+ phones, including older devices. No TV support, focused on perfect phone experience.</div></div>
-<div class="details-item"><summary>Does it work offline?</summary><div class="content">Yes — works fully offline. Finds videos, saves posters/subtitles for offline viewing, plays without internet. Only uses internet to check updates when connected and to fetch movie info/subtitles — all saved for offline later.</div></div>
-<div class="details-item"><summary>How to update?</summary><div class="content">Install new APK over old — keeps data. Or inside app: Settings → Check for updates → Download & Install. Shows progress, uses FileProvider + REQUEST_INSTALL_PACKAGES permission for self-update (user-initiated, requires system installer confirmation).</div></div>
-<div class="details-item"><summary>REQUEST_INSTALL_PACKAGES — why?</summary><div class="content">For in-app self-updater. App checks GitHub releases, downloads APK to cache, triggers system installer. No silent install — user must grant "Install unknown apps" and confirm Install. Fallback opens GitHub releases page. Allowed as self-updating app per F-Droid/Izzy policy (like F-Droid client).</div></div>
-<div class="details-item"><summary>Dependency Info block warning?</summary><div class="content">Fixed in v2.6.120+. Added android.dependenciesInfo { includeInApk=false includeInBundle=false } to build.gradle.kts. Previous APKs contained Google dependency metadata block — now removed. Scan now passes.</div></div>
-<div class="details-item"><summary>Where are my videos?</summary><div class="content">OptiCast uses MediaStore to find videos in Movies, DCIM, Download. If missing: Settings → Excluded folders → remove exclusion, Library → pull to refresh. Files starting with dot or in Android/data are hidden by system.</div></div>
+<div class="details-item"><summary>Is it for TV?</summary><div class="content">No — designed for phones. Works on Android 8 and newer, including older devices. Focused on providing the best phone experience.</div></div>
+<div class="details-item"><summary>Does it work offline?</summary><div class="content">Yes — works fully offline after the initial setup. Your videos, posters, and subtitles are saved to your device, so you can watch without an internet connection.</div></div>
+<div class="details-item"><summary>How to update?</summary><div class="content">Install the new version over the old one — your data is preserved. You can also update directly inside the app from Settings → Check for updates.</div></div>
+<div class="details-item"><summary>Why does it need install permission?</summary><div class="content">To allow in-app updates. When a new version is available, you can download and install it directly from the app. Installation always requires your confirmation in the system installer.</div></div>
+<div class="details-item"><summary>Where are my videos?</summary><div class="content">OptiCast looks in your Movies, DCIM, and Download folders. If a video is missing, check Settings → Excluded folders to ensure the folder is not excluded, then pull to refresh in your Library.</div></div>
 </div>
 <div class="btn-row"><a class="btn small secondary" href="FAQ.md">Full FAQ</a><a class="btn small secondary" href="PRIVACY.md">Privacy Policy</a><a class="btn small secondary" href="https://github.com/opticastplayer-dev/opticast/blob/main/CHANGELOG.md">Changelog</a></div>
 </section>

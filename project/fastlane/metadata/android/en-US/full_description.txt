@@ -1,40 +1,41 @@
 OptiCast — Your videos, beautifully organized.
 
-Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and plays them flawlessly offline
+Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and plays them flawlessly offline.
 
 Why it's different:
-Most players try to do everything. OptiCast focuses on one thing: playing your own videos well. Focused local playback, no streaming catalogs, no login walls. Scans your device via MediaStore, shows Continue Watching, Recently Added, Collections. Fast, even on older phones.
+Most players try to do everything. OptiCast focuses on one thing: playing your own videos well. No streaming catalogs, no login walls. Just your personal collection, beautifully organized and easy to enjoy.
+
+Focused local playback:
+Automatically organizes your movies and TV shows with clear artwork. Continue where you left off, browse by category, and find what you want quickly. Designed to be smooth and responsive on all phones.
 
 Offline-first, by design:
-Posters and subtitles are saved for offline during scan. Works fully offline after first scan. Update check once when internet detected, minimal data.
+Works fully offline after the initial setup. Posters and subtitles are saved to your device, so you can watch without an internet connection. Updates are checked only when you are online, using minimal data.
 
-Private & simple:
-No ads, no tracking, GPL-3.0. Your media stays on device. No accounts. Small APK, manual DI, no bloat. Easy to audit.
+Private and simple:
+No advertisements, no tracking, and no accounts required. Your videos stay on your device. Open source, lightweight, and built to be fast, secure, and easy to use.
 
 LIBRARY:
-Finds your videos automatically, adaptive poster grid (Compact/Comfortable), Continue Watching, Movies & TV Shows, Favorites, Recently Added, Collections, search. Fast scrolling. If you don't see videos, check Settings → Excluded folders.
+Finds your videos automatically and displays them with clear posters. Browse Continue Watching, Movies and TV Shows, Favorites, Recently Added, and Collections. Fast search helps you find any title instantly.
 
 MOVIE INFO:
-Recognizes movies/TV from filenames, posters cached offline, blurred fallback never black. Cast, genres, runtime.
+Recognizes movies and TV shows from file names and shows posters, cast, genres, and runtime. All information is saved for offline viewing.
 
 SUBTITLES:
-OpenSubtitles + SubDL, multi-language, always saved offline during scan, custom fonts .ttf/.otf, dual subs.
+Supports multiple languages and saves subtitles for offline viewing. Customize fonts and display two subtitles at once for language learning.
 
 PLAYER:
-mpv + Media3 fallback, plays mkv/mp4/avi and more, edge-to-edge, gestures for seek/volume/brightness, speed, aspect, audio/subs picker, predictive back, sleep timer, auto-play next, chapters, PiP auto-resumes.
+Plays common video formats with intuitive controls. Adjust brightness and volume with gestures, change playback speed, select audio and subtitle tracks, use picture-in-picture, and set a sleep timer.
 
 UPDATES:
-Checks once when internet detected, minimal data, in-app download with progress via FileProvider, full changelog visible, Up To Date only when update available.
+Checks for updates only when connected, using minimal data. Download and install new versions directly inside the app with progress visible. View what's new in each update.
 
 GETTING STARTED (30 seconds):
-1. Install APK, grant video permission
-2. Open — auto-scans videos
-3. Tap poster — watch, posters cached offline
-
-Where are my videos? Looks in Movies, DCIM, Download via MediaStore. If missing: Settings → Excluded folders → remove exclusion, pull to refresh. Files hidden (dot) or in Android/data are hidden by system.
+1. Install the app and allow access to videos
+2. Open the app — your videos are organized automatically
+3. Tap any poster to start watching
 
 PRIVATE:
-No ads, no tracking, GPL-3.0, media stays on device, no accounts. Permissions: Internet, Network State, Video Library, Notifications, Background Playback, Install Updates.
+No advertisements, no tracking, open source. Your media stays on your device with no accounts required. Permissions are used only for essential features: finding videos, showing playback controls, and installing updates.
 
 LINKS:
 GitHub: https://github.com/opticastplayer-dev/opticast
@@ -42,4 +43,4 @@ Website: https://opticastplayer-dev.github.io/opticast/
 FAQ: https://github.com/opticastplayer-dev/opticast/blob/main/docs/FAQ.md
 Privacy: https://github.com/opticastplayer-dev/opticast/blob/main/docs/PRIVACY.md
 
-Small, fast, offline-first, private — your videos, beautifully organized.
+Your personal collection, beautifully organized and always available offline.

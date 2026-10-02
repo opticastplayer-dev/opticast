@@ -30,64 +30,69 @@ For security and to ensure you receive verified builds, please use only the offi
 
 Most players try to do everything. OptiCast focuses on one thing: playing your own videos well.
 
-- **Focused local playback** — Scans your device via MediaStore, shows Continue Watching, Recently Added, Collections. No streaming catalogs, no login walls.
-- **Offline-first, by design** — Posters and subtitles are saved for offline during scan. Works fully offline after. Update check once when internet detected, minimal data.
-- **Private & simple** — No ads, no tracking, GPL-3.0. Your media stays on device. No accounts. Small APK, manual DI, no bloat.
+- **Focused local playback** — Automatically organizes your movies and TV shows with clear artwork. Continue where you left off and browse by category.
+- **Offline-first, by design** — Works fully offline after initial setup. Posters and subtitles are saved to your device.
+- **Private and simple** — No advertisements, no tracking, open source. Your videos stay on your device with no accounts required.
 
 ### Getting Started — 30 seconds
 
-1. **Install** — Download APK from [Releases](https://github.com/opticastplayer-dev/opticast/releases/latest) and install. Grant video permission.
-2. **Open** — Auto-scans your videos. If you don't see them, check `Settings → Folders` — maybe a folder is excluded.
-3. **Watch** — Tap a poster. Posters and subtitles are fetched and cached for offline.
+1. **Install** — Download APK from [Releases](https://github.com/opticastplayer-dev/opticast/releases/latest) and install. Allow access to videos.
+2. **Open** — Your videos are organized automatically.
+3. **Watch** — Tap any poster to start watching.
 
-**Where are my videos?** OptiCast looks in Movies, DCIM, Download via MediaStore. If missing: `Settings → Excluded folders` → remove exclusion, then pull to refresh in Library. Files hidden (dot prefix) or in `Android/data` are hidden by system.
+**Where are my videos?** OptiCast looks in your Movies, DCIM, and Download folders. If you don't see a video, check Settings → Excluded folders and ensure the folder is not excluded, then pull to refresh in your Library.
 
 ### Screenshots — real app
 
 | Library | Movie detail | TV show |
 |---------|--------------|---------|
-| ![Library](docs/showcase/1.jpg) | Library: adaptive grid, Continue Watching, Recently Added. Fast scrolling. | ![Detail](docs/showcase/2.jpg) | Movie detail: poster, backdrop, genres, runtime, cast. Cached offline. | ![TV Show](docs/showcase/3.jpg) | TV shows: seasons & episodes, stills, auto-play next. |
+| ![Library](docs/showcase/1.jpg) | Your collection at a glance with Continue Watching and Recently Added | ![Detail](docs/showcase/2.jpg) | Clear posters, cast, and details saved for offline viewing | ![TV Show](docs/showcase/3.jpg) | Browse seasons and episodes with progress remembered |
 
 | Player | Settings |
 |--------|----------|
-| ![Player](docs/showcase/4.jpg) | Player: mpv + Media3 fallback, gestures, speed, PiP auto-resumes, chapters, sleep timer. | ![Settings](docs/showcase/5.jpg) | Settings: grid size, data saver, subtitle fonts, in-app updates with progress. |
+| ![Player](docs/showcase/4.jpg) | Simple controls, adjustable speed, picture-in-picture, and sleep timer | ![Settings](docs/showcase/5.jpg) | Customize your experience and check for updates |
 
-*Real screenshots from OptiCast v2.6.119*
+*Real screenshots from OptiCast*
 
 ### Features
 
 **Library**
-- Auto-scan via MediaStore, adaptive grid (Compact/Comfortable), fast scrolling, search
-- Continue Watching, Featured, Recently Added, Movies, TV Shows, Collections, Favorites
+- Organized automatically with clear posters
+- Continue Watching, Movies, TV Shows, Favorites, Recently Added, Collections
+- Fast search
 
 **Movie Info**
-- Recognizes movies/TV from filenames, posters cached offline, blurred fallback
+- Recognizes titles and shows posters, cast, and details
+- Saved for offline viewing
 
 **Subtitles**
-- OpenSubtitles + SubDL, multi-language, always saved offline during scan, custom fonts .ttf/.otf, dual subs
+- Multiple languages, saved offline
+- Customizable fonts and dual subtitle support
 
 **Player**
-- mpv + Media3 fallback, edge-to-edge, gestures, speed, aspect, audio/subs picker, predictive back, sleep timer, auto-play next, chapters, PiP auto-resume
+- Plays common video formats smoothly
+- Intuitive controls, adjustable speed, picture-in-picture, sleep timer
 
 **Updates**
-- Checks once when internet detected, minimal data, in-app download with progress via FileProvider, full changelog visible
+- Check for updates inside the app
+- View what's new in each version
 
 ### Installation
 
 **GitHub Releases**
 1. Go to https://github.com/opticastplayer-dev/opticast/releases
-2. Download `OptiCast-v2.6.119.apk`
-3. Install APK (allow unknown sources)
-4. Open → Grant permission → Auto-scan
+2. Download the latest APK
+3. Install and allow access to videos
+4. Open the app — your collection is organized automatically
 
-**F-Droid**
-- https://f-droid.org/packages/com.opticast.player — MR 50679 open, can_be_merged
+**F-Droid and IzzyOnDroid**
+- Available via official repositories when reviews are complete (F-Droid MR !50919, IzzyOnDroid #659)
 
 ### What people say
 
-> “Finally a player that just shows my movies nicely and works offline on my old phone. No ads, no clutter.” — Early tester, 32-bit device
+> “Finally a player that just shows my movies nicely and works offline on my old phone. No ads, no clutter.” — Early tester
 
-> “I like that it doesn't try to sell me streaming. It's my library, organized like Infuse but for Android and open.” — GitHub feedback
+> “I like that it doesn't try to sell me streaming. It's my library, organized beautifully.” — GitHub feedback
 
 Users give feedback, not us rating ourselves.
 
@@ -98,13 +103,11 @@ cd project
 ./gradlew assembleRelease
 ```
 
-Requires Android Studio Ladybug+, JDK 17, compileSdk 36, minSdk 26, targetSdk 35
+Requires Android Studio, JDK 17
 
 ### Privacy
 
-No accounts, library stays on device, works offline, no tracking. Permissions: Internet, Network State, Video Library, Notifications, Background Playback, Install Updates, Wake Lock
-
-See [PRIVACY.md](docs/PRIVACY.md) and [FAQ.md](docs/FAQ.md)
+No accounts, your library stays on your device, works offline, no tracking. See [PRIVACY.md](docs/PRIVACY.md) and [FAQ.md](docs/FAQ.md)
 
 ### Links
 

@@ -13,6 +13,8 @@ import com.opticast.player.ui.components.toggledDiscoverySections
 import com.opticast.player.ui.components.matchesLibraryGenre
 import com.opticast.player.ui.components.libraryGenres
 import com.opticast.player.ui.components.completedLibrarySeries
+import com.opticast.player.ui.screens.library.libraryFileAvailability
+import com.opticast.player.ui.screens.library.libraryMatching
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -629,7 +631,7 @@ fun LibraryScreen(
                 }
             }
             // Gold: file availability extracted to library/LibraryGridHeaders.kt
-            com.opticast.player.ui.screens.library.libraryFileAvailability(
+            libraryFileAvailability(
                 missingCount = missingFiles.size,
                 fileScanError = state.fileScanError,
                 checkingFiles = state.checkingFiles,
@@ -650,7 +652,7 @@ fun LibraryScreen(
                 }
             }
             // Gold: matching extracted to library/LibraryGridHeaders.kt
-            com.opticast.player.ui.screens.library.libraryMatching(
+            libraryMatching(
                 isMatching = state.isMatching,
                 matchingDone = state.matchingDone,
                 matchingTotal = state.matchingTotal

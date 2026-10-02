@@ -12,6 +12,9 @@ import com.opticast.player.domain.usecase.RefreshLibraryUseCase
 import com.opticast.player.domain.usecase.SearchLibraryUseCase
 import com.opticast.player.domain.usecase.SetWatchedUseCase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean
  * - Offline-first, survives rotation
  * - Easy to test with FakeLibraryRepository + Fake UseCases
  * - 8.5 → 9.0/10 architecture gold
- */
  */
 class LibraryViewModel(
     private val repository: LibraryRepository? = null

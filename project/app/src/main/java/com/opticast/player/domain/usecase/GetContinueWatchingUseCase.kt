@@ -4,7 +4,7 @@ import com.opticast.player.data.AppContainer
 import com.opticast.player.data.model.LibraryEntry
 import com.opticast.player.data.repository.LibraryRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 /**
  * Gold Standard UseCase — Continue Watching, offline-first
@@ -14,18 +14,15 @@ class GetContinueWatchingUseCase(
     private val repository: LibraryRepository? = null
 ) {
     operator fun invoke(): Flow<List<LibraryEntry>> {
-        // If repository provided, use it, else use AppContainer (backward compat)
-        return if (repository != null) {
-            combine(repository.entries, AppContainer.playbackState.progressFlow) { entries, _ ->
-                entries.filter { entry ->
-                    val state = AppContainer.playbackState.state(entry.video.id)
-                    state?.isResumable == true && state.isWatched != true
-                }.sortedByDescending { AppContainer.playbackState.state(it.video.id)?.lastPlayedMs ?: 0L }
-            }
-        } else {
-            combine(AppContainer.playbackState.progressFlow, AppContainer.metadataStore.version) { _, _ ->
-                emptyList<LibraryEntry>()
-            }
+        val entriesFlow = repository?.entries ?: AppContainer.metadataStore.version.let {
+            // Fallback: empty flow if no repo
+            kotlinx.coroutines.flow.MutableStateFlow(emptyList<LibraryEntry>())
+        }
+        return entriesFlow.map { entries ->
+            entries.filter { entry ->
+                val state = AppContainer.playbackState.state(entry.video.id)
+                state?.isResumable == true && state.isWatched != true
+            }.sortedByDescending { AppContainer.playbackState.state(it.video.id)?.updatedAt ?: 0L }
         }
     }
 
@@ -34,6 +31,6 @@ class GetContinueWatchingUseCase(
         return entries.filter { entry ->
             val state = AppContainer.playbackState.state(entry.video.id)
             state?.isResumable == true && state.isWatched != true
-        }.sortedByDescending { AppContainer.playbackState.state(it.video.id)?.lastPlayedMs ?: 0L }
+        }.sortedByDescending { AppContainer.playbackState.state(it.video.id)?.updatedAt ?: 0L }
     }
 }

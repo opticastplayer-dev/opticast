@@ -10,6 +10,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 /**
  * Gold Standard — Bottom sheets extracted from LibraryScreen.kt
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LibraryGenrePickerSheet(
     genres: List<String>,

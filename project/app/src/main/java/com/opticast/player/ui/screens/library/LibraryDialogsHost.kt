@@ -12,7 +12,7 @@ import com.opticast.player.data.model.LibraryEntry
  * Single responsibility: customize, collections, smart collections, missing files, rename, genre, delete confirm
  */
 @Composable
-fun LibraryDialogsHost(
+internal fun LibraryDialogsHost(
     showCustomize: Boolean,
     tab: String,
     design: com.opticast.player.ui.screens.LibraryDesign,
@@ -21,7 +21,7 @@ fun LibraryDialogsHost(
     onDesignRevisionChange: (Int) -> Unit,
     onShowCustomizeChange: (Boolean) -> Unit,
     showCollections: Boolean,
-    personalCollections: List<com.opticast.player.data.model.PersonalCollection>,
+    personalCollections: List<com.opticast.player.ui.screens.PersonalCollection>,
     entries: List<LibraryEntry>,
     onShowCollectionsChange: (Boolean) -> Unit,
     openCollectionId: String?,
@@ -32,7 +32,7 @@ fun LibraryDialogsHost(
     extrasRevision: Int,
     onExtrasRevisionChange: (Int) -> Unit,
     onShowSmartCollectionsChange: (Boolean) -> Unit,
-    allCollections: List<com.opticast.player.data.model.PersonalCollection>,
+    allCollections: List<com.opticast.player.ui.screens.PersonalCollection>,
     showRenameSuggestions: Boolean,
     onShowRenameSuggestionsChange: (Boolean) -> Unit,
     onOpenMatch: (Long) -> Unit,
@@ -71,9 +71,10 @@ fun LibraryDialogsHost(
         onSave = { extrasStore.saveRules(it); onExtrasRevisionChange(extrasRevision + 1) },
         onDismiss = { onShowSmartCollectionsChange(false) }
     )
-    allCollections.firstOrNull { it.id == openCollectionId }?.let { collection ->
+    val openCollection = allCollections.firstOrNull { it.id == openCollectionId }
+    if (openCollection != null) {
         com.opticast.player.ui.screens.CollectionContentsDialog(
-            collection, entries,
+            openCollection, entries,
             onOpen = { id -> onOpenCollectionIdChange(null); onOpenDetail(id) },
             onDismiss = { onOpenCollectionIdChange(null) }
         )

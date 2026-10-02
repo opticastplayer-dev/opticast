@@ -1,6 +1,6 @@
 # OptiCast — Your videos, beautifully organized.
 
-Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and play them flawlessly OFFLINE
+Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and plays them flawlessly offline
 
 **No ads, no tracking, open source. Focused on local playback.**
 

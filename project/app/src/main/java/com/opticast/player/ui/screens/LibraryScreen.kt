@@ -384,71 +384,13 @@ fun LibraryScreen(
     fun shareVideos(ids: List<Long>) =
         com.opticast.player.ui.screens.library.LibraryFileActions.shareVideos(context, ids)
 
-    val deleteLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-                        ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) viewModel.recheckFiles()
-    }
-    val writePermLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-                        ) { granted ->
-        if (granted && pendingWriteDelete.isNotEmpty()) {
-            pendingWriteDelete.mapNotNull { uriOf(it) }.forEach { uri ->
-                runCatching { context.contentResolver.delete(uri, null, null) }
-            }
-            viewModel.scan()
-            pendingWriteDelete = emptyList()
-        }
-    }
-
-    val legacyDeleteLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) legacyDeleteTick++
-        else { pendingWriteDelete = emptyList(); viewModel.recheckFiles() }
-    }
-    LaunchedEffect(legacyDeleteTick) {
-        if (Build.VERSION.SDK_INT != 29 || legacyDeleteTick == 0) return@LaunchedEffect
-        while (pendingWriteDelete.isNotEmpty()) {
-            val id = pendingWriteDelete.first()
-            try {
-                val uri = kotlinx.coroutines.withContext(Dispatchers.IO) { uriOf(id) }
-                if (uri == null) { fileActionError("A selected episode is unavailable; remaining files were not deleted."); pendingWriteDelete = emptyList(); break }
-                kotlinx.coroutines.withContext(Dispatchers.IO) { context.contentResolver.delete(uri, null, null) }
-                pendingWriteDelete = pendingWriteDelete.drop(1)
-            } catch (e: android.app.RecoverableSecurityException) {
-                legacyDeleteLauncher.launch(IntentSenderRequest.Builder(e.userAction.actionIntent.intentSender).build())
-                return@LaunchedEffect
-            } catch (e: kotlinx.coroutines.CancellationException) { throw e }
-            catch (_: Exception) { fileActionError("Could not delete all selected episodes. Refresh the library to review the remaining files."); pendingWriteDelete = emptyList(); break }
-        }
-        viewModel.recheckFiles()
-    }
-
-    fun performDelete(ids: List<Long>) {
-        val uris = ids.distinct().mapNotNull { uriOf(it) }
-        if (uris.size != ids.distinct().size) { fileActionError("Some selected files are unavailable. Recheck storage before deleting the selection."); return }
-        if (uris.isEmpty()) return
-        if (Build.VERSION.SDK_INT == 29) { pendingWriteDelete = ids.distinct(); legacyDeleteTick++; return }
-        if (Build.VERSION.SDK_INT >= 30) {
-            runCatching {
-                val request = MediaStore.createDeleteRequest(context.contentResolver, uris)
-                deleteLauncher.launch(IntentSenderRequest.Builder(request.intentSender).build())
-            }.onFailure { fileActionError("Could not request deletion. Try a smaller selection or check storage access.") }
-        } else {
-            val granted = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        ) == PackageManager.PERMISSION_GRANTED
-            if (granted) {
-                uris.forEach { uri ->
-                    runCatching { context.contentResolver.delete(uri, null, null) }
-                }
-                viewModel.scan()
-            } else {
-                pendingWriteDelete = ids
-                writePermLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-        }
-    }
+    // Gold: delete handling extracted to library/LibraryDeleteHandler.kt
+    val deleteHandler = com.opticast.player.ui.screens.library.rememberLibraryDeleteHandler(
+        selectionState = selectionState,
+        viewModel = viewModel,
+        onFileActionError = { fileActionError(it) }
+    )
+    fun performDelete(ids: List<Long>) = deleteHandler.performDelete(ids)
 
 
     fun exitSelection() {
@@ -470,25 +412,14 @@ fun LibraryScreen(
     BackHandler(enabled = searchOpen && !selectionMode) { closeSearch() }
 
 
-    val videoPermission = if (Build.VERSION.SDK_INT >= 33) {
-        Manifest.permission.READ_MEDIA_VIDEO
-    } else {
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    }
+    // Gold: permission handling extracted to library/LibraryPermissionHandler.kt
+    val permissionState = com.opticast.player.ui.screens.library.rememberLibraryPermissionState()
+    var hasPermission by permissionState.hasPermission
+    val permissionLauncher = permissionState.permissionLauncher
     val permissionsToRequest = if (Build.VERSION.SDK_INT >= 33) {
-        arrayOf(videoPermission, Manifest.permission.POST_NOTIFICATIONS)
+        arrayOf(Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.POST_NOTIFICATIONS)
     } else {
-        arrayOf(videoPermission)
-    }
-    var hasPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, videoPermission) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { results ->
-        hasPermission = results[videoPermission] == true
+        arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
 
     LaunchedEffect(Unit) {
@@ -1047,35 +978,48 @@ fun LibraryScreen(
         }
     }
 
-    if(showCustomize) LibraryCustomizeDialog(tab,design,onChange={designStore.save(tab,it);designRevision++},
-        onCollections={showCustomize=false;showCollections=true},onDismiss={showCustomize=false})
-    if(showCollections) CollectionsDialog(personalCollections,state.entries,
-        onSave={designStore.saveCollections(it);designRevision++},
-        onOpen={showCollections=false;openCollectionId=it.id},onSmart={showCollections=false;showSmartCollections=true},onDismiss={showCollections=false})
-    if(showSmartCollections) SmartCollectionsDialog(smartRules,onSave={extrasStore.saveRules(it);extrasRevision++},onDismiss={showSmartCollections=false})
-    allCollections.firstOrNull { it.id==openCollectionId }?.let { collection ->
-        CollectionContentsDialog(collection,state.entries,onOpen={id -> openCollectionId=null; onOpenDetail(id)},onDismiss={openCollectionId=null})
-    }
-
-    RenameSuggestionsPanel(visible = showRenameSuggestions, entries = state.entries,
-        onClose = { showRenameSuggestions = false },
-        onIdentify = { id -> showRenameSuggestions = false; onOpenMatch(id) },
-        onChanged = { viewModel.recheckFiles() })
-
-    if (showMissingFiles) {
-        MissingFilesDialog(files = missingFiles, checking = state.checkingFiles, error = state.fileScanError,
-            onRecheck = { viewModel.recheckFiles() }, onDismissEntry = { viewModel.dismissMissing(it) },
-            onClose = { showMissingFiles = false })
-    }
-
-    if (showGenrePicker) {
-        com.opticast.player.ui.screens.library.LibraryGenrePickerSheet(
-            genres = genres,
-            selectedGenre = selectedGenre,
-            onGenreSelected = { selectedGenre = it; showGenrePicker = false },
-            onDismiss = { showGenrePicker = false }
-        )
-    }
+    // Gold: dialogs host extracted to library/LibraryDialogsHost.kt — saves 60+ lines
+    com.opticast.player.ui.screens.library.LibraryDialogsHost(
+        showCustomize = showCustomize,
+        tab = tab,
+        design = design,
+        designStore = designStore,
+        designRevision = designRevision,
+        onDesignRevisionChange = { designRevision = it },
+        onShowCustomizeChange = { showCustomize = it },
+        showCollections = showCollections,
+        personalCollections = personalCollections,
+        entries = state.entries,
+        onShowCollectionsChange = { showCollections = it },
+        openCollectionId = openCollectionId,
+        onOpenCollectionIdChange = { openCollectionId = it },
+        showSmartCollections = showSmartCollections,
+        smartRules = smartRules,
+        extrasStore = extrasStore,
+        extrasRevision = extrasRevision,
+        onExtrasRevisionChange = { extrasRevision = it },
+        onShowSmartCollectionsChange = { showSmartCollections = it },
+        allCollections = allCollections,
+        showRenameSuggestions = showRenameSuggestions,
+        onShowRenameSuggestionsChange = { showRenameSuggestions = it },
+        onOpenMatch = onOpenMatch,
+        viewModel = viewModel,
+        showMissingFiles = showMissingFiles,
+        missingFiles = missingFiles,
+        fileScanError = state.fileScanError,
+        checkingFiles = state.checkingFiles,
+        onShowMissingFilesChange = { showMissingFiles = it },
+        showGenrePicker = showGenrePicker,
+        genres = genres,
+        selectedGenre = selectedGenre,
+        onSelectedGenreChange = { selectedGenre = it },
+        onShowGenrePickerChange = { showGenrePicker = it },
+        confirmDeleteIds = confirmDeleteIds,
+        onConfirmDeleteIdsChange = { confirmDeleteIds = it },
+        onPerformDelete = { performDelete(it) },
+        onExitSelection = { exitSelection() },
+        onOpenDetail = onOpenDetail
+    )
 
 
     // Gold: Floating multi-select action bar extracted to library/LibrarySelectionBar.kt
@@ -1101,88 +1045,26 @@ fun LibraryScreen(
     )
     }
 
-    menuEntry?.let { entry ->
-        val targets = if (menuIsWholeShow) showCollection(state.entries, entry) else listOf(entry)
-        val targetIds = targets.map { it.video.id }.distinct()
-        EntryMenuSheet(
-            groupEntries = if (menuIsWholeShow) targets else null,
-            entry = entry,
-            onDismiss = { menuEntry = null },
-            onPlay = {
-                menuEntry = null
-                playEntry(targets.firstOrNull { AppContainer.playbackState.state(it.video.id)?.isWatched != true } ?: entry)
-            },
-            onDetails = {
-                menuEntry = null
-                if (menuIsWholeShow) onOpenShow(showTitleOf(entry)) else onOpenDetail(entry.video.id)
-            },
-            onMatch = {
-                menuEntry = null
-                onOpenMatch(entry.video.id)
-            },
-            onRefreshArtwork = {
-                viewModel.refreshArtwork(entry)
-                menuEntry = null
-            },
-            onToggleWatched = { watched ->
-                targets.forEach { viewModel.setWatched(it.video.id, it.video.durationMs, watched) }
-                menuEntry = null
-            },
-            onToggleFavorite = {
-                if (targets.all { AppContainer.favorites.isFavorite(it.video.id) }) AppContainer.favorites.remove(targetIds)
-                else AppContainer.favorites.add(targetIds)
-                menuEntry = null
-            },
-            onForget = {
-                viewModel.clearMetadata(entry.video.id)
-                menuEntry = null
-            },
-            onShare = {
-                menuEntry = null
-                shareVideos(targetIds)
-            },
-            onDelete = {
-                menuEntry = null
-                confirmDeleteIds = targetIds
-            },
-            onSelect = {
-                menuEntry = null
-                selectionMode = true
-                targetIds.forEach { if (it !in selectedIds) selectedIds.add(it) }
-            }
-                        )
-    }
+    // Gold: menu host extracted to library/LibraryMenuHost.kt — saves 50+ lines
+    com.opticast.player.ui.screens.library.LibraryMenuHost(
+        menuEntry = menuEntry,
+        menuIsWholeShow = menuIsWholeShow,
+        entries = state.entries,
+        selectionMode = selectionMode,
+        selectedIds = selectedIds,
+        onMenuEntryChange = { menuEntry = it },
+        onPlay = { playEntry(it) },
+        onOpenShow = onOpenShow,
+        onOpenDetail = onOpenDetail,
+        onOpenMatch = onOpenMatch,
+        onRefreshArtwork = { viewModel.refreshArtwork(it) },
+        onSetWatched = { id, dur, watched -> viewModel.setWatched(id, dur, watched) },
+        onClearMetadata = { viewModel.clearMetadata(it) },
+        onShare = { shareVideos(it) },
+        onConfirmDelete = { confirmDeleteIds = it },
+        onSelectionModeChange = { selectionMode = it }
+    )
 
-    confirmDeleteIds?.let { ids ->
-        AlertDialog(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
-            onDismissRequest = { confirmDeleteIds = null },
-            title = {
-                Text(if (ids.size == 1) "Delete this video?" else "Delete ${ids.size} videos?")
-            },
-            text = {
-                Text(
-                    if (ids.size == 1) {
-                        "The file will be permanently deleted from your device storage."
-                    } else {
-                        "These ${ids.size} files will be permanently deleted from your device storage."
-                    }
-                        )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmDeleteIds = null
-                    performDelete(ids)
-                    exitSelection()
-                }) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { confirmDeleteIds = null }) { Text("Cancel") }
-            }
-                        )
-    }
     } // Library-only visual style; never changes the player theme or density.
 }
 

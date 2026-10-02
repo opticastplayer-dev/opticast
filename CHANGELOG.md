@@ -1,6 +1,13 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.115 (164) — 2026-10-02
+**Current:** v2.6.116 (165) — 2026-10-02
+
+## v2.6.116 (165) — 2026-10-02
+
+- Gold Architecture Step 3: Split LibraryScreen 1199→1081 lines — safe incremental 9.2→9.4/10
+- New library components: LibraryPermissionHandler.kt, LibraryDeleteHandler.kt, LibraryDialogsHost.kt, LibraryMenuHost.kt, LibraryUiState.kt, LibraryDiscoverySections.kt — single responsibility, thin composable
+- LibraryScreen now uses deleteHandler for performDelete, permissionState for permission, dialogsHost for all dialogs, menuHost for entry menu
+- Keeps FileActions, SelectionState, SelectionBar, BottomSheets, FastScrollThumb from v2.6.115, domain UseCases, TmdbRepository, EmptyState premium, fail-fast, baseline 110 locked
 
 ## v2.6.115 (164) — 2026-10-02
 

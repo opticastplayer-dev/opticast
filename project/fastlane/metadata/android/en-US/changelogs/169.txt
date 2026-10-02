@@ -1,9 +1,0 @@
-OptiCast v2.6.120
-
-- Clean professional repository: deleted 14 older GitHub releases (kept only v2.6.119→v2.6.120), deleted 14 older tags (kept only v2.6.119→v2.6.120), reduced topics 19→6 core (android, video-player, kotlin, offline-first, open-source, mpv), disabled Projects tab
-- Root cleanup: removed 39MB APK, duplicate release.yml, uploads/ screenshots, fdroid yml - updated .gitignore to *.apk, *.aab, uploads/, *.jpg, build/, .idea/
-- Docs cleanup: removed 20 internal technical markdown (ALTERNATIVETO, BULLETPROOF-BUILD, FDROID_MR, REDDIT, SECURE_PROXY, VERSION_SAFEGUARD etc.) - kept only index.html, sitemap.xml, PRIVACY.md, FAQ.md, robots.txt, showcase/
-- Fastlane cleanup: removed 15 old changelogs (153-167.txt) - kept only 168→169.txt latest for F-Droid
-- Code cleanup: removed unused LibraryViewModelImproved.kt (duplicate of LibraryViewModel)
-- Keeps v2.6.119 features: auto check updates on startup, global install prompt from any screen, removed WhatsNew card from library, increased poster size 320-520 dp scale 1.35 alpha 0.7, simplified update UI
-- No size increase, still 38M, manual DI 0KB, 9.6/10 architecture, professional repo

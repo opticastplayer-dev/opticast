@@ -366,63 +366,23 @@ fun LibraryScreen(
     var menuEntry by remember { mutableStateOf<LibraryEntry?>(null) }
     var menuIsWholeShow by remember { mutableStateOf(false) }
 
-    // Multi-select mode for bulk share / delete.
-    var selectionMode by rememberSaveable { mutableStateOf(false) }
-    val selectedIds = rememberSaveable(saver = androidx.compose.runtime.saveable.listSaver<androidx.compose.runtime.snapshots.SnapshotStateList<Long>, Long>(
-        save = { it.toList() }, restore = { values -> mutableStateListOf<Long>().apply { addAll(values) } }
-    )) { mutableStateListOf<Long>() }
-    var confirmDeleteIds by remember { mutableStateOf<List<Long>?>(null) }
-    var pendingWriteDelete by remember { mutableStateOf<List<Long>>(emptyList()) }
-    var legacyDeleteTick by remember { mutableStateOf(0) }
+    // Gold: selection state extracted to library/LibrarySelectionState.kt
+    val selectionState = com.opticast.player.ui.screens.library.rememberLibrarySelectionState()
+    var selectionMode by selectionState.selectionMode
+    val selectedIds = selectionState.selectedIds
+    var confirmDeleteIds by selectionState.confirmDeleteIds
+    var pendingWriteDelete by selectionState.pendingWriteDelete
+    var legacyDeleteTick by selectionState.legacyDeleteTick
     fun fileActionError(text: String) { android.widget.Toast.makeText(context, text, android.widget.Toast.LENGTH_LONG).show() }
 
     fun uriOf(videoId: Long): Uri? =
-        AppContainer.mediaScanner.byId(videoId)?.uri?.let { Uri.parse(it) }
+        com.opticast.player.ui.screens.library.LibraryFileActions.uriOf(videoId)
 
-    fun mimeForVideo(uri: Uri, displayName: String): String {
-        val fromResolver = context.contentResolver.getType(uri)
-        if (fromResolver != null && fromResolver != "application/octet-stream") return fromResolver
-        val ext = displayName.substringAfterLast('.', "").lowercase()
-        return when (ext) {
-            "mp4", "m4v" -> "video/mp4"
-            "mkv" -> "video/x-matroska"
-            "webm" -> "video/webm"
-            "avi" -> "video/x-msvideo"
-            "mov" -> "video/quicktime"
-            "3gp" -> "video/3gpp"
-            "ts", "m2ts" -> "video/mp2ts"
-            "flv" -> "video/x-flv"
-            "wmv" -> "video/x-ms-wmv"
-            else -> "video/*"
-        }
-    }
+    fun mimeForVideo(uri: Uri, displayName: String): String =
+        com.opticast.player.ui.screens.library.LibraryFileActions.mimeForVideo(context, uri, displayName)
 
-    fun shareVideos(ids: List<Long>) {
-        val videos = ids.distinct().mapNotNull { AppContainer.mediaScanner.byId(it) }
-        if (videos.size != ids.distinct().size) { fileActionError("Some selected files are unavailable. Recheck storage before sharing the whole selection."); return }
-        val uris = videos.map { Uri.parse(it.uri) }
-        if (videos.isEmpty() || uris.isEmpty()) return
-        runCatching {
-            if (uris.size == 1) {
-                val video = videos.first()
-                val send = Intent(Intent.ACTION_SEND)
-                    .putExtra(Intent.EXTRA_STREAM, uris.first())
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    .setType(mimeForVideo(uris.first(), video.name))
-                send.clipData = android.content.ClipData.newUri(context.contentResolver, video.name, uris.first())
-                context.startActivity(Intent.createChooser(send, "Share video"))
-            } else {
-                val send = Intent(Intent.ACTION_SEND_MULTIPLE)
-                    .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    .setType("video/*")
-                send.clipData = android.content.ClipData.newUri(context.contentResolver, "Selected videos", uris.first()).apply {
-                    uris.drop(1).forEach { addItem(android.content.ClipData.Item(it)) }
-                }
-                context.startActivity(Intent.createChooser(send, "Share ${uris.size} videos"))
-            }
-        }.onFailure { fileActionError("Could not open sharing. No files were changed.") }
-    }
+    fun shareVideos(ids: List<Long>) =
+        com.opticast.player.ui.screens.library.LibraryFileActions.shareVideos(context, ids)
 
     val deleteLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
@@ -1109,108 +1069,36 @@ fun LibraryScreen(
     }
 
     if (showGenrePicker) {
-        ModalBottomSheet(onDismissRequest = { showGenrePicker = false },
-            containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.90f), tonalElevation = 0.dp) {
-            Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = DiscoveryGutterDp.dp).navigationBarsPadding()) {
-                Text("Genre", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                (listOf("") + genres).forEach { genre ->
-                    Row(Modifier.fillMaxWidth().selectable(selected = selectedGenre == genre,
-                        onClick = { selectedGenre = genre; showGenrePicker = false }).padding(vertical = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically) {
-                        Text(genre.ifBlank { "All genres" }, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-                        if (selectedGenre == genre) Icon(Icons.Filled.Check, "Selected", tint = MaterialTheme.colorScheme.primary)
-                    }
-                }
-            }
-        }
+        com.opticast.player.ui.screens.library.LibraryGenrePickerSheet(
+            genres = genres,
+            selectedGenre = selectedGenre,
+            onGenreSelected = { selectedGenre = it; showGenrePicker = false },
+            onDismiss = { showGenrePicker = false }
+        )
     }
 
 
-    // Floating multi-select action bar - ultra fast no animation
-    if (selectionMode) Box(
-        Modifier
-            .align(Alignment.BottomCenter)
-            .padding(bottom = 100.dp)
-    ) {
-        Surface(
-            shape = RoundedCornerShape(30.dp),
-            color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.95f),
-            shadowElevation = 12.dp,
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.10f))
-                        ) {
-            Row(
-                Modifier.padding(start = 18.dp, end = 6.dp, top = 4.dp, bottom = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-                        ) {
-                Text(
-                    "${selectedIds.size} selected",
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(end = 8.dp)
-                        )
-                IconButton(
-                    onClick = {
-                        val chosen = state.entries.filter { it.video.id in selectedIds }
-                        chosen.forEach {
-                            viewModel.setWatched(it.video.id, it.video.durationMs, true)
-                        }
-                        exitSelection()
-                    }
-                        ) {
-                    Icon(
-                        Icons.Filled.CheckCircle,
-                        contentDescription = "Mark selected as watched",
-                        tint = MaterialTheme.colorScheme.primary
-                        )
-                }
-                IconButton(
-                    onClick = {
-                        if (selectedIds.isNotEmpty()) {
-                            if (tab == "favs" || selectedIds.all { AppContainer.favorites.isFavorite(it) }) AppContainer.favorites.remove(selectedIds.toList())
-                            else AppContainer.favorites.add(selectedIds.toList())
-                            exitSelection()
-                        }
-                    }
-                        ) {
-                    Icon(
-                        if (tab == "favs" || selectedIds.all { AppContainer.favorites.isFavorite(it) }) Icons.Outlined.FavoriteBorder else Icons.Filled.Favorite,
-                        contentDescription = if (tab == "favs" || selectedIds.all { AppContainer.favorites.isFavorite(it) }) "Remove selected from favorites" else "Add selected to favorites",
-                        tint = MaterialTheme.colorScheme.primary
-                        )
-                }
-                IconButton(
-                    onClick = {
-                        if (selectedIds.isNotEmpty()) {
-                            shareVideos(selectedIds.toList())
-                        }
-                    }
-                        ) {
-                    Icon(
-                        Icons.Filled.Share,
-                        contentDescription = "Share selected",
-                        tint = MaterialTheme.colorScheme.primary
-                        )
-                }
-                IconButton(
-                    onClick = {
-                        if (selectedIds.isNotEmpty()) confirmDeleteIds = selectedIds.toList()
-                    }
-                        ) {
-                    Icon(
-                        Icons.Filled.Delete,
-                        contentDescription = "Delete selected",
-                        tint = MaterialTheme.colorScheme.error
-                        )
-                }
-                IconButton(onClick = { exitSelection() }) {
-                    Icon(
-                        Icons.Filled.Close,
-                        contentDescription = "Exit selection",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                }
+    // Gold: Floating multi-select action bar extracted to library/LibrarySelectionBar.kt
+    if (selectionMode) com.opticast.player.ui.screens.library.LibrarySelectionBar(
+        selectedIds = selectedIds.toList(),
+        tab = tab,
+        onMarkWatched = {
+            val chosen = state.entries.filter { it.video.id in selectedIds }
+            chosen.forEach { viewModel.setWatched(it.video.id, it.video.durationMs, true) }
+            exitSelection()
+        },
+        onToggleFavorite = {
+            if (selectedIds.isNotEmpty()) {
+                if (tab == "favs" || selectedIds.all { AppContainer.favorites.isFavorite(it) }) AppContainer.favorites.remove(selectedIds.toList())
+                else AppContainer.favorites.add(selectedIds.toList())
+                exitSelection()
             }
-        }
-    }
+        },
+        onShare = { if (selectedIds.isNotEmpty()) shareVideos(selectedIds.toList()) },
+        onDelete = { if (selectedIds.isNotEmpty()) confirmDeleteIds = selectedIds.toList() },
+        onExit = { exitSelection() },
+        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 100.dp)
+    )
     }
 
     menuEntry?.let { entry ->
@@ -1298,38 +1186,14 @@ fun LibraryScreen(
     } // Library-only visual style; never changes the player theme or density.
 }
 
-/** Fast-scroll thumb overlay like Infuse - low-RAM safe with derivedStateOf + graphicsLayer */
+/** Fast-scroll thumb overlay like Infuse - low-RAM safe with derivedStateOf + graphicsLayer
+ * Gold: extracted to library/LibraryFastScrollThumb.kt, kept wrapper for backward compat
+ */
 @Composable
 fun FastScrollThumb(
     gridState: LazyGridState,
     modifier: Modifier = Modifier
 ) {
-    val showThumb by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.isScrollInProgress } }
-    val firstVisible by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.firstVisibleItemIndex } }
-    val totalItems by androidx.compose.runtime.remember { androidx.compose.runtime.derivedStateOf { gridState.layoutInfo.totalItemsCount } }
-    androidx.compose.animation.AnimatedVisibility(
-        visible = showThumb && totalItems > 20,
-        enter = androidx.compose.animation.fadeIn(),
-        exit = androidx.compose.animation.fadeOut(),
-        modifier = modifier
-    ) {
-        Box(
-            Modifier
-                .fillMaxHeight()
-                .width(32.dp)
-                .padding(vertical = 80.dp),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            val progress = if (totalItems > 0) firstVisible.toFloat() / totalItems else 0f
-            Box(
-                Modifier
-                    .fillMaxHeight(0.1f)
-                    .width(4.dp)
-                    .graphicsLayer { translationY = progress * 200f }
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.6f))
-            )
-        }
-    }
+    com.opticast.player.ui.screens.library.LibraryFastScrollThumb(gridState, modifier)
 }
 

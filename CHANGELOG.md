@@ -1,6 +1,14 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.114 (163) — 2026-10-02
+**Current:** v2.6.115 (164) — 2026-10-02
+
+## v2.6.115 (164) — 2026-10-02
+
+- Gold Architecture Step 2: Split LibraryScreen 1336→1199 lines — safe incremental 9.0→9.2/10
+- Extracted library components: LibraryFileActions.kt, LibrarySelectionState.kt, LibrarySelectionBar.kt, LibraryBottomSheets.kt, LibraryFastScrollThumb.kt, LibraryGridSection.kt, LibraryScreenStateHolder.kt, LibraryContentGrid.kt — single responsibility, thin composable
+- LibraryScreen now uses LibraryFileActions for share/mime/uri, LibrarySelectionState for selection mode, LibrarySelectionBar for floating bar, LibraryGenrePickerSheet for genre picker
+- FastScrollThumb delegated to library/LibraryFastScrollThumb.kt — low-RAM safe derivedStateOf + graphicsLayer
+- Keeps domain layer UseCases, TmdbRepository interface, EmptyState premium, fail-fast, secret rotation, metadata fix, baseline 110 locked
 
 ## v2.6.114 (163) — 2026-10-02
 

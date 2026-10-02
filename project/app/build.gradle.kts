@@ -48,8 +48,8 @@ android {
         }
         // SINGLE SOURCE OF TRUTH: versionCode/versionName defined once — prevents mismatch
         // Bump both together: versionCode must always increase, versionName must match tag
-        versionCode = 159
-        versionName = "2.6.110"
+        versionCode = 160
+        versionName = "2.6.111"
         vectorDrawables { useSupportLibrary = true }
         // Secure proxy secret — injected as BuildConfig field, not plain string in code
         // local.properties: tmdb.proxy.secret=YOUR_SECRET, or env TMDB_PROXY_SECRET

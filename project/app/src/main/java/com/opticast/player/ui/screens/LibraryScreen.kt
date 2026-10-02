@@ -1149,6 +1149,8 @@ fun LibraryScreen(
                         ) {
                         PosterCard(
                             entry = entry,
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope,
                             onClick = {
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else onOpenDetail(entry.video.id)
@@ -1200,6 +1202,8 @@ fun LibraryScreen(
                         ) {
                         PosterCard(
                             entry = entry,
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedVisibilityScope = animatedVisibilityScope,
                             onClick = {
                                 if (selectionMode) toggleSelect(entry.video.id)
                                 else onOpenDetail(entry.video.id)
@@ -1258,6 +1262,8 @@ fun LibraryScreen(
                         lazyItems(completedMovies, key = { "watched-movie-${it.video.id}" }) { entry ->
                             SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp).clip(RoundedCornerShape(12.dp)), onToggle = { toggleSelect(entry.video.id) }) {
                                 PosterCard(entry = entry,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                                     onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
                                     onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
                                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)))

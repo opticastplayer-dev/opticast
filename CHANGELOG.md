@@ -1,6 +1,15 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.110 (159) — 2026-10-01
+**Current:** v2.6.111 (160) — 2026-10-02
+
+## v2.6.111 (160) — 2026-10-02
+
+- Gold Step 2: Empty states + SharedElement — premium UX like Infuse
+- EmptyState: new component ui/components/EmptyState.kt with spring animation (scale + alpha, bouncy), large 96dp Surface primaryContainer, 48dp icon, bold title, clear actions — used for library empty, search no results, offline, no internet
+- EmptyLibrary now uses EmptyLibraryPremium — simple professional, no technical bullets
+- SharedElement: LibraryGrid accepts sharedTransitionScope + animatedVisibilityScope, PosterCard applies sharedElement key poster-{id} via rememberSharedContentState, DetailScreen already had sharedElement poster-{id} — poster morphs grid → detail header 300ms spring
+- All 4 PosterCard calls in LibraryScreen now pass sharedTransitionScope + animatedVisibilityScope
+- Keeps fail-fast, secret rotation, metadata fix, download fix, baseline 110 locked
 
 ## v2.6.110 (159) — 2026-10-01
 

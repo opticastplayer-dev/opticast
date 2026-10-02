@@ -1,5 +1,8 @@
 package com.opticast.player.ui.screens
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -8,7 +11,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -24,6 +26,7 @@ import com.opticast.player.ui.components.PosterCard
  * - ContentType: helps Compose skip recomposition
  * - AnimateItem: smooth animations when grid changes
  * - Offline-first: uses cached posters, no network while scrolling
+ * - SharedElement: poster morphs to detail header (gold standard)
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -36,6 +39,8 @@ fun LibraryGrid(
     onPosterClick: (LibraryEntry) -> Unit,
     onPosterLongClick: (LibraryEntry) -> Unit,
     modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
     headerContent: @Composable () -> Unit = {},
     filterContent: @Composable () -> Unit = {},
     statsContent: @Composable () -> Unit = {},
@@ -62,12 +67,14 @@ fun LibraryGrid(
             key = { it.video.id },
             contentType = { "poster" }
         ) { entry ->
-            // Stability: animateItem for smooth grid changes, stable key prevents jank
+            // Gold: SharedElement for poster morph + animateItem for smooth grid
             PosterCard(
                 entry = entry,
                 onClick = { onPosterClick(entry) },
                 onLongClick = { onPosterLongClick(entry) },
-                modifier = Modifier.animateItem()
+                modifier = Modifier.animateItem(),
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
             )
         }
     }

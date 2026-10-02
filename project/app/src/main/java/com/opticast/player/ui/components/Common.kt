@@ -379,8 +379,8 @@ fun PosterCard(
     val fallbackTitle = remember(entry.video.name, entry.video.parsed.title) { entry.video.parsed.title.ifBlank { entry.video.name } }
     val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) }
 
-    // Ultra-fast: no press animation, no graphicsLayer scale - instant, no recomposition during scroll
-    val sharedModifier = modifier
+    // Gold: SharedElement for poster morph if scope provided, else ultra-fast no animation
+    val baseModifier = modifier
         .fillMaxWidth()
         .aspectRatio(2f / 3f)
         .clip(RoundedCornerShape(12.dp))
@@ -391,6 +391,18 @@ fun PosterCard(
         )
         .background(MaterialTheme.colorScheme.surfaceContainer)
         .clip(RoundedCornerShape(12.dp))
+
+    val sharedModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            baseModifier.sharedElement(
+                rememberSharedContentState(key = "poster-${entry.video.id}"),
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+        }
+    } else {
+        baseModifier
+    }
+
     Box(
         modifier = sharedModifier,
     ) {

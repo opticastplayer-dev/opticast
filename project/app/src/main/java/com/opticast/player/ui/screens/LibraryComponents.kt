@@ -5,6 +5,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import com.opticast.player.ui.components.EmptyLibraryPremium
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -571,68 +572,12 @@ internal fun FilterChipsRow(sortBy: String, onSortChange: (String) -> Unit, sele
 
 @Composable
 internal fun EmptyLibrary(fromSearch: Boolean) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp, vertical = 48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            Icons.Filled.Movie,
-            contentDescription = null,
-            modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-        )
-        Spacer(Modifier.height(16.dp))
-        Text(
-            text = if (fromSearch) "Nothing matches" else "Your library is empty",
-            style = MaterialTheme.typography.headlineSmall,
-            textAlign = TextAlign.Center
-        )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = if (fromSearch) {
-                "Try a different title or choose All genres."
-            } else {
-                "OptiCast looks for videos in your Movies, DCIM, and Download folders. Add a movie to your device, then pull to refresh."
-            },
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        if (!fromSearch) {
-            Spacer(Modifier.height(16.dp))
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(Modifier.padding(14.dp)) {
-                    Text(
-                        "Where are my videos?",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        "• Check Settings → Excluded folders — maybe a folder is excluded\n" +
-                        "• Files starting with dot or in Android/data are hidden by system\n" +
-                        "• Grant video permission and pull to refresh\n" +
-                        "• Posters are fetched automatically via secure proxy, no API key needed, and cached for offline",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            Spacer(Modifier.height(16.dp))
-            Text(
-                "Quick tour: swipe down to refresh, tap search for titles, long-press a poster for options. Your videos, organized.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
+    // Gold Standard: use premium empty state with spring animation
+    EmptyLibraryPremium(
+        fromSearch = fromSearch,
+        onOpenSettings = null,
+        onRefresh = null
+    )
 }
 
 @Composable

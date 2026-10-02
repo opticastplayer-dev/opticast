@@ -1,6 +1,14 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.118 (167) — 2026-10-02
+**Current:** v2.6.119 (168) — 2026-10-02
+
+## v2.6.119 (168) — 2026-10-02
+
+- Remove unnecessary info under check for updates: simplified App updates - removed OFFLINE-FIRST technical bullets, now clean "Up to date" + toggle + buttons
+- Automatically check for app updates on startup: AutoUpdateDialog checks after 2s automatically, suggests download & install when newer available
+- When background download complete always allow to install regardless of screen: added readyToInstall StateFlow, triggerInstall() with FLAG_ACTIVITY_NEW_TASK, GlobalUpdateInstallDialog() in MainActivity shows "Ready to install" from any screen
+- Remove popup what's new card when app is updated in library screen: removed WhatsNewCard from LibraryScreen LazyVerticalGrid and WhatsNewDialog from MainActivity
+- Slightly increase size of media information background poster: heroHeight 280-460→320-520 dp, scale 1.2→1.35, alpha 0.6→0.7
 
 ## v2.6.118 (167) — 2026-10-02
 

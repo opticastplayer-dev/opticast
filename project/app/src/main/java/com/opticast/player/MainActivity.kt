@@ -111,8 +111,10 @@ class MainActivity : ComponentActivity() {
                 useDeviceColors = settings.useDeviceColors,
             ) {
                 OptiCastApp(libraryReturnRevision.intValue, returnDetailId.longValue, returnShowTitle.value)
-                com.opticast.player.ui.screens.WhatsNewDialog()
+                // REMOVED WhatsNewDialog popup - user requested remove popup what's new card when app is updated in library screen
+                // com.opticast.player.ui.screens.WhatsNewDialog() removed
                 com.opticast.player.ui.screens.AutoUpdateDialog()
+                com.opticast.player.ui.screens.GlobalUpdateInstallDialog()
             }
         }
     }

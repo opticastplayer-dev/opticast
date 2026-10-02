@@ -70,6 +70,8 @@ object UpdateChecker {
     val downloadProgress: kotlinx.coroutines.flow.StateFlow<Int> = _downloadProgress
     private val _isDownloading = kotlinx.coroutines.flow.MutableStateFlow(false)
     val isDownloading: kotlinx.coroutines.flow.StateFlow<Boolean> = _isDownloading
+    private val _readyToInstall = kotlinx.coroutines.flow.MutableStateFlow<File?>(null)
+    val readyToInstall: kotlinx.coroutines.flow.StateFlow<File?> = _readyToInstall
     private var downloadJob: kotlinx.coroutines.Job? = null
 
     @Serializable
@@ -507,28 +509,46 @@ object UpdateChecker {
 
             _downloadProgress.value = 100
             _isDownloading.value = false
+            _readyToInstall.value = file
 
-            // Trigger install via FileProvider
+            // Trigger install via FileProvider - always allow to install regardless of screen user is at
             withContext(Dispatchers.Main) {
-                val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-                val intent = Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(uri, "application/vnd.android.package-archive")
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                }
-                context.startActivity(intent)
+                triggerInstall(context, file)
             }
             true
         } catch (e: Exception) {
             _isDownloading.value = false
+            _readyToInstall.value = null
             false
         }
+    }
+
+    fun triggerInstall(context: Context, file: File = File(context.cacheDir, "update.apk")): Boolean {
+        return try {
+            if (!file.exists()) return false
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/vnd.android.package-archive")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(intent)
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    fun clearReadyToInstall() {
+        _readyToInstall.value = null
+        _downloadProgress.value = 0
     }
 
     // New: Start download in global scope that survives navigation
     fun startDownloadInBackground(context: Context, downloadUrl: String, onProgress: (Int) -> Unit = {}, onResult: (Boolean) -> Unit = {}) {
         // Cancel previous if any
         downloadJob?.cancel()
+        _readyToInstall.value = null
         downloadJob = downloadScope.launch {
             val result = downloadAndInstall(context, downloadUrl, onProgress)
             withContext(Dispatchers.Main) { onResult(result) }

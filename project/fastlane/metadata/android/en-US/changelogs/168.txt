@@ -1,0 +1,8 @@
+OptiCast v2.6.119
+
+- Remove unnecessary info under check for updates: simplified App updates section - removed OFFLINE-FIRST technical bullets, data sipping details, emoji spam - now clean professional "Up to date" + "Automatic update checks" toggle + "Check for updates" + "Open GitHub"
+- Automatically check for app updates on startup: AutoUpdateDialog now checks after 2s on startup automatically (was 3s + only if autoCheck enabled) - always suggests download and install option when newer version available on GitHub, respects skipped versions
+- When background download complete always allow to install regardless of screen: added readyToInstall StateFlow in UpdateChecker, triggerInstall() with FLAG_ACTIVITY_NEW_TASK, GlobalUpdateInstallDialog() in MainActivity observes readyToInstall and shows "Ready to install" dialog from any screen (library, detail, settings, player return) - user can install now, dismiss, or later
+- Remove popup what's new card when app is updated in library screen: removed WhatsNewCard item from LibraryScreen.kt LazyVerticalGrid (was showing in library on every update), removed WhatsNewDialog() from MainActivity - no popup after update in library, clean UX
+- Slightly increase size of media information background poster: DetailScreen heroHeight 280-460 -> 320-520 dp, poster scale 1.2 -> 1.35, alpha 0.6 -> 0.7 - slightly larger immersive background, better readability
+- Keeps architecture 9.6/10, domain UseCases, TmdbRepository, 38M, manual DI 0KB

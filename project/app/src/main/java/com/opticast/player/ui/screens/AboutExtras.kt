@@ -37,7 +37,6 @@ internal fun UpdateCheckOption(version: String) {
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("App updates", style = MaterialTheme.typography.titleMedium)
-        // Always show Up To Date notification when installed matches GitHub - FIX: show installed version 2.6.78 not old GitHub 2.6.77
         if (isUpToDate && upToDateVersion != null) {
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
@@ -51,12 +50,12 @@ internal fun UpdateCheckOption(version: String) {
                     Text("✅", style = MaterialTheme.typography.titleMedium)
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            "Up To Date — ${installedVersion}",
+                            "Up to date — ${installedVersion}",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Text(
-                            "You have the latest version from GitHub! 🎉",
+                            "You have the latest version.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -64,12 +63,8 @@ internal fun UpdateCheckOption(version: String) {
                 }
             }
         }
-        Text(
-            "OFFLINE-FIRST: Checks GitHub only once when internet detected (not every 6h), minimal data usage. Downloads and installs within app. Up To Date card only in Settings, not library — respects offline use.",
-            style = MaterialTheme.typography.bodySmall
-        )
         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Check when internet detected", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+            Text("Automatic update checks", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
             Switch(
                 checked = autoCheckEnabled,
                 onCheckedChange = { enabled ->
@@ -85,11 +80,6 @@ internal fun UpdateCheckOption(version: String) {
                 }
             )
         }
-        Text(
-            if (autoCheckEnabled) "✅ Enabled — checks once when internet detected (24h min, 7 days max) — data sipping, offline-first" else "❌ Disabled — only manual checks",
-            style = MaterialTheme.typography.bodySmall,
-            color = if (autoCheckEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-        )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(
                 onClick = {
@@ -132,7 +122,7 @@ internal fun UpdateCheckOption(version: String) {
         val showProgress = if (globalDownloading) globalProgress else progress
         if (showDownloading) {
             LinearProgressIndicator(progress = { showProgress / 100f }, modifier = Modifier.fillMaxWidth())
-            Text("Downloading: $showProgress% — continues even if you scroll or go to Library", style = MaterialTheme.typography.bodySmall)
+            Text("Downloading: $showProgress%", style = MaterialTheme.typography.bodySmall)
         }
     }
 
@@ -148,7 +138,7 @@ internal fun UpdateCheckOption(version: String) {
                     Text("Latest: ${info.version} (code ${info.versionCode})")
                     if (!info.isNewer) {
                         Text(
-                            "You are already on the latest version! 🎉 Your app is fully updated and ready.",
+                            "You are already on the latest version.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -163,7 +153,7 @@ internal fun UpdateCheckOption(version: String) {
                     } else if (info.changelog.isNotBlank() && !info.isNewer) {
                         Text("Changelog:", style = MaterialTheme.typography.titleSmall)
                         Text(
-                            "You have the latest version. No new updates available.",
+                            "You have the latest version.",
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -314,19 +304,18 @@ internal fun AutoUpdateDialog() {
     var progress by remember { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
 
-    // Background auto check for updates on app startup - allowed
+    // Automatically check for app updates on startup then suggest option to download and install - user request
     LaunchedEffect(Unit) {
-        // Delay 3s to let app start, then check if update available from background auto check
-        kotlinx.coroutines.delay(3000)
-        if (!UpdateChecker.isAutoCheckEnabled(context)) return@LaunchedEffect
+        // Delay 2s to let app start, then check for updates automatically
+        kotlinx.coroutines.delay(2000)
         try {
             val info = UpdateChecker.getAvailableUpdateInfo(context)
             if (info != null && info.isNewer && !UpdateChecker.isSkipped(context, info.version)) {
                 updateInfo = info
                 show = true
             } else {
-                // OFFLINE-FIRST: If no stored info, try fresh check only when internet detected (respects 24h min, 7 days max) - data sipping
-                val fresh = UpdateChecker.checkWhenInternetDetected(context)
+                // Automatically check GitHub for updates on startup - always suggest if newer
+                val fresh = UpdateChecker.checkForUpdate(context, force = false)
                 if (fresh != null && fresh.isNewer && !UpdateChecker.isSkipped(context, fresh.version)) {
                     updateInfo = fresh
                     show = true
@@ -357,7 +346,7 @@ internal fun AutoUpdateDialog() {
                         LinearProgressIndicator(progress = { progress / 100f }, modifier = Modifier.fillMaxWidth())
                         Text("Downloading: $progress%", style = MaterialTheme.typography.bodySmall)
                     }
-                    Text("OFFLINE-FIRST: checks once when internet detected (24h min, 7 days max) — data sipping", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Checking for updates automatically.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
             confirmButton = {
@@ -398,3 +387,51 @@ internal fun AutoUpdateDialog() {
         )
     }
 }
+
+@Composable
+internal fun GlobalUpdateInstallDialog() {
+    val context = LocalContext.current
+    val readyFile by UpdateChecker.readyToInstall.collectAsState()
+    var show by remember { mutableStateOf(false) }
+
+    LaunchedEffect(readyFile) {
+        if (readyFile != null && readyFile!!.exists()) {
+            show = true
+        } else {
+            show = false
+        }
+    }
+
+    if (show) {
+        val file = readyFile ?: return
+        AlertDialog(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
+            onDismissRequest = { 
+                // Allow dismiss but keep file for later install
+                show = false 
+            },
+            title = { Text("Ready to install") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Update downloaded and ready to install.", style = MaterialTheme.typography.bodyMedium)
+                    Text("You can install it now from any screen.", style = MaterialTheme.typography.bodySmall)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    UpdateChecker.triggerInstall(context, file)
+                }) { Text("Install now") }
+            },
+            dismissButton = {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    TextButton(onClick = {
+                        UpdateChecker.clearReadyToInstall()
+                        show = false
+                    }) { Text("Dismiss") }
+                    TextButton(onClick = { show = false }) { Text("Later") }
+                }
+            }
+        )
+    }
+}
+

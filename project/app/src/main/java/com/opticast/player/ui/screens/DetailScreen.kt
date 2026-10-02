@@ -378,10 +378,10 @@ fun DetailScreen(
     val posterUrl = AppContainer.posterCache.localUrl(videoId, metadata)
         ?: tmdbPosterUrl(metadata?.posterPath)
 
-    // Immersive hero: true 16:9 on wide phones, never below 280dp so the
-    // title block is never clipped.
+    // Immersive hero: slightly increased for media info background poster - user request
+    // True 16:9 on wide phones, never below 320dp so title block never clipped, slightly larger
     val configuration = LocalConfiguration.current
-    val heroHeight = ((configuration.screenWidthDp * 9f) / 16f).coerceIn(280f, 460f).dp
+    val heroHeight = ((configuration.screenWidthDp * 9f) / 16f).coerceIn(320f, 520f).dp
     val appSettings by AppContainer.settings.settings
         .collectAsStateWithLifecycle(initialValue = AppSettings())
     val launchExternal = rememberExternalPlayer { v, position, duration ->
@@ -485,10 +485,10 @@ fun DetailScreen(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .graphicsLayer {
-                                            // Scale poster slightly for background effect
-                                            scaleX = 1.2f
-                                            scaleY = 1.2f
-                                            alpha = 0.6f
+                                            // Slightly increased size for media info background poster - user request
+                                            scaleX = 1.35f
+                                            scaleY = 1.35f
+                                            alpha = 0.7f
                                         },
                                 )
                                 // Dark overlay to ensure text readability + blur effect simulation

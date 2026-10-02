@@ -589,27 +589,8 @@ fun LibraryScreen(
                     LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
                 }
             }
-            // OFFLINE-FIRST: Only show What's New once after update, not Up To Date card on every startup
-            // User request: Don't show Up To Date card in library on every app startup, only when real update available
-            // Up To Date should only show in Settings, not library - save data, offline-first
-            if (!searching) {
-                item(span = { GridItemSpan(maxLineSpan) }, contentType = "whats-new") {
-                    val context = LocalContext.current
-                    var dismissed by remember { mutableStateOf(false) }
-                    var whatsNewVersion by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.getWhatsNewVersion(context)) }
-                    val currentWhatsNew = whatsNewVersion
-                    if (!dismissed && currentWhatsNew != null) {
-                        WhatsNewCard(version = currentWhatsNew, onDismiss = {
-                            com.opticast.player.data.remote.UpdateChecker.dismissWhatsNew(context)
-                            dismissed = true
-                            whatsNewVersion = null
-                        })
-                    }
-                }
-            }
-            // REMOVED: UpToDateCard - user requested don't show in library on every startup, only show real update available
-            // Real update available is shown via AutoUpdateDialog, not Up To Date card
-            // This saves data and respects offline-first rule
+            // REMOVED: WhatsNewCard in library - user requested remove popup what's new card when app is updated in library screen
+            // What's New is now only shown via global WhatsNewDialog in MainActivity, not in library grid
             if (searching) item(key = "focused-search-controls", span = { GridItemSpan(maxLineSpan) }) {
                 Column(Modifier.fillMaxWidth().padding(horizontal = DiscoveryGutterDp.dp)) {
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -1,6 +1,11 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.119 (168) — 2026-10-02
+**Current:** v2.6.120 (169) — 2026-10-02
+
+## v2.6.120 (169) — 2026-10-02
+
+- Clean professional repository: deleted 14 older releases (kept only v2.6.120), deleted 14 older tags (kept only v2.6.120), topics 19→6 core, disabled Projects, root cleanup (39MB APK, duplicate yml, uploads, fdroid yml), docs cleanup (20 internal md removed, kept index, sitemap, PRIVACY, FAQ), fastlane cleanup (15 old changelogs removed, kept 169.txt), code cleanup (LibraryViewModelImproved removed), .gitignore updated
+- Keeps v2.6.119: auto check updates on startup, global install prompt from any screen, removed WhatsNew card, increased poster size 320-520 dp scale 1.35 alpha 0.7, simplified update UI
 
 ## v2.6.119 (168) — 2026-10-02
 

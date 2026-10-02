@@ -9,6 +9,7 @@ import com.opticast.player.data.repository.LibraryRepository
 import com.opticast.player.data.repository.LibraryRepositoryImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

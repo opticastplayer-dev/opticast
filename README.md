@@ -1,6 +1,6 @@
 # OptiCast — Your videos, beautifully organized.
 
-OptiCast is a local video player for Android. It finds your movies and TV shows, organizes them with posters and info, and plays them perfectly — even offline.
+Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and play them flawlessly OFFLINE
 
 **No ads, no tracking, open source. Focused on local playback.**
 

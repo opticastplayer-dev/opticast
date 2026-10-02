@@ -1,21 +1,21 @@
 OptiCast — Your videos, beautifully organized.
 
-OptiCast is a local video player for Android. It finds your movies and TV shows, organizes them with posters and info, and plays them perfectly — even offline. No ads, no tracking, open source.
+Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and play them flawlessly OFFLINE
 
 Why it's different:
 Most players try to do everything. OptiCast focuses on one thing: playing your own videos well. Focused local playback, no streaming catalogs, no login walls. Scans your device via MediaStore, shows Continue Watching, Recently Added, Collections. Fast, even on older phones.
 
 Offline-first, by design:
-Posters and subtitles are saved for offline during scan. Works fully offline after first scan. Update check once when internet detected, minimal data. Secure proxy for metadata, no API key needed.
+Posters and subtitles are saved for offline during scan. Works fully offline after first scan. Update check once when internet detected, minimal data.
 
 Private & simple:
-No ads, no tracking, GPL-3.0. Your media stays on device. No accounts. Small APK 38M, manual DI, no bloat. Easy to audit.
+No ads, no tracking, GPL-3.0. Your media stays on device. No accounts. Small APK, manual DI, no bloat. Easy to audit.
 
 LIBRARY:
 Finds your videos automatically, adaptive poster grid (Compact/Comfortable), Continue Watching, Movies & TV Shows, Favorites, Recently Added, Collections, search. Fast scrolling. If you don't see videos, check Settings → Excluded folders.
 
 MOVIE INFO:
-Recognizes movies/TV from filenames via TMDB via secure proxy (no key needed), posters cached offline, blurred fallback never black. Cast, genres, runtime.
+Recognizes movies/TV from filenames, posters cached offline, blurred fallback never black. Cast, genres, runtime.
 
 SUBTITLES:
 OpenSubtitles + SubDL, multi-language, always saved offline during scan, custom fonts .ttf/.otf, dual subs.
@@ -34,10 +34,7 @@ GETTING STARTED (30 seconds):
 Where are my videos? Looks in Movies, DCIM, Download via MediaStore. If missing: Settings → Excluded folders → remove exclusion, pull to refresh. Files hidden (dot) or in Android/data are hidden by system.
 
 PRIVATE:
-No ads, no tracking, GPL-3.0, media stays on device, no accounts. Permissions: Internet (metadata via proxy), Network State, Video Library, Notifications, Background Playback, Install Updates.
-
-WHAT'S NEW in 2.6.105:
-Secure proxy — no API key needed, metadata via https://tmdb-proxy-xstu.onrender.com/api/ with retry for Render waking. Honest simplicity tone — rewritten landing page, captioned screenshots, FAQ & Privacy links. First-run audited — empty state tooltip, quick tour.
+No ads, no tracking, GPL-3.0, media stays on device, no accounts. Permissions: Internet, Network State, Video Library, Notifications, Background Playback, Install Updates.
 
 LINKS:
 GitHub: https://github.com/opticastplayer-dev/opticast

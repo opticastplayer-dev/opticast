@@ -671,7 +671,6 @@ private fun DeviceInfo() {
         "Package" to context.packageName,
         "Build" to installedVersionLabel(context).removePrefix("Version "),
         "Installer" to installer.first,
-        "Signing" to "f7e5ba26...3f0240 ✓",
     )
     Box(
         modifier = Modifier
@@ -695,14 +694,14 @@ private fun DeviceInfo() {
                 ) {
                     Column {
                         Text(
-                            "⚠️ Unofficial store detected",
+                            "Notice: Third-party source",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                             color = androidx.compose.ui.graphics.Color(0xFFB3261E)
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "This APK was installed from ${installer.first}, which is not an official source. It may contain malware or be outdated. Download only from opticast.app, GitHub Releases, F-Droid, or IzzyOnDroid to stay safe. Official signing key: f7e5ba26...3f0240",
+                            "This build was installed from a source outside the official distribution channels. For security and to ensure you receive verified updates, we recommend obtaining OptiCast from official sources listed in the project documentation.",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface
                         )
@@ -711,7 +710,7 @@ private fun DeviceInfo() {
             } else {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "✓ Official source — Signing key verified f7e5ba26...3f0240",
+                    "Official distribution channel verified",
                     style = MaterialTheme.typography.bodySmall,
                     color = androidx.compose.ui.graphics.Color(0xFF2E7D32),
                     fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
@@ -736,29 +735,20 @@ private fun getInstallerInfo(context: Context): Pair<String, Boolean> {
             "com.android.packageinstaller", "com.google.android.packageinstaller",
             "com.android.shell", null
         )
-        val unofficialInstallers = mapOf(
-            "com.apkpure.aegon" to "APKPure (unofficial)",
-            "com.aptoide.aptoide" to "Aptoide (unofficial)",
-            "com.uptodown.android" to "Uptodown (unofficial)",
-            "com.apkmirror.helper" to "APKMirror (unofficial)",
-            "com.sec.android.easyMover" to "Smart Switch",
-            "com.huawei.appmarket" to "Huawei AppGallery (unofficial)",
-            "com.xiaomi.mipicks" to "GetApps (unofficial)",
-            "com.amazon.venezia" to "Amazon Appstore (unofficial)"
-        )
-        val isUnofficial = installer != null && unofficialInstallers.containsKey(installer) || 
-                          (installer != null && installer !in officialInstallers && !installer.contains("fdroid") && !installer.contains("izzy") && !installer.contains("packageinstaller") && !installer.contains("shell"))
+        val isOfficial = installer == null || installer in officialInstallers || 
+                         installer.contains("fdroid") || installer.contains("izzy") || 
+                         installer.contains("packageinstaller") || installer.contains("shell")
         val displayName = when {
-            installer == null -> "Sideload (GitHub/Website) ✓ Official"
-            unofficialInstallers.containsKey(installer) -> unofficialInstallers[installer]!!
+            installer == null -> "Direct installation (Official)"
             installer in officialInstallers -> when (installer) {
-                "org.fdroid.fdroid", "org.fdroid.fdroid.privileged" -> "F-Droid ✓ Official"
-                "org.izzyondroid.izzyondroid", "org.izzyondroid.izzyondroid.privileged" -> "IzzyOnDroid ✓ Official"
-                else -> "Package Installer ✓ Official"
+                "org.fdroid.fdroid", "org.fdroid.fdroid.privileged" -> "F-Droid (Official)"
+                "org.izzyondroid.izzyondroid", "org.izzyondroid.izzyondroid.privileged" -> "IzzyOnDroid (Official)"
+                else -> "System Installer (Official)"
             }
-            else -> "$installer ${if (isUnofficial) "(unofficial)" else "(✓)"}"
+            isOfficial -> "System Installer (Official)"
+            else -> "Third-party source"
         }
-        displayName to (isUnofficial && unofficialInstallers.containsKey(installer))
+        displayName to !isOfficial
     } catch (_: Exception) {
         "Unknown" to false
     }

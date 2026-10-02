@@ -13,22 +13,18 @@ Get a great local video player experience with OptiCast! It finds and organizes 
 
 **Current:** v2.6.119 (168)
 
-### ⚠️ Official Distribution Only
+### Official Distribution
 
-**Download only from official sources to avoid malware:**
+**Official sources:**
 
-| Official | URL |
-|----------|-----|
+| Source | URL |
+|--------|-----|
 | GitHub Releases | https://github.com/opticastplayer-dev/opticast/releases/latest |
-| Website | https://opticast.app/ |
+| Website | https://opticastplayer-dev.github.io/opticast/ |
 | F-Droid | https://f-droid.org/packages/com.opticast.player (MR !50919) |
 | IzzyOnDroid | https://apt.izzysoft.de/fdroid/index/apk/com.opticast.player (Issue #659) |
 
-**Signing key:** `f7e5ba26...3f0240` CN=Luma App Release RSA/3072. All official APKs same key — install over old, data preserved. If signature differs → fake.
-
-**Unofficial stores** (APKPure, APKMirror, Aptoide, Uptodown etc.) are **NOT authorized**, may contain malware, may violate GPL-3.0 (no source) and trademark OptiCast™. If you find fake, email opticastproject@gmail.com — we DMCA.
-
-See [OFFICIAL_DISTRIBUTION.md](OFFICIAL_DISTRIBUTION.md) for full policy, verification, takedown template.
+For security and to ensure you receive verified builds, please use only the official sources listed above. See [OFFICIAL_DISTRIBUTION.md](OFFICIAL_DISTRIBUTION.md) for full policy.
 
 ### Why it's different
 

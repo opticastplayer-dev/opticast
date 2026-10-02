@@ -8,7 +8,7 @@
 
 **Current:** v2.6.119 (168)
 
-Infuse-style local video player for Android — beautiful, offline-first, no ads, open source.
+Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and plays them flawlessly offline
 
 See root [README.md](../README.md) for full showcase, [docs/index.html](https://opticastplayer-dev.github.io/opticast/) for website, [Releases](https://github.com/opticastplayer-dev/opticast/releases/latest) for APK.
 

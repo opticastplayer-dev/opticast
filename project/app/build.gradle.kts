@@ -148,6 +148,15 @@ android {
         resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" }
     }
 
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs (for IzzyOnDroid/F-Droid)
+        // Fixes Izzy scan warning: APK signing block contains dependency info block
+        // https://izzyondroid.org/docs/general/SigningBlockChecks/
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles (for Google Play)
+        includeInBundle = false
+    }
+
     lint {
         // The bundled lint tooling crashes release analysis on this AGP/Kotlin
         // combination (IncompatibleClassChangeError inside the

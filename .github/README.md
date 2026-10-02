@@ -6,7 +6,7 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build&branch=main)](https://github.com/opticastplayer-dev/opticast/actions)
 [![Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.112 (161)
+**Current:** v2.6.113 (162)
 
 Infuse-style local video player for Android — beautiful, offline-first, no ads, open source.
 

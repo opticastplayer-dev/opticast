@@ -1,6 +1,15 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.112 (161) — 2026-10-02
+**Current:** v2.6.113 (162) — 2026-10-02
+
+## v2.6.113 (162) — 2026-10-02
+
+- Gold Step 2B: Architecture — Repository interfaces + split LibraryScreen (Option B)
+- TmdbRepository: new interface + impl + fake — separates TMDB data from UI, easy to test, no God object, mirrors LibraryRepository pattern
+- LibraryViewModel: split from LibraryScreen.kt (was 226 lines inside screen, total 1562 → now 1335 screen + 200 ViewModel separate file) — single source of truth, uses repository interface, business logic out of composable, offline-first, survives rotation, easy to test with FakeLibraryRepository
+- LibraryRepository interface already existed with impl + fake — now properly used
+- Keeps EmptyState premium (spring animation), fail-fast, secret rotation, metadata fix, download fix, baseline 110 locked for v2.6.109
+- No size increase, still 38M, manual DI 0KB kept (no Hilt 100-200KB rejected)
 
 ## v2.6.112 (161) — 2026-10-02
 

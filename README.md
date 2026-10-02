@@ -2,7 +2,7 @@
 
 OptiCast is a local video player for Android. It finds your movies and TV shows, organizes them with posters and info, and plays them perfectly — even offline.
 
-**No ads, no tracking, open source. 38M APK. Focused on local playback.**
+**No ads, no tracking, open source. Focused on local playback.**
 
 [![Release](https://img.shields.io/github/v/release/opticastplayer-dev/opticast?label=Release)](https://github.com/opticastplayer-dev/opticast/releases)
 [![License](https://img.shields.io/github/license/opticastplayer-dev/opticast)](LICENSE)
@@ -39,7 +39,7 @@ Most players try to do everything. OptiCast focuses on one thing: playing your o
 |--------|----------|
 | ![Player](docs/showcase/4.jpg) | Player: mpv + Media3 fallback, gestures, speed, PiP auto-resumes, chapters, sleep timer. | ![Settings](docs/showcase/5.jpg) | Settings: grid size, data saver, subtitle fonts, in-app updates with progress. |
 
-*Real screenshots from OptiCast v2.6.105*
+*Real screenshots from OptiCast v2.6.119*
 
 ### Features
 
@@ -63,7 +63,7 @@ Most players try to do everything. OptiCast focuses on one thing: playing your o
 
 **GitHub Releases**
 1. Go to https://github.com/opticastplayer-dev/opticast/releases
-2. Download `OptiCast-v2.6.105.apk` (38M)
+2. Download `OptiCast-v2.6.119.apk`
 3. Install APK (allow unknown sources)
 4. Open → Grant permission → Auto-scan
 

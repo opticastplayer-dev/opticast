@@ -3,12 +3,19 @@ build/
 *.apk
 *.aab
 uploads/
-*.jpg
-*.jpeg
-*.png
 .idea/
 *.iml
 local.properties
 .DS_Store
 node_modules/
 dist/
+
+# Images - ignore uploads but allow showcase and fastlane
+*.jpg
+*.jpeg
+*.png
+!docs/showcase/*.jpg
+!docs/showcase/*.png
+!project/fastlane/**/images/**/*.png
+!project/fastlane/**/images/**/*.jpg
+!project/fastlane/**/images/**/*.jpeg

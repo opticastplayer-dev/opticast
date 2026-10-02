@@ -1,8 +1,8 @@
 # Privacy Policy — OptiCast Video Player
 
-**Version:** v2.6.109 (158)
+**Version:** v2.6.119 (168)
 
-**Last updated:** 2026-10-01
+**Last updated:** 2026-10-02
 
 ### Summary
 OptiCast is **100% private, no ads, no tracking, open source**. Your local cinema — plays your own videos, no movies or accounts included.

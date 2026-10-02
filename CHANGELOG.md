@@ -1,6 +1,13 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.116 (165) — 2026-10-02
+**Current:** v2.6.117 (166) — 2026-10-02
+
+## v2.6.117 (166) — 2026-10-02
+
+- Gold Architecture Step 4: Split LibraryScreen 1081→1021 lines — safe incremental 9.4→9.5/10
+- New library components: LibraryGridHeaders.kt (header, search controls, file availability, matching, stats/filters), LibraryDiscoveryContent.kt (featured, recentlyAdded, collections)
+- LibraryScreen now uses libraryHeader, librarySearchControls, libraryFileAvailability, libraryMatching, featuredSection, recentlyAddedSection, collectionsSection — thin composable, saves 60+ lines
+- Keeps PermissionHandler, DeleteHandler, DialogsHost, MenuHost, FileActions, SelectionState, SelectionBar, BottomSheets, FastScrollThumb, domain UseCases, TmdbRepository, EmptyState premium, fail-fast, baseline 110 locked
 
 ## v2.6.116 (165) — 2026-10-02
 

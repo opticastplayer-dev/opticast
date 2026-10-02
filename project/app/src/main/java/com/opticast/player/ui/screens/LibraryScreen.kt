@@ -578,74 +578,45 @@ fun LibraryScreen(
             modifier = Modifier
                 .fillMaxSize()
                 
-                .background(MaterialTheme.colorScheme.background)
-                .consumeWindowInsets(padding),
-            contentPadding = PaddingValues(top = padding.calculateTopPadding(), bottom = 88.dp)
-                        ) {
-            if (!searching) item(span = { GridItemSpan(maxLineSpan) }) {
-                Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background)) {
-                    LibraryHeader(onOpenSettings = onOpenSettings, onCustomize = { showCustomize = true }, scanning = state.isMatching || state.checkingFiles, onScan = { viewModel.scan(manual = true) })
-                }
-            }
-            // OFFLINE-FIRST: Only show What's New once after update, not Up To Date card on every startup
-            // User request: Don't show Up To Date card in library on every app startup, only when real update available
-            // Up To Date should only show in Settings, not library - save data, offline-first
+            // Gold: header + whats new + search controls extracted to library/LibraryGridHeaders.kt
+            if (!searching) com.opticast.player.ui.screens.library.libraryHeader(
+                scanning = state.isMatching || state.checkingFiles,
+                onOpenSettings = onOpenSettings,
+                onCustomize = { showCustomize = true },
+                onScan = { viewModel.scan(manual = true) }
+            )
             if (!searching) {
                 item(span = { GridItemSpan(maxLineSpan) }, contentType = "whats-new") {
-                    val context = LocalContext.current
+                    val ctx = LocalContext.current
                     var dismissed by remember { mutableStateOf(false) }
-                    var whatsNewVersion by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.getWhatsNewVersion(context)) }
+                    var whatsNewVersion by remember { mutableStateOf(com.opticast.player.data.remote.UpdateChecker.getWhatsNewVersion(ctx)) }
                     val currentWhatsNew = whatsNewVersion
                     if (!dismissed && currentWhatsNew != null) {
                         WhatsNewCard(version = currentWhatsNew, onDismiss = {
-                            com.opticast.player.data.remote.UpdateChecker.dismissWhatsNew(context)
+                            com.opticast.player.data.remote.UpdateChecker.dismissWhatsNew(ctx)
                             dismissed = true
                             whatsNewVersion = null
                         })
                     }
                 }
             }
-            // REMOVED: UpToDateCard - user requested don't show in library on every startup, only show real update available
-            // Real update available is shown via AutoUpdateDialog, not Up To Date card
-            // This saves data and respects offline-first rule
-            if (searching) item(key = "focused-search-controls", span = { GridItemSpan(maxLineSpan) }) {
-                Column(Modifier.fillMaxWidth().padding(horizontal = DiscoveryGutterDp.dp)) {
-                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf("all" to "All", "movies" to "Movies", "tv" to "TV").forEach { (id,label) ->
-                            FilterChip(selected = searchScope == id, onClick = { searchScope=id }, label = { Text(label) })
-                        }
-                    }
-                    if(query.isBlank() && recentQueries.isNotEmpty()) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Recent searches", Modifier.weight(1f), style = MaterialTheme.typography.labelLarge)
-                            TextButton(onClick = { designStore.clearHistory(); designRevision++ }) { Text("Clear") }
-                        }
-                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            lazyItems(recentQueries, key={it}) { recent ->
-                                SuggestionChip(onClick = { query=recent; designStore.recordQuery(recent); designRevision++; keyboard?.hide() }, label = { Text(recent,maxLines=1,overflow=TextOverflow.Ellipsis,modifier=Modifier.widthIn(max=200.dp)) })
-                            }
-                        }
-                    }
-                }
-            }
-            if (missingFiles.isNotEmpty() || state.fileScanError != null) {
-                item(key = "file-availability", span = { GridItemSpan(maxLineSpan) }) {
-                    Surface(Modifier.padding(horizontal = DiscoveryGutterDp.dp, vertical = 10.dp), shape = RoundedCornerShape(18.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainer) {
-                        Column(Modifier.fillMaxWidth().padding(14.dp)) {
-                            Text(if (state.checkingFiles) "Checking local files…" else if (state.fileScanError != null) "Storage check needs attention"
-                                else "${missingFiles.size} unavailable file${if (missingFiles.size == 1) "" else "s"}",
-                                style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                            Text(state.fileScanError ?: "Saved posters and progress are kept. Review files that were moved, removed or are temporarily inaccessible.",
-                                style = MaterialTheme.typography.bodySmall)
-                            Row {
-                                TextButton(onClick = { showMissingFiles = true }) { Text("Review files") }
-                                TextButton(onClick = { viewModel.recheckFiles() }, enabled = !state.checkingFiles) { Text("Recheck storage") }
-                            }
-                        }
-                    }
-                }
-            }
+            if (searching) com.opticast.player.ui.screens.library.librarySearchControls(
+                searchScope = searchScope,
+                onSearchScopeChange = { searchScope = it },
+                query = query,
+                recentQueries = recentQueries,
+                onQueryChange = { query = it },
+                designStore = designStore,
+                onDesignRevisionChange = { designRevision++ },
+                keyboard = keyboard
+            )
+            com.opticast.player.ui.screens.library.libraryFileAvailability(
+                missingCount = missingFiles.size,
+                fileScanError = state.fileScanError,
+                checkingFiles = state.checkingFiles,
+                onReview = { showMissingFiles = true },
+                onRecheck = { viewModel.recheckFiles() }
+            )
             if (state.entries.isNotEmpty()) {
                 if (showLibraryStatistics(design.style, design.stats, searching)) item(span = { GridItemSpan(maxLineSpan) }) {
                     StatsCard(stats)
@@ -659,25 +630,11 @@ fun LibraryScreen(
                         )
                 }
             }
-            if (state.isMatching) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Column(Modifier.padding(horizontal = DiscoveryGutterDp.dp, vertical = 10.dp)) {
-                        Text(
-                            "Identifying titles… ${state.matchingDone}/${state.matchingTotal}",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        com.opticast.player.ui.components.FastLoadingBar(
-                            progress = if (state.matchingTotal == 0) null
-                                else state.matchingDone.toFloat() / state.matchingTotal,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(50))
-                        )
-                    }
-                }
-            }
+            com.opticast.player.ui.screens.library.libraryMatching(
+                isMatching = state.isMatching,
+                matchingDone = state.matchingDone,
+                matchingTotal = state.matchingTotal
+            )
             if (!state.scannedOnce) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(
@@ -761,44 +718,36 @@ fun LibraryScreen(
 
                     }
                     "featured" -> {
-            if (showDiscoveryExtras(searching) && featured.isNotEmpty()) {
-                item(key = "discovery-featured-header", span = { GridItemSpan(maxLineSpan) }) {
-                    DiscoveryHeader("Featured", "A little cinema, from your own collection.", Color(0xFF63CFFF), expanded = "featured" !in collapsedSections, onToggle = { toggleSection("featured") })
-                }
-                if ("featured" !in collapsedSections) item(key = "discovery-featured-content", span = { GridItemSpan(maxLineSpan) }) {
-                    HeroPager(items = featured, onOpenDetail = onOpenDetail, onPlay = { playEntry(it) }, selectionMode = selectionMode,
-                        selectedIds = selectedIds.toSet(), onToggle = { toggleSelect(it.video.id) },
-                        onHold = { menuIsWholeShow = false; menuEntry = it })
-                }
-            }
+            // Gold: featured section extracted to library/LibraryDiscoveryContent.kt
+            com.opticast.player.ui.screens.library.featuredSection(
+                featured = featured,
+                collapsed = "featured" in collapsedSections,
+                onToggle = { toggleSection("featured") },
+                showExtras = showDiscoveryExtras(searching),
+                selectionMode = selectionMode,
+                selectedIds = selectedIds.toSet(),
+                onToggleSelect = { toggleSelect(it) },
+                onOpenDetail = onOpenDetail,
+                onPlay = { playEntry(it) },
+                onHold = { menuIsWholeShow = false; menuEntry = it }
+            )
 
                     }
                     "recent" -> {
-            if (showDiscoveryExtras(searching) && recentlyAdded.isNotEmpty()) {
-                item(key = "discovery-recent-header", span = { GridItemSpan(maxLineSpan) }) {
-                    DiscoveryHeader("Recently added", "Fresh arrivals. Ready when you are.", Color(0xFF63DAB0), recentlyAdded.size, expanded = "recent" !in collapsedSections, onToggle = { toggleSection("recent") })
-                }
-                if ("recent" !in collapsedSections) item(key = "discovery-recent-content", span = { GridItemSpan(maxLineSpan) }) {
-                    val carouselState = rememberLazyListState()
-                    LazyRow(
-                        state = carouselState,
-
-                        contentPadding = PaddingValues(horizontal = DiscoveryGutterDp.dp, vertical = 6.dp),
-                        horizontalArrangement = Arrangement.spacedBy(DiscoveryGapDp.dp)
-                        ) {
-                        lazyItems(recentlyAdded, key = { "recent-${it.video.id}" }) { entry ->
-                            SelectableCard(selectionMode, entry.video.id in selectedIds, Modifier.width(DiscoveryPosterDp.dp).clip(RoundedCornerShape(12.dp)), onToggle = { toggleSelect(entry.video.id) }) {
-                                PosterCard(entry = entry,
-                                    sharedTransitionScope = sharedTransitionScope,
-                                    animatedVisibilityScope = animatedVisibilityScope,
-                                    onClick = { if (selectionMode) toggleSelect(entry.video.id) else onOpenDetail(entry.video.id) },
-                                    onLongClick = { if (selectionMode) toggleSelect(entry.video.id) else { menuIsWholeShow = false; menuEntry = entry } },
-                                    modifier = Modifier.fillMaxWidth())
-                            }
-                        }
-                    }
-                }
-            }
+            // Gold: recent section extracted to library/LibraryDiscoveryContent.kt
+            com.opticast.player.ui.screens.library.recentlyAddedSection(
+                recentlyAdded = recentlyAdded,
+                collapsed = "recent" in collapsedSections,
+                onToggle = { toggleSection("recent") },
+                showExtras = showDiscoveryExtras(searching),
+                selectionMode = selectionMode,
+                selectedIds = selectedIds.toSet(),
+                onToggleSelect = { toggleSelect(it) },
+                onOpenDetail = onOpenDetail,
+                onLongClick = { menuIsWholeShow = false; menuEntry = it },
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
+            )
 
                     }
                     "titles" -> {
@@ -947,29 +896,20 @@ fun LibraryScreen(
             }
                     }
                     "collections" -> {
-            item(key="discovery-collections",span={GridItemSpan(maxLineSpan)}) {
-                Column {
-                    Row(Modifier.fillMaxWidth().padding(horizontal=20.dp),verticalAlignment=Alignment.CenterVertically) {
-                        Text(discoveryHeading("Collections"),Modifier.weight(1f),style=MaterialTheme.typography.titleLarge,fontWeight=FontWeight.Bold)
-                        TextButton(onClick={showCollections=true}) { Text("Manage") }
-                    }
-                    if(allCollections.isEmpty()) TextButton(onClick={showCollections=true},modifier=Modifier.padding(horizontal=20.dp)) { Text("Create a personal or franchise collection") }
-                    LazyRow(contentPadding=PaddingValues(horizontal=DiscoveryGutterDp.dp,vertical=6.dp),horizontalArrangement=Arrangement.spacedBy(DiscoveryGapDp.dp)) {
-                        lazyItems(allCollections,key={it.id}) { collection ->
-                            val members=remember(collection.videoIds, libraryEntriesById) { collection.videoIds.mapNotNull { libraryEntriesById[it] } }
-                            fun toggleMembers() {
-                                val ids=members.map { it.video.id }
-                                if(ids.all { it in selectedIds }) selectedIds.removeAll(ids)
-                                else selectedIds.addAll(ids.filterNot { it in selectedIds })
-                            }
-                            SelectableCard(selectionMode,members.isNotEmpty() && members.all { it.video.id in selectedIds },Modifier.width(DiscoveryCollectionDp.dp),onToggle={toggleMembers()}) {
-                                CollectionCover(collection,members,onClick={if(selectionMode) toggleMembers() else openCollectionId=collection.id},
-                                    onHold={selectionMode=true; selectedIds.addAll(members.map{it.video.id}.filterNot{it in selectedIds})})
-                            }
-                        }
-                    }
-                }
-            }
+            // Gold: collections section extracted to library/LibraryDiscoveryContent.kt
+            com.opticast.player.ui.screens.library.collectionsSection(
+                allCollections = allCollections,
+                libraryEntriesById = libraryEntriesById,
+                selectionMode = selectionMode,
+                selectedIds = selectedIds.toSet(),
+                onToggleMembers = { ids ->
+                    if (ids.all { it in selectedIds }) selectedIds.removeAll(ids)
+                    else selectedIds.addAll(ids.filterNot { it in selectedIds })
+                },
+                onOpenCollection = { openCollectionId = it },
+                onShowCollections = { showCollections = true },
+                onSelectCollection = { ids -> selectionMode = true; selectedIds.addAll(ids) }
+            )
 
                     }
                 }

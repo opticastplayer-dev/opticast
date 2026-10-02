@@ -1,5 +1,0 @@
-OptiCast v2.6.112
-
-- Fix: library messed up — MOVIES section showed 4 empty outlined boxes instead of posters (Screenshot_20261002_055504). Root cause: PosterCard sharedElement + animateItem in LazyVerticalGrid caused empty boxes. Fixed by removing sharedElement from grid cards, keeping ultra-fast baseModifier, SharedElement only for detail header (no source = no-op, safe). Grid now shows all 27 movies correctly.
-- Keeps Gold Step 2 EmptyState premium: spring animation, 96dp Surface primaryContainer, bold title — for library empty, search no results, offline
-- Keeps fail-fast, secret rotation, metadata fix, download fix, baseline 110 locked

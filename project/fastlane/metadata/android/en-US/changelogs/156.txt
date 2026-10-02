@@ -1,7 +1,0 @@
-OptiCast v2.6.107
-
-- Fix: in-app download no longer cancels when scrolling settings or going to library — now uses global downloadScope that survives navigation + NonCancellable file IO
-- Download progress continues even if you scroll or go to Library, shows global progress 0-100%
-- UpdateChecker: added downloadScope SupervisorJob IO, _downloadProgress StateFlow, _isDownloading StateFlow, startDownloadInBackground, cancelDownload
-- UI now observes global downloading state that survives navigation
-- Secured proxy: 403 without secret, 200 with secret, rate limit 30/10s, /health 200

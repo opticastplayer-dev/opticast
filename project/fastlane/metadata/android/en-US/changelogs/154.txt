@@ -1,8 +1,0 @@
-OptiCast v2.6.105
-
-- No API key needed — metadata via proxy with retry for waking, confirmed working
-- Fetches automatically, no key in APK
-- Your videos, beautifully organized — Why different, Getting Started, captioned screenshots, FAQ & Privacy links
-- Focused local playback, offline-first, private
-- Empty state Where are my videos? tooltip, quick tour
-- F-Droid description updated

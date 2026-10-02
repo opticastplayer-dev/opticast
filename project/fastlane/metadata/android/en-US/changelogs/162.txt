@@ -1,8 +1,0 @@
-OptiCast v2.6.113
-
-- Gold Step 2B: Architecture — Repository interfaces + split LibraryScreen
-- TmdbRepository: new interface + impl + fake — separates TMDB data from UI, easy to test, no God object
-- LibraryViewModel: split from LibraryScreen.kt (was 226 lines inside screen, 1562 lines total) into separate LibraryViewModel.kt (now 1335 lines screen + 200 lines ViewModel) — single source of truth, uses repository interface, business logic out of composable, offline-first, survives rotation
-- LibraryRepository interface already existed with impl + fake — now used by ViewModel
-- Keeps EmptyState premium, fail-fast, secret rotation, metadata fix, download fix, baseline 110 locked
-- No size increase, still 38M, manual DI 0KB kept (no Hilt)

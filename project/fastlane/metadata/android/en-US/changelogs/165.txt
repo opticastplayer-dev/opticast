@@ -1,8 +1,0 @@
-OptiCast v2.6.116
-
-- Gold Architecture Step 3: Split LibraryScreen 1199→1081 lines — safe incremental
-- New library components: LibraryPermissionHandler.kt (video+notification permission), LibraryDeleteHandler.kt (MediaStore delete + legacy Android 10 handling), LibraryDialogsHost.kt (customize, collections, smart collections, missing files, rename, genre, delete confirm), LibraryMenuHost.kt (entry menu sheet), LibraryUiState.kt (designStore, collections, search, filters, tabs state holder), LibraryDiscoverySections.kt (continue watching placeholder)
-- LibraryScreen now uses deleteHandler for performDelete, permissionState for permission, dialogsHost for all dialogs, menuHost for entry menu — thin composable, single responsibility
-- FastScrollThumb, SelectionBar, BottomSheets, FileActions, SelectionState kept from v2.6.115
-- Keeps domain UseCases, TmdbRepository interface, EmptyState premium, fail-fast, secret rotation, metadata fix, baseline 110 locked
-- No size increase, still 38M, manual DI 0KB, 9.2→9.4/10 architecture

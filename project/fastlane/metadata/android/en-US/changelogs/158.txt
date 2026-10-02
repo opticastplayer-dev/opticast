@@ -1,7 +1,0 @@
-OptiCast v2.6.109
-
-- Security: rotate proxy secret — old secret was public in repo history and APK, now rotated to new secret stored in GitHub secrets + Render env, old secret revoked
-- Remove hardcoded public secret from build.gradle.kts — now no fallback in public repo, secret from env only, prevents public leak
-- Keeps metadata fix: workflow injects secret, BuildConfig gets secret, proxy 200, metadata works
-- Keeps download fix: global scope survives navigation
-- Secured proxy 9/10 safe: 403 without secret, 200 with secret

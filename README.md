@@ -25,7 +25,7 @@ Most players try to do everything. OptiCast focuses on one thing: playing your o
 
 1. **Install** — Download APK from [Releases](https://github.com/opticastplayer-dev/opticast/releases/latest) and install. Grant video permission.
 2. **Open** — Auto-scans your videos. If you don't see them, check `Settings → Folders` — maybe a folder is excluded.
-3. **Watch** — Tap a poster. Posters and subtitles are fetched via secure proxy (no API key needed) and cached for offline.
+3. **Watch** — Tap a poster. Posters and subtitles are fetched and cached for offline.
 
 **Where are my videos?** OptiCast looks in Movies, DCIM, Download via MediaStore. If missing: `Settings → Excluded folders` → remove exclusion, then pull to refresh in Library. Files hidden (dot prefix) or in `Android/data` are hidden by system.
 
@@ -48,7 +48,7 @@ Most players try to do everything. OptiCast focuses on one thing: playing your o
 - Continue Watching, Featured, Recently Added, Movies, TV Shows, Collections, Favorites
 
 **Movie Info**
-- Recognizes movies/TV from filenames via TMDB (via secure proxy, no key needed), posters cached offline, blurred fallback
+- Recognizes movies/TV from filenames, posters cached offline, blurred fallback
 
 **Subtitles**
 - OpenSubtitles + SubDL, multi-language, always saved offline during scan, custom fonts .ttf/.otf, dual subs
@@ -95,48 +95,14 @@ See [PRIVACY.md](docs/PRIVACY.md) and [FAQ.md](docs/FAQ.md)
 
 ### Links
 
-- Website: https://opticastplayer-dev.github.io/opticast/ — simple, focused, why different, getting started, screenshots captioned, FAQ & Privacy links, stars/downloads
+- Website: https://opticastplayer-dev.github.io/opticast/
 - GitHub: https://github.com/opticastplayer-dev/opticast
 - Release: https://github.com/opticastplayer-dev/opticast/releases/latest
 - F-Droid MR: https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50679
-- AlternativeTo: https://alternativeto.net/software/opticast-player/ (pending)
-- Product Hunt: upcoming
+- IzzyOnDroid: https://codeberg.org/IzzyOnDroid/repodata/issues/657
 
 ### License
 
 **GPL-3.0** — see [LICENSE](LICENSE)
 
-Providers: TMDB via secure proxy https://tmdb-proxy-xstu.onrender.com/, OpenSubtitles + SubDL, OMDb, Fanart.tv, AniList
-
 Contact: opticastproject@gmail.com
-
-### What's New in 2.6.109
-
-- Security: rotate proxy secret — old secret was public in repo history and APK, now rotated to new secret stored in GitHub secrets + Render env, old secret revoked
-- Remove hardcoded public secret from build.gradle.kts — no fallback in public repo, secret from env only, prevents future public leak
-- Keeps metadata fix + download fix + secured proxy 9/10 safe: 403 without secret, 200 with secret
-
-### What's New in 2.6.108
-
-- Fix: metadata fetching failed in v2.6.106-107 vs v2.6.105 — secured proxy requires X-App-Secret but CI had blank secret → 403. Now injects secret from GitHub secrets into BuildConfig, proxy 200, metadata works like v2.6.105
-- Keeps download fix: download continues even if you scroll or go to Library (global scope)
-- Secured proxy 9/10 safe: 403 without secret, 200 with secret, rate limit, /health
-
-### What's New in 2.6.107
-
-- Fix: in-app download no longer cancels when scrolling settings or going to library — now uses global scope that survives navigation + NonCancellable
-- Download progress continues even if you scroll or go to Library
-- Secured proxy: 403 without secret, 200 with secret, rate limit, /health
-
-### What's New in 2.6.106
-
-- Secured proxy: requires X-App-Secret, rate limit 30/10s, CORS blocked, /health — 9/10 safe
-- No API key in APK, key server-side, secret in BuildConfig
-- Version safeguard: single versionCode/versionName
-
-### What's New in 2.6.105
-
-- No API key needed — metadata via proxy with retry for waking, fetches automatically
-- Your videos, beautifully organized — Why different, Getting Started, captioned screenshots, FAQ & Privacy links
-- Empty state Where are my videos? tooltip, quick tour
-- Offline-first, install over existing, in-app updates

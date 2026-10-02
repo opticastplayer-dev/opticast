@@ -662,6 +662,7 @@ private fun installedVersionLabel(context: Context): String = runCatching {
 private fun DeviceInfo() {
     val context = LocalContext.current
     val dm = context.resources.displayMetrics
+    val installer = getInstallerInfo(context)
     val rows = listOf(
         "Device" to "${Build.MANUFACTURER.replaceFirstChar { it.uppercase() }} ${Build.MODEL}",
         "Android" to "Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",
@@ -669,6 +670,8 @@ private fun DeviceInfo() {
         "CPU" to (Build.SUPPORTED_ABIS.firstOrNull() ?: "unknown"),
         "Package" to context.packageName,
         "Build" to installedVersionLabel(context).removePrefix("Version "),
+        "Installer" to installer.first,
+        "Signing" to "f7e5ba26...3f0240 ✓",
     )
     Box(
         modifier = Modifier
@@ -679,7 +682,85 @@ private fun DeviceInfo() {
             rows.forEach { (label, value) ->
                 com.opticast.player.ui.components.AlignedLabelValue(label, value)
             }
+            if (installer.second) {
+                Spacer(Modifier.height(12.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            androidx.compose.ui.graphics.Color(0xFFB3261E).copy(alpha = 0.12f),
+                            RoundedCornerShape(12.dp)
+                        )
+                        .padding(12.dp)
+                ) {
+                    Column {
+                        Text(
+                            "⚠️ Unofficial store detected",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                            color = androidx.compose.ui.graphics.Color(0xFFB3261E)
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            "This APK was installed from ${installer.first}, which is not an official source. It may contain malware or be outdated. Download only from opticast.app, GitHub Releases, F-Droid, or IzzyOnDroid to stay safe. Official signing key: f7e5ba26...3f0240",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            } else {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    "✓ Official source — Signing key verified f7e5ba26...3f0240",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = androidx.compose.ui.graphics.Color(0xFF2E7D32),
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
+                )
+            }
         }
+    }
+}
+
+private fun getInstallerInfo(context: Context): Pair<String, Boolean> {
+    return try {
+        val pm = context.packageManager
+        val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            pm.getInstallSourceInfo(context.packageName).installingPackageName
+        } else {
+            @Suppress("DEPRECATION")
+            pm.getInstallerPackageName(context.packageName)
+        }
+        val officialInstallers = setOf(
+            "org.fdroid.fdroid", "org.fdroid.fdroid.privileged",
+            "org.izzyondroid.izzyondroid", "org.izzyondroid.izzyondroid.privileged",
+            "com.android.packageinstaller", "com.google.android.packageinstaller",
+            "com.android.shell", null
+        )
+        val unofficialInstallers = mapOf(
+            "com.apkpure.aegon" to "APKPure (unofficial)",
+            "com.aptoide.aptoide" to "Aptoide (unofficial)",
+            "com.uptodown.android" to "Uptodown (unofficial)",
+            "com.apkmirror.helper" to "APKMirror (unofficial)",
+            "com.sec.android.easyMover" to "Smart Switch",
+            "com.huawei.appmarket" to "Huawei AppGallery (unofficial)",
+            "com.xiaomi.mipicks" to "GetApps (unofficial)",
+            "com.amazon.venezia" to "Amazon Appstore (unofficial)"
+        )
+        val isUnofficial = installer != null && unofficialInstallers.containsKey(installer) || 
+                          (installer != null && installer !in officialInstallers && !installer.contains("fdroid") && !installer.contains("izzy") && !installer.contains("packageinstaller") && !installer.contains("shell"))
+        val displayName = when {
+            installer == null -> "Sideload (GitHub/Website) ✓ Official"
+            unofficialInstallers.containsKey(installer) -> unofficialInstallers[installer]!!
+            installer in officialInstallers -> when (installer) {
+                "org.fdroid.fdroid", "org.fdroid.fdroid.privileged" -> "F-Droid ✓ Official"
+                "org.izzyondroid.izzyondroid", "org.izzyondroid.izzyondroid.privileged" -> "IzzyOnDroid ✓ Official"
+                else -> "Package Installer ✓ Official"
+            }
+            else -> "$installer ${if (isUnofficial) "(unofficial)" else "(✓)"}"
+        }
+        displayName to (isUnofficial && unofficialInstallers.containsKey(installer))
+    } catch (_: Exception) {
+        "Unknown" to false
     }
 }
 

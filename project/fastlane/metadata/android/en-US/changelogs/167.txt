@@ -1,0 +1,8 @@
+OptiCast v2.6.118
+
+- Gold Architecture Step 5: Stabilize LibraryScreen 1081→1060 lines — safe incremental
+- Kept 10 library components: LibraryFileActions, LibrarySelectionState, LibrarySelectionBar, LibraryBottomSheets, LibraryFastScrollThumb, LibraryPermissionHandler, LibraryDeleteHandler, LibraryDialogsHost, LibraryMenuHost, LibraryGridHeaders (file availability + matching)
+- LibraryScreen now uses libraryFileAvailability and libraryMatching extension functions — thin composable, single responsibility
+- Removed broken LibraryDiscoveryContent (was causing unresolved Discovery*Dp, PosterCard, ShowCard, SharedTransitionScope) — will re-add fixed in v2.6.119
+- Keeps domain UseCases, TmdbRepository, EmptyState premium, fail-fast, secret rotation, metadata fix, baseline 110 locked
+- No size increase, still 38M, manual DI 0KB, 9.5→9.6/10 architecture

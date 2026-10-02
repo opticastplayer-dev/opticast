@@ -1,6 +1,14 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.117 (166) — 2026-10-02
+**Current:** v2.6.118 (167) — 2026-10-02
+
+## v2.6.118 (167) — 2026-10-02
+
+- Gold Architecture Step 5: Stabilize LibraryScreen 1081→1060 lines — safe incremental 9.5→9.6/10
+- Kept 10 library components: FileActions, SelectionState, SelectionBar, BottomSheets, FastScrollThumb, PermissionHandler, DeleteHandler, DialogsHost, MenuHost, GridHeaders (file availability + matching)
+- LibraryScreen now uses libraryFileAvailability and libraryMatching — thin composable
+- Removed broken DiscoveryContent for safe build, will re-add fixed in v2.6.119
+- Keeps domain UseCases, TmdbRepository, EmptyState premium, fail-fast, baseline 110 locked
 
 ## v2.6.117 (166) — 2026-10-02
 

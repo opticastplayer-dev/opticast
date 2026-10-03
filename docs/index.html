@@ -40,6 +40,30 @@
 </script>
 <style>
 :root{--bg:#0a0a0f;--card:#22223a;--card2:#2a2a48;--border:#ffffff22;--border2:#ffffff40;--text:#ffffff;--muted:#e5e7eb;--muted2:#cbd5e1;--accent:#5ee1ff;--accent2:#8b5cf6;--accent3:#22d3ee;--green:#22c55e;--radius:16px;--radius-lg:24px}
+[data-theme="light"]{--bg:#f8fafc;--card:#ffffff;--card2:#f1f5f9;--border:#0f172a14;--border2:#0f172a20;--text:#0f172a;--muted:#334155;--muted2:#64748b;--accent:#0891b2;--accent2:#7c3aed;--accent3:#0e7490}
+[data-theme="light"] body{background:#f8fafc !important;color:#0f172a !important;color-scheme:light}
+[data-theme="light"] header{background:radial-gradient(1000px 600px at 50% -10%,#e0f2fe 0%,#ddd6fe 20%,#f8fafc 70%) !important}
+[data-theme="light"] header::before{background:radial-gradient(800px 400px at 20% 20%,#06b6d415 0%,transparent 60%),radial-gradient(600px 400px at 80% 30%,#8b5cf615 0%,transparent 60%)}
+[data-theme="light"] h1{color:#0f172a !important;-webkit-text-fill-color:#0f172a !important;text-shadow:0 2px 24px #06b6d420}
+[data-theme="light"] .hero-sub{color:#334155 !important}
+[data-theme="light"] .badge{background:#0f172a0a !important;border-color:#0f172a15 !important;color:#0f172a !important}
+[data-theme="light"] .badge strong{color:#0f172a !important}
+[data-theme="light"] .download-area{background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%) !important;border-color:#0f172a12 !important;box-shadow:0 20px 60px #0f172a10, inset 0 1px 0 #ffffff}
+[data-theme="light"] .card{background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%) !important;border-color:#0f172a12 !important;box-shadow:0 4px 20px #0f172a08 !important}
+[data-theme="light"] .card p,[data-theme="light"] .card li,[data-theme="light"] .lead{color:#334155 !important}
+[data-theme="light"] .card .lead{color:#475569 !important}
+[data-theme="light"] h2,[data-theme="light"] h3{color:#0f172a !important}
+[data-theme="light"] .shot{background:#ffffff !important;border-color:#0f172a12 !important}
+[data-theme="light"] .shot .cap b{color:#0f172a !important}
+[data-theme="light"] .shot .cap span{color:#475569 !important}
+[data-theme="light"] a{color:#0891b2 !important}
+[data-theme="light"] .btn.secondary{background:#0f172a06 !important;color:#0f172a !important;border-color:#0f172a12 !important}
+[data-theme="light"] .install-box{background:linear-gradient(135deg,#f0f9ff 0%,#ede9fe 100%) !important;border-color:#0f172a12 !important}
+[data-theme="light"] footer{background:linear-gradient(180deg,transparent,#0f172a03) !important;border-color:#0f172a12 !important;color:#475569 !important}
+[data-theme="light"] .footer-links a{color:#475569 !important}
+[data-theme="light"] .details-item{background:#ffffff !important;border-color:#0f172a12 !important}
+[data-theme="light"] .details-item summary{color:#0f172a !important}
+[data-theme="light"] .details-item .content{color:#334155 !important}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,sans-serif;background:#0a0a0f !important;color:#ffffff !important;line-height:1.8;letter-spacing:0.02em;overflow-x:hidden;font-size:17px;-webkit-font-smoothing:antialiased;color-scheme:dark}
 a{color:#7de8ff !important;text-decoration:none;font-weight:600}a:hover{text-decoration:underline;color:#a5f3fc !important}
@@ -116,6 +140,9 @@ footer{text-align:center;padding:48px 24px;color:#cbd5e1;font-size:0.92rem;borde
 </style>
 </head>
 <body>
+<div style="position:fixed;top:16px;right:16px;z-index:100;display:flex;gap:8px">
+<button id="themeToggle" aria-label="Toggle theme" style="width:44px;height:44px;border-radius:12px;border:1px solid #ffffff20;background:#ffffff10;backdrop-filter:blur(12px);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s">🌙</button>
+</div>
 <header>
 <h1>Your videos,<br>beautifully organized.</h1>
 <p class="hero-sub">Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and plays them flawlessly offline.</p>
@@ -341,6 +368,26 @@ function drawQR(canvas, text){
     box.innerHTML='';box.appendChild(img);
   }catch(e){console.log(e)}
 }
+// Theme toggle - light/dark
+(function(){
+  const btn=document.getElementById('themeToggle');
+  const root=document.documentElement;
+  const saved=localStorage.getItem('optic_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  root.setAttribute('data-theme', saved);
+  if(btn) btn.textContent = saved==='light' ? '☀️' : '🌙';
+  if(btn) btn.style.background = saved==='light' ? '#0f172a0a' : '#ffffff10';
+  if(btn) btn.style.borderColor = saved==='light' ? '#0f172a15' : '#ffffff20';
+  if(btn) btn.style.color = saved==='light' ? '#0f172a' : '#fff';
+  if(btn) btn.addEventListener('click', ()=>{
+    const cur=root.getAttribute('data-theme')==='light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', cur);
+    localStorage.setItem('optic_theme', cur);
+    btn.textContent = cur==='light' ? '☀️' : '🌙';
+    btn.style.background = cur==='light' ? '#0f172a0a' : '#ffffff10';
+    btn.style.borderColor = cur==='light' ? '#0f172a15' : '#ffffff20';
+    btn.style.color = cur==='light' ? '#0f172a' : '#fff';
+  });
+})();
 </script>
 </body>
 </html>

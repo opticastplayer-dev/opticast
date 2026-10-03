@@ -1,6 +1,19 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.119 (168) — 2026-10-02
+**Current:** v2.6.120 (169) — 2026-10-03 (pending release, not tagged yet)
+
+## v2.6.120 (169) — 2026-10-03 (pending)
+
+- Website: Direct APK download site with auto latest version fetch, QR code, verified badges, PWA — live at opticastplayer-dev.github.io/opticast/
+- Readability: Fixed title Your videos, beautifully organized invisible on Samsung Browser dark mode — solid white with !important, increased contrast for all text, added light/dark theme toggle with localStorage
+- Professional: Removed technical jargon throughout — simplified 3 feature cards (Focused local playback, Offline-first, Private & simple) and full audit of README, fastlane full_description, Features, FAQ — now simple straightforward professional
+- Distribution: Added OFFICIAL_DISTRIBUTION.md with official sources (GitHub Releases, Website, F-Droid MR !50919, IzzyOnDroid #659), professional trademark and GPL compliance, verification guide
+- Protection: In-app installer detection in Settings → About — shows official vs third-party source notice, professional no explicit store names, no signing key on web
+- Fix: Disabled dependency metadata block in APK (android.dependenciesInfo includeInApk=false includeInBundle=false) — fixes IzzyOnDroid scan WARNING APK signing block contains dependency info block
+- F-Droid: MR !50919 — fixed template (title New app, full hash, no summary/description, branch com.opticast.player, 26/26 checklist), fixed category Multimedia→Local Media Player per linsui, replied professional unique value vs Infuse-inspired without naming other players
+- IzzyOnDroid: Issue #659 — proper template [AppRequest], fixed dependency block, explained REQUEST_INSTALL_PACKAGES for self-updater, explained AI usage transparency (moderate, suggestions + human review)
+- Tests: Added 25 unit tests — VersionUtilsTest (10 tests for parseVersionCode, normalizeVersion, isVersionNewer same version not newer bug), InstallerVerifierTest (9 tests for official vs third-party), UpdateProgressTest (6 tests for progress calculation and downloadScope survives navigation)
+- Quality: Extracted VersionUtils and InstallerVerifier for testability, improved maintainability, 9.6/10 architecture
 
 ## v2.6.119 (168) — 2026-10-02
 

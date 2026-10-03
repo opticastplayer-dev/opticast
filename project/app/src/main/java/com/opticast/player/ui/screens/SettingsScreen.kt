@@ -723,32 +723,14 @@ private fun DeviceInfo() {
 private fun getInstallerInfo(context: Context): Pair<String, Boolean> {
     return try {
         val pm = context.packageManager
-        val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        val installer = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             pm.getInstallSourceInfo(context.packageName).installingPackageName
         } else {
             @Suppress("DEPRECATION")
             pm.getInstallerPackageName(context.packageName)
         }
-        val officialInstallers = setOf(
-            "org.fdroid.fdroid", "org.fdroid.fdroid.privileged",
-            "org.izzyondroid.izzyondroid", "org.izzyondroid.izzyondroid.privileged",
-            "com.android.packageinstaller", "com.google.android.packageinstaller",
-            "com.android.shell", null
-        )
-        val isOfficial = installer == null || installer in officialInstallers || 
-                         installer.contains("fdroid") || installer.contains("izzy") || 
-                         installer.contains("packageinstaller") || installer.contains("shell")
-        val displayName = when {
-            installer == null -> "Direct installation (Official)"
-            installer in officialInstallers -> when (installer) {
-                "org.fdroid.fdroid", "org.fdroid.fdroid.privileged" -> "F-Droid (Official)"
-                "org.izzyondroid.izzyondroid", "org.izzyondroid.izzyondroid.privileged" -> "IzzyOnDroid (Official)"
-                else -> "System Installer (Official)"
-            }
-            isOfficial -> "System Installer (Official)"
-            else -> "Third-party source"
-        }
-        displayName to !isOfficial
+        val info = com.opticast.player.util.InstallerVerifier.verify(installer)
+        info.displayName to info.isThirdParty
     } catch (_: Exception) {
         "Unknown" to false
     }

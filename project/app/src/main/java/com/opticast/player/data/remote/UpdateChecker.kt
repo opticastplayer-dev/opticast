@@ -597,51 +597,7 @@ object UpdateChecker {
         }
     }
 
-    private fun parseVersionCode(version: String): Long {
-        return try {
-            // Parse version like 2.6.71-optimized -> 2.6.71 -> code
-            // Normalize by removing -optimized suffix
-            val normalized = version.substringBefore("-optimized").substringBefore("-")
-            val parts = normalized.split(".")
-            if (parts.size >= 3) {
-                val major = parts[0].toLongOrNull() ?: 0
-                val minor = parts[1].toLongOrNull() ?: 0
-                val patch = parts[2].substringBefore("-").toLongOrNull() ?: 0
-                major * 10000 + minor * 100 + patch
-            } else {
-                0L
-            }
-        } catch (_: Exception) {
-            0L
-        }
-    }
-
-    private fun normalizeVersion(version: String): String {
-        // Remove -optimized suffix and any other suffix for comparison
-        // 2.6.71-optimized -> 2.6.71, 2.6.71 -> 2.6.71
-        return version.substringBefore("-optimized").substringBefore("-").trim()
-    }
-
-    private fun isVersionNewer(remote: String, installed: String): Boolean {
-        return try {
-            // Normalize both versions to compare - remove -optimized suffix
-            // When latest is 2.6.71-optimized and installed is 2.6.71, they are SAME, not newer
-            val remoteNorm = normalizeVersion(remote)
-            val installedNorm = normalizeVersion(installed)
-            if (remoteNorm == installedNorm) return false // Same version, not newer - fix misleading update
-
-            val remoteParts = remoteNorm.split(".").map { it.substringBefore("-").toIntOrNull() ?: 0 }
-            val installedParts = installedNorm.split(".").map { it.substringBefore("-").toIntOrNull() ?: 0 }
-            for (i in 0 until maxOf(remoteParts.size, installedParts.size)) {
-                val r = remoteParts.getOrNull(i) ?: 0
-                val inst = installedParts.getOrNull(i) ?: 0
-                if (r > inst) return true
-                if (r < inst) return false
-            }
-            false
-        } catch (_: Exception) {
-            // Fallback: compare normalized versions
-            normalizeVersion(remote) != normalizeVersion(installed) && remote != installed
-        }
-    }
+    private fun parseVersionCode(version: String): Long = com.opticast.player.util.VersionUtils.parseVersionCode(version)
+    private fun normalizeVersion(version: String): String = com.opticast.player.util.VersionUtils.normalizeVersion(version)
+    private fun isVersionNewer(remote: String, installed: String): Boolean = com.opticast.player.util.VersionUtils.isVersionNewer(remote, installed)
 }

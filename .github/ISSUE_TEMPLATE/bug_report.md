@@ -1,46 +1,36 @@
 ---
 name: Bug report
-about: Report bug for mobile only offline-first player
+about: Report a bug to help improve OptiCast
 title: "[BUG] "
 labels: bug
 assignees: ''
 ---
 
-**Device:** [e.g. Samsung A14 3GB RAM 32-bit Android 13]
-**Version:** [e.g. v2.6.84 build 133]
-**Mobile only:** Phone/tablet only, no TV
+**Device:** [e.g. Samsung A14, Android 13]
+**Version:** [e.g. v2.6.119 (168)]
 
 **Describe the bug**
-Clear description
+A clear and concise description of what the bug is.
 
 **To Reproduce**
+Steps to reproduce the behavior:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
 
 **Expected behavior**
-What you expected
+A clear and concise description of what you expected to happen.
 
 **Screenshots**
-If applicable
+If applicable, add screenshots to help explain your problem.
 
 **Logs**
-- Library grid choppy? Settings smooth?
-- Loading animation persists when quickly jumping videos?
-- PiP auto-resume?
-- Grid changeable?
-- Black background Afterburn?
+If applicable, add logs or error messages.
 
 **Additional context**
-- Offline-first: internet available?
-- Subtitles cached?
-- Install-over existing same signature higher versionCode?
-- Low-RAM 32-bit 3GB device?
-- Baseline 54 locked v2.6.84 mobile only
+Add any other context about the problem here.
 
 **Checklist**
-- [ ] I use mobile only (no TV)
 - [ ] I checked FAQ.md
-- [ ] I checked latest release v2.6.84-optimized
-- [ ] Offline-first priority respected
+- [ ] I checked the latest release

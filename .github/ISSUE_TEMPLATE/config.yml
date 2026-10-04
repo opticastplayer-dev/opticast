@@ -2,10 +2,13 @@ blank_issues_enabled: false
 contact_links:
   - name: 📚 FAQ
     url: https://github.com/opticastplayer-dev/opticast/blob/main/docs/FAQ.md
-    about: Check FAQ for mobile only, offline-first, grid fix, loading fix
-  - name: 🔒 Privacy
+    about: Common questions and troubleshooting
+  - name: 🔒 Privacy Policy
     url: https://github.com/opticastplayer-dev/opticast/blob/main/docs/PRIVACY.md
-    about: No ads, no tracking, GPL-3.0
+    about: Privacy and permissions information
   - name: 📦 Latest Release
-    url: https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.84-optimized
-    about: Download v2.6.84 (133) mobile only 37.6M
+    url: https://github.com/opticastplayer-dev/opticast/releases/latest
+    about: Download the latest version
+  - name: 🌐 Website
+    url: https://opticastplayer-dev.github.io/opticast/
+    about: Official website with direct download

@@ -1,19 +1,4 @@
 User-agent: *
 Allow: /
+
 Sitemap: https://opticastplayer-dev.github.io/opticast/sitemap.xml
-
-# Googlebot
-User-agent: Googlebot
-Allow: /
-
-# Bingbot
-User-agent: Bingbot
-Allow: /
-
-# For GitHub Pages
-User-agent: *
-Allow: /
-
-# Disallow no content
-Disallow: /releases/*.apk$
-Allow: /releases/

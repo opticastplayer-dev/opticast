@@ -10,7 +10,14 @@
     {
       "src": "showcase/1.jpg",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "showcase/1.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
   ],
   "categories": ["multimedia", "video", "entertainment"],
@@ -26,6 +33,18 @@
       "sizes": "1080x1920",
       "type": "image/jpeg",
       "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Direct Download",
+      "url": "/opticast/download/",
+      "description": "Direct APK download"
+    },
+    {
+      "name": "FAQ",
+      "url": "/opticast/faq/",
+      "description": "Common questions"
     }
   ]
 }

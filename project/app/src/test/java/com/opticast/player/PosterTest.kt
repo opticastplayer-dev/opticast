@@ -1,6 +1,6 @@
 package com.opticast.player
 
-import com.opticast.player.ui.components.libraryPosterMinimumDp
+import com.opticast.player.ui.screens.libraryPosterMinimumDp
 import org.junit.Assert.*
 import org.junit.Test
 

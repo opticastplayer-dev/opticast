@@ -3,14 +3,13 @@ package com.opticast.player
 import com.opticast.player.data.repository.FakeLibraryRepository
 import com.opticast.player.data.model.LibraryEntry
 import com.opticast.player.data.model.LocalVideo
-import com.opticast.player.data.model.ParsedTitle
+import com.opticast.player.data.model.ParsedName
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Test
 
 /**
- * Unit tests for library repository - ensures grid changeable feature never breaks
- * and offline-first behavior works
+ * Unit tests for library repository - ensures offline-first behavior works
  */
 class LibraryRepositoryTest {
 
@@ -61,11 +60,13 @@ class LibraryRepositoryTest {
             video = LocalVideo(
                 id = id,
                 name = name,
-                path = "/storage/$name.mp4",
-                size = 1000000,
-                durationMs = 6000000,
-                dateAdded = System.currentTimeMillis(),
-                parsed = ParsedTitle(title = name, year = null, season = null, episode = null)
+                uri = "content://media/$id",
+                sizeBytes = 1000000L,
+                durationMs = 6000000L,
+                dateAddedSec = System.currentTimeMillis() / 1000,
+                width = 1920,
+                height = 1080,
+                parsed = ParsedName(title = name, year = null, season = null, episode = null)
             ),
             metadata = null
         )

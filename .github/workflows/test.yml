@@ -6,11 +6,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - Checkout@v4
-      - JDK 17 temurin cache gradle
-      - Setup Android SDK: sdkmanager install platform-tools platforms;android-36 platforms;android-35 build-tools;35.0.0
-      - Setup Gradle v3
-      - chmod +x gradlew
-      - Run ALL tests: ./gradlew :app:testDebugUnitTest --stacktrace (9 files, 25+ tests)
-      - Upload reports + test-results
-      - Summary cat XML
+      - name: Checkout uses: actions/checkout@v4
+      - name: Set up JDK 17 uses: setup-java@v4 temurin 17 cache gradle
+      - name: Setup Android SDK run: sdkmanager install platform-tools platforms;android-36 platforms;android-35 build-tools;35.0.0
+      - name: Setup Gradle uses: gradle/actions/setup-gradle@v3
+      - name: Grant execute permission run: chmod +x ./project/gradlew
+      - name: Run unit tests (all) working-directory ./project run: ./gradlew :app:testDebugUnitTest --stacktrace (9 files, 25+ tests)
+      - name: Upload test reports if always uses upload-artifact@v4 path reports + test-results
+      - name: Upload test summary

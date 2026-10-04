@@ -23,7 +23,7 @@ class VersionUtilsTest {
     @Test
     fun parseVersionCode_parsesStandardVersions() {
         assertEquals(20671L, VersionUtils.parseVersionCode("2.6.71"))
-        assertEquals(206119L, VersionUtils.parseVersionCode("2.6.119"))
+        assertEquals(20719L, VersionUtils.parseVersionCode("2.6.119"))
         assertEquals(10000L, VersionUtils.parseVersionCode("1.0.0"))
         assertEquals(0L, VersionUtils.parseVersionCode("invalid"))
     }

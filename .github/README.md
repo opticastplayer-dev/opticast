@@ -3,9 +3,10 @@
 [![Release](https://img.shields.io/github/v/release/opticastplayer-dev/opticast?label=Release)](https://github.com/opticastplayer-dev/opticast/releases)
 [![License](https://img.shields.io/github/license/opticastplayer-dev/opticast)](../LICENSE)
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build&branch=main)](https://github.com/opticastplayer-dev/opticast/actions)
+[![Tests](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/test.yml?label=Tests&branch=main)](https://github.com/opticastplayer-dev/opticast/actions/workflows/test.yml)
 [![Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.119 (168)
+**Current:** v2.6.120 (169)
 
 Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and plays them flawlessly offline.
 

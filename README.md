@@ -9,9 +9,10 @@ Get a great local video player experience with OptiCast! It finds and organizes 
 [![Stars](https://img.shields.io/github/stars/opticastplayer-dev/opticast?style=social)](https://github.com/opticastplayer-dev/opticast/stargazers)
 [![Downloads](https://img.shields.io/github/downloads/opticastplayer-dev/opticast/total?color=63daff)](https://github.com/opticastplayer-dev/opticast/releases)
 [![Build](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/release.yml?label=Build)](https://github.com/opticastplayer-dev/opticast/actions)
+[![Tests](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/test.yml?label=Tests)](https://github.com/opticastplayer-dev/opticast/actions/workflows/test.yml)
 [![Pages](https://img.shields.io/badge/Website-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.119 (168)
+**Current:** v2.6.120 (169)
 
 ### Official Distribution
 

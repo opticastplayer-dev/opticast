@@ -1,8 +1,8 @@
 # Changelog — OptiCast
 
-**Current:** v2.6.120 (169) — 2026-10-03 (pending release, not tagged yet)
+**Current:** v2.6.120 (169) — 2026-10-04
 
-## v2.6.120 (169) — 2026-10-03 (pending)
+## v2.6.120 (169) — 2026-10-04
 
 - Website: Direct APK download site with auto latest version fetch, QR code, verified badges, PWA — live at opticastplayer-dev.github.io/opticast/
 - Readability: Fixed title Your videos, beautifully organized invisible on Samsung Browser dark mode — solid white with !important, increased contrast for all text, added light/dark theme toggle with localStorage
@@ -14,6 +14,11 @@
 - IzzyOnDroid: Issue #659 — proper template [AppRequest], fixed dependency block, explained REQUEST_INSTALL_PACKAGES for self-updater, explained AI usage transparency (moderate, suggestions + human review)
 - Tests: Added 25 unit tests — VersionUtilsTest (10 tests for parseVersionCode, normalizeVersion, isVersionNewer same version not newer bug), InstallerVerifierTest (9 tests for official vs third-party), UpdateProgressTest (6 tests for progress calculation and downloadScope survives navigation)
 - Quality: Extracted VersionUtils and InstallerVerifier for testability, improved maintainability, 9.6/10 architecture
+- Website Polish: FAQ and Privacy as HTML pages (faq/, privacy/) with high-contrast cards, robots.txt simplified, sitemap.xml updated with download/faq/privacy, manifest.json icons 192+512 shortcuts, fixed FAQ/Privacy links in index
+- GitHub Docs: Professional rewrite of .github/README, SECURITY, CONTRIBUTING, CODE_OF_CONDUCT, issue templates — removed technical jargon (38M, baseline locked, ServiceLocator 0KB, FileProvider mpv, low-RAM 32-bit, JKS, etc)
+- CI: Fixed unit tests workflow — valid YAML, Android SDK 36 install, Gradle v3 cache, run all 47 tests, fixed PosterTest import, added coroutines-test, fixed LibraryRepositoryTest/FileIdentityPolicyTest/FuzzySearchTest/VersionUtilsTest compilation and logic
+- Own F-Droid Repo: Added docs/fdroid/index.html explaining alternative after Izzy AI rejection, how to add repo URL in F-Droid client
+
 
 ## v2.6.119 (168) — 2026-10-02
 

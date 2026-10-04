@@ -162,7 +162,7 @@ footer{text-align:center;padding:48px 24px;color:#cbd5e1;font-size:0.92rem;borde
 </div>
 
 <div class="version-info" id="versionInfo">
-<span><strong id="verName">v2.6.119</strong> <span id="verCode">(168)</span></span>
+<span><strong id="verName">v2.6.120</strong> <span id="verCode">(169)</span></span>
 <span id="verSize">~38 MB</span>
 <span id="verDate">2026-10-02</span>
 <span class="verified" id="verifiedBadge">✓ Verified · SHA256 signed</span>
@@ -287,7 +287,7 @@ footer{text-align:center;padding:48px 24px;color:#cbd5e1;font-size:0.92rem;borde
 </section>
 
 <footer>
-<p>OptiCast <span id="footerVer">v2.6.119</span> — Your videos, beautifully organized — GPL-3.0 — opticastproject@gmail.com</p>
+<p>OptiCast <span id="footerVer">v2.6.120</span> — Your videos, beautifully organized — GPL-3.0 — opticastproject@gmail.com</p>
 <p style="margin-top:8px">Direct APK: <a href="https://github.com/opticastplayer-dev/opticast/releases/latest">github.com/opticastplayer-dev/opticast/releases/latest</a></p>
 <div class="footer-links"><a href="faq/">FAQ</a><a href="privacy/">Privacy</a><a href="https://github.com/opticastplayer-dev/opticast">GitHub</a><a href="https://github.com/opticastplayer-dev/opticast/releases">Releases</a><a href="download/">Direct Download</a><a href="latest.json">API</a></div>
 <p style="margin-top:12px;font-size:0.85rem;color:#e5e7eb">No ads, no tracking, open source. Your media stays on device.</p>
@@ -308,14 +308,14 @@ footer{text-align:center;padding:48px 24px;color:#cbd5e1;font-size:0.92rem;borde
     const res = await fetch('https://api.github.com/repos/opticastplayer-dev/opticast/releases/latest',{headers:{'Accept':'application/vnd.github.v3+json'}});
     if(!res.ok) throw new Error('API fail');
     const data = await res.json();
-    const tag = data.tag_name || 'v2.6.119';
+    const tag = data.tag_name || 'v2.6.120';
     const name = tag.replace(/^v/,'');
     const apk = (data.assets||[]).find(a=>a.name.endsWith('.apk') && a.name.toLowerCase().includes('optic')) || (data.assets||[]).find(a=>a.name.endsWith('.apk'));
     const date = data.published_at ? new Date(data.published_at).toISOString().slice(0,10) : '2026-10-02';
     const size = apk ? (apk.size/1024/1024).toFixed(1)+' MB' : '~38 MB';
     if(verName) verName.textContent = 'v'+name;
     if(footerVer) footerVer.textContent = 'v'+name;
-    if(verCode) verCode.textContent = apk ? '' : '(168)';
+    if(verCode) verCode.textContent = apk ? '' : '(169)';
     if(verSize) verSize.textContent = size;
     if(verDate) verDate.textContent = date;
     if(apk && btn){

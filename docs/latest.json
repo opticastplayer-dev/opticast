@@ -1,11 +1,11 @@
 {
   "name": "OptiCast Video Player",
   "package": "com.opticast.player",
-  "version": "2.6.119",
-  "versionCode": 168,
-  "tag": "v2.6.119",
-  "published_at": "2026-10-02T10:00:00Z",
-  "download_url": "https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.119/OptiCast-v2.6.119.apk",
+  "version": "2.6.120",
+  "versionCode": 169,
+  "tag": "v2.6.120",
+  "published_at": "2026-10-04T10:30:00Z",
+  "download_url": "https://github.com/opticastplayer-dev/opticast/releases/download/v2.6.120/OptiCast-v2.6.120.apk",
   "releases_url": "https://github.com/opticastplayer-dev/opticast/releases/latest",
   "size": 39800000,
   "size_human": "~38 MB",
@@ -17,6 +17,6 @@
   "source": "https://github.com/opticastplayer-dev/opticast",
   "fdroid_mr": "https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50919",
   "izzy_issue": "https://codeberg.org/IzzyOnDroid/repodata/issues/659",
-  "changelog": "Fix Izzy scan: disable dependency info block, F-Droid template compliant MR !50919, Izzy #659 proper template",
+  "changelog": "Website polish + professional docs + CI green + own F-Droid repo docs — v2.6.120 professional polish and protection",
   "notes": "Offline-first local video player. No ads, no tracking. Install via direct APK or via F-Droid/Izzy when merged."
 }

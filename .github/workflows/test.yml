@@ -1,14 +1,16 @@
 name: Unit Tests
-on: [push/PR to main]
+on:
+  push: branches [main]
+  pull_request: branches [main]
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - Checkout v4
+      - Checkout@v4
       - JDK 17 temurin cache gradle
-      - Setup Gradle v3  # better cache, same as release.yml
+      - Setup Android SDK: sdkmanager install platform-tools platforms;android-36 platforms;android-35 build-tools;35.0.0
+      - Setup Gradle v3
       - chmod +x gradlew
-      - Run ALL tests: ./gradlew :app:testDebugUnitTest --stacktrace
-        (9 files, 25+ tests: util, local, parser + InstallOver, LibraryRepo, Poster)
+      - Run ALL tests: ./gradlew :app:testDebugUnitTest --stacktrace (9 files, 25+ tests)
       - Upload reports + test-results
-      - Summary step cat XML
+      - Summary cat XML

@@ -21,9 +21,13 @@ val proxySecret = localProps.getProperty("tmdb.proxy.secret")
     ?: System.getenv("APP_SECRET")
     ?: "" // no hardcoded public secret — must come from local.properties or env
 
-// FAIL-FAST for gold standard — never ship APK with blank secret that would cause silent 403
+// FAIL-FAST for gold standard — never ship official APK with blank secret that would cause silent 403
+// F-Droid builds Media3-only and doesn't need proxy secret, so allow blank for non-official Release
 val isOfficialRelease = gradle.startParameter.taskNames.any { 
-    it.contains("OfficialRelease") || it.contains("Release") 
+    it.contains("OfficialRelease") 
+}
+val isAnyRelease = gradle.startParameter.taskNames.any {
+    it.contains("Release")
 }
 if (isOfficialRelease && proxySecret.isBlank()) {
     throw GradleException(
@@ -32,6 +36,9 @@ if (isOfficialRelease && proxySecret.isBlank()) {
         "Set tmdb.proxy.secret in local.properties or TMDB_PROXY_SECRET/APP_SECRET env. " +
         "GitHub secrets: TMDB_PROXY_SECRET + APP_SECRET must exist. See docs/METADATA_FIX_v2.6.108.md"
     )
+}
+if (isAnyRelease && !isOfficialRelease && proxySecret.isBlank()) {
+    println("INFO: F-Droid/Play release build without proxy secret — using blank fallback, metadata via TVMaze/AniList still works")
 }
 
 android {

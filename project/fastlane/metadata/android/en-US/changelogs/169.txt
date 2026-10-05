@@ -1,12 +1,7 @@
-OptiCast v2.6.120 — Professional polish and protection
+OptiCast v2.6.120 — Website and protection improvements
 
-• Website: Direct APK download site with auto latest version fetch, QR code for phone scan, verified badges, and PWA support — live at opticastplayer-dev.github.io/opticast/
-• Readability: Fixed title and all text for high contrast on dark and light modes, added light/dark theme toggle
-• Professional: Removed technical jargon throughout — simplified feature cards, README, and store descriptions for clear, straightforward language
-• Distribution: Added official distribution policy — official sources via GitHub Releases, F-Droid, and IzzyOnDroid, with professional trademark and GPL compliance guidance
-• Protection: In-app detection of installation source with professional notice for third-party sources, helping users stay on official channels
-• Fix: Disabled dependency metadata block in APK (includeInApk=false, includeInBundle=false) — fixes IzzyOnDroid scan warning
-• F-Droid: Category corrected to Local Media Player, MR !50919 template compliant, professional reply explaining unique value vs Infuse-inspired design
-• IzzyOnDroid: Issue #659 with proper template, fixed dependency block, explained self-updater permission and AI usage transparency
-• Tests: Added 25 unit tests for version comparison, installer verification, and update progress — prevents regressions
-• Quality: Extracted VersionUtils and InstallerVerifier for testability, improved maintainability
+• New official website with direct download, QR code, and verified badges
+• Improved readability in light and dark themes
+• Clearer feature descriptions focused on local playback and privacy
+• Added installation source detection with guidance for official builds
+• Improved stability and security compliance

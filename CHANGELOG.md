@@ -4,153 +4,84 @@
 
 ## v2.6.120 (169) — 2026-10-04
 
-- Website: Direct APK download site with auto latest version fetch, QR code, verified badges, PWA — live at opticastplayer-dev.github.io/opticast/
-- Readability: Fixed title Your videos, beautifully organized invisible on Samsung Browser dark mode — solid white with !important, increased contrast for all text, added light/dark theme toggle with localStorage
-- Professional: Removed technical jargon throughout — simplified 3 feature cards (Focused local playback, Offline-first, Private & simple) and full audit of README, fastlane full_description, Features, FAQ — now simple straightforward professional
-- Distribution: Added OFFICIAL_DISTRIBUTION.md with official sources (GitHub Releases, Website, F-Droid MR !50919, IzzyOnDroid #659), professional trademark and GPL compliance, verification guide
-- Protection: In-app installer detection in Settings → About — shows official vs third-party source notice, professional no explicit store names, no signing key on web
-- Fix: Disabled dependency metadata block in APK (android.dependenciesInfo includeInApk=false includeInBundle=false) — fixes IzzyOnDroid scan WARNING APK signing block contains dependency info block
-- F-Droid: MR !50919 — fixed template (title New app, full hash, no summary/description, branch com.opticast.player, 26/26 checklist), fixed category Multimedia→Local Media Player per linsui, replied professional unique value vs Infuse-inspired without naming other players
-- IzzyOnDroid: Issue #659 — proper template [AppRequest], fixed dependency block, explained REQUEST_INSTALL_PACKAGES for self-updater, explained AI usage transparency (moderate, suggestions + human review)
-- Tests: Added 25 unit tests — VersionUtilsTest (10 tests for parseVersionCode, normalizeVersion, isVersionNewer same version not newer bug), InstallerVerifierTest (9 tests for official vs third-party), UpdateProgressTest (6 tests for progress calculation and downloadScope survives navigation)
-- Quality: Extracted VersionUtils and InstallerVerifier for testability, improved maintainability, 9.6/10 architecture
-- Website Polish: FAQ and Privacy as HTML pages (faq/, privacy/) with high-contrast cards, robots.txt simplified, sitemap.xml updated with download/faq/privacy, manifest.json icons 192+512 shortcuts, fixed FAQ/Privacy links in index
-- GitHub Docs: Professional rewrite of .github/README, SECURITY, CONTRIBUTING, CODE_OF_CONDUCT, issue templates — removed technical jargon (38M, baseline locked, ServiceLocator 0KB, FileProvider mpv, low-RAM 32-bit, JKS, etc)
-- CI: Fixed unit tests workflow — valid YAML, Android SDK 36 install, Gradle v3 cache, run all 47 tests, fixed PosterTest import, added coroutines-test, fixed LibraryRepositoryTest/FileIdentityPolicyTest/FuzzySearchTest/VersionUtilsTest compilation and logic
-- Own F-Droid Repo: Added docs/fdroid/index.html explaining alternative after Izzy AI rejection, how to add repo URL in F-Droid client
+**Website and distribution**
+- New official website with direct APK download, QR code for easy phone install, and verified badges — https://opticastplayer-dev.github.io/opticast/
+- Added official distribution guide with verified sources and installation verification
 
+**Design and readability**
+- Improved readability across light and dark themes, including Samsung Browser
+- Added light/dark theme toggle on website
+- Simplified feature descriptions for clarity — focused on local playback, offline-first, and privacy
+
+**Security and privacy**
+- In-app detection of installation source in Settings → About, with guidance for staying on official builds
+- Removed dependency metadata from APK to meet store security checks
+
+**Quality**
+- Added additional automated tests for update handling and version checks
+- Improved overall stability and maintainability
 
 ## v2.6.119 (168) — 2026-10-02
 
-- Clean professional repository: deleted 14 older releases (kept only v2.6.119), deleted 14 older tags (kept only v2.6.119), topics 19→6 core, disabled Projects, root cleanup (39MB APK, duplicate yml, uploads, fdroid yml), docs cleanup (20 internal md removed, kept index, sitemap, PRIVACY, FAQ), fastlane cleanup (15 old changelogs removed, kept 168.txt), code cleanup (LibraryViewModelImproved removed), .gitignore updated to *.apk, build/, uploads/, *.jpg
-- Remove unnecessary info under check for updates: simplified App updates - removed OFFLINE-FIRST technical bullets, now clean "Up to date" + toggle + buttons
-- Automatically check for app updates on startup: AutoUpdateDialog checks after 2s automatically, suggests download & install when newer available
-- When background download complete always allow to install regardless of screen: added readyToInstall StateFlow, triggerInstall() with FLAG_ACTIVITY_NEW_TASK, GlobalUpdateInstallDialog() in MainActivity shows "Ready to install" from any screen
-- Remove popup what's new card when app is updated in library screen: removed WhatsNewCard from LibraryScreen LazyVerticalGrid and WhatsNewDialog from MainActivity
-- Slightly increase size of media information background poster: heroHeight 280-460→320-520 dp, scale 1.2→1.35, alpha 0.6→0.7
+**Updates**
+- Simplified update check UI — clear status and actions
+- Automatic update check on startup with prompt when new version is available
+- Download continues in background and allows install from any screen when ready
+- Removed redundant update popups in library
+
+**Visual**
+- Slightly larger backdrop in media details for better presentation
+
+**Repository**
+- Cleaned repository history, keeping only latest release for clarity
 
 ## v2.6.118 (167) — 2026-10-02
 
-- Remove unnecessary info under check for updates: simplified App updates - removed OFFLINE-FIRST technical bullets, now clean "Up to date" + toggle + buttons
-- Automatically check for app updates on startup: AutoUpdateDialog checks after 2s automatically, suggests download & install when newer available
-- When background download complete always allow to install regardless of screen: added readyToInstall StateFlow, triggerInstall() with FLAG_ACTIVITY_NEW_TASK, GlobalUpdateInstallDialog() in MainActivity shows "Ready to install" from any screen
-- Remove popup what's new card when app is updated in library screen: removed WhatsNewCard from LibraryScreen LazyVerticalGrid and WhatsNewDialog from MainActivity
-- Slightly increase size of media information background poster: heroHeight 280-460→320-520 dp, scale 1.2→1.35, alpha 0.6→0.7
-
-## v2.6.118 (167) — 2026-10-02
-
-- Gold Architecture Step 5: Stabilize LibraryScreen 1081→1060 lines — safe incremental 9.5→9.6/10
-- Kept 10 library components: FileActions, SelectionState, SelectionBar, BottomSheets, FastScrollThumb, PermissionHandler, DeleteHandler, DialogsHost, MenuHost, GridHeaders (file availability + matching)
-- LibraryScreen now uses libraryFileAvailability and libraryMatching — thin composable
-- Removed broken DiscoveryContent for safe build, will re-add fixed in v2.6.119
-- Keeps domain UseCases, TmdbRepository, EmptyState premium, fail-fast, baseline 110 locked
-
-## v2.6.117 (166) — 2026-10-02
-
-- Gold Architecture Step 4: Split LibraryScreen 1081→1021 lines — safe incremental 9.4→9.5/10
-- New library components: LibraryGridHeaders.kt (header, search controls, file availability, matching, stats/filters), LibraryDiscoveryContent.kt (featured, recentlyAdded, collections)
-- LibraryScreen now uses libraryHeader, librarySearchControls, libraryFileAvailability, libraryMatching, featuredSection, recentlyAddedSection, collectionsSection — thin composable, saves 60+ lines
-- Keeps PermissionHandler, DeleteHandler, DialogsHost, MenuHost, FileActions, SelectionState, SelectionBar, BottomSheets, FastScrollThumb, domain UseCases, TmdbRepository, EmptyState premium, fail-fast, baseline 110 locked
-
-## v2.6.116 (165) — 2026-10-02
-
-- Gold Architecture Step 3: Split LibraryScreen 1199→1081 lines — safe incremental 9.2→9.4/10
-- New library components: LibraryPermissionHandler.kt, LibraryDeleteHandler.kt, LibraryDialogsHost.kt, LibraryMenuHost.kt, LibraryUiState.kt, LibraryDiscoverySections.kt — single responsibility, thin composable
-- LibraryScreen now uses deleteHandler for performDelete, permissionState for permission, dialogsHost for all dialogs, menuHost for entry menu
-- Keeps FileActions, SelectionState, SelectionBar, BottomSheets, FastScrollThumb from v2.6.115, domain UseCases, TmdbRepository, EmptyState premium, fail-fast, baseline 110 locked
-
-## v2.6.115 (164) — 2026-10-02
-
-- Gold Architecture Step 2: Split LibraryScreen 1336→1199 lines — safe incremental 9.0→9.2/10
-- Extracted library components: LibraryFileActions.kt, LibrarySelectionState.kt, LibrarySelectionBar.kt, LibraryBottomSheets.kt, LibraryFastScrollThumb.kt, LibraryGridSection.kt, LibraryScreenStateHolder.kt, LibraryContentGrid.kt — single responsibility, thin composable
-- LibraryScreen now uses LibraryFileActions for share/mime/uri, LibrarySelectionState for selection mode, LibrarySelectionBar for floating bar, LibraryGenrePickerSheet for genre picker
-- FastScrollThumb delegated to library/LibraryFastScrollThumb.kt — low-RAM safe derivedStateOf + graphicsLayer
-- Keeps domain layer UseCases, TmdbRepository interface, EmptyState premium, fail-fast, secret rotation, metadata fix, baseline 110 locked
+- Improved update handling and install flow
+- Refined library UI for smoother browsing
 
 ## v2.6.114 (163) — 2026-10-02
 
-- Gold Architecture Step 1: Domain layer + UseCases — safe incremental, 8.5→9.0/10
-- New domain/usecase: SearchLibraryUseCase, GetContinueWatchingUseCase, RefreshLibraryUseCase, RecheckFilesUseCase, MatchMetadataUseCase, GetLibraryEntriesUseCase, ClearMetadataUseCase, SetWatchedUseCase — pure business logic, no Android, testable, 0KB
-- LibraryViewModel now uses UseCases: thin ViewModel, business logic out of composable, uses repository interface
-- Keeps repository interfaces, EmptyState premium, fail-fast, secret rotation, metadata fix, download fix, baseline 110 locked for v2.6.109
-
-## v2.6.113 (162) — 2026-10-02
-
-- Gold Step 2B: Architecture — Repository interfaces + split LibraryScreen (Option B)
-- TmdbRepository: new interface + impl + fake — separates TMDB data from UI, easy to test, no God object, mirrors LibraryRepository pattern
-- LibraryViewModel: split from LibraryScreen.kt (was 226 lines inside screen, total 1562 → now 1335 screen + 200 ViewModel separate file) — single source of truth, uses repository interface, business logic out of composable, offline-first, survives rotation, easy to test with FakeLibraryRepository
-- LibraryRepository interface already existed with impl + fake — now properly used
-- Keeps EmptyState premium (spring animation), fail-fast, secret rotation, metadata fix, download fix, baseline 110 locked for v2.6.109
-- No size increase, still 38M, manual DI 0KB kept (no Hilt 100-200KB rejected)
-
-## v2.6.112 (161) — 2026-10-02
-
-- Fix: library messed up — MOVIES section showed 4 empty outlined boxes instead of posters (Screenshot_20261002_055504_OptiCast.jpg). Root cause: PosterCard sharedElement + animateItem in LazyVerticalGrid caused empty boxes. Fixed by removing sharedElement from grid cards, keeping ultra-fast baseModifier, SharedElement only for detail header (safe no-op). Grid now shows all 27 movies correctly like v2.6.110
-- Keeps Gold Step 2 EmptyState premium: spring animation, 96dp Surface primaryContainer, bold title — for library empty, search no results, offline
-- Keeps fail-fast, secret rotation, metadata fix, download fix, baseline 110 locked
-
-## v2.6.111 (160) — 2026-10-02
-
-- Gold Step 2: Empty states + SharedElement — premium UX like Infuse
-- EmptyState: new component ui/components/EmptyState.kt with spring animation (scale + alpha, bouncy), large 96dp Surface primaryContainer, 48dp icon, bold title, clear actions — used for library empty, search no results, offline, no internet
-- EmptyLibrary now uses EmptyLibraryPremium — simple professional, no technical bullets
-- SharedElement: LibraryGrid accepts sharedTransitionScope + animatedVisibilityScope, PosterCard applies sharedElement key poster-{id} via rememberSharedContentState, DetailScreen already had sharedElement poster-{id} — poster morphs grid → detail header 300ms spring
-- All 4 PosterCard calls in LibraryScreen now pass sharedTransitionScope + animatedVisibilityScope
-- Keeps fail-fast, secret rotation, metadata fix, download fix, baseline 110 locked
+- Improved library organization and search
+- Better handling of file availability and metadata matching
+- Enhanced empty states and loading indicators
 
 ## v2.6.110 (159) — 2026-10-01
 
-- Gold Step 1: fail-fast check — prevents silent metadata failure like v2.6.106-107. If TMDB proxy secret blank, official release build now throws FATAL immediately instead of building APK that returns 403. Ensures metadata always works, never ships broken build. Build checks isOfficialRelease && proxySecret.isBlank() → throw GradleException
-- Keeps secret rotation, metadata fix, download fix, secured proxy 9/10 safe, simple professional docs
+- Added safeguards to prevent builds with missing configuration that would break metadata fetching
 
 ## v2.6.109 (158) — 2026-10-01
 
-- Security: rotate proxy secret — old secret was public in repo history (build.gradle.kts fallback) and APK, now rotated to new secret (stored in GitHub secrets TMDB_PROXY_SECRET + APP_SECRET via API 204 and Render env), old secret revoked
-- Remove hardcoded public secret from build.gradle.kts — now no fallback in public repo, secret comes only from local.properties or env, prevents secret being public in repo history, workflow injection ensures metadata works
-- Keeps metadata fix + download fix + secured proxy 9/10 safe: 403 without secret, 200 with secret
+- Security improvement: rotated service credentials and removed hardcoded secrets from repository
 
 ## v2.6.108 (157) — 2026-09-30
 
-- Fix: metadata fetching failed in v2.6.106-107 vs v2.6.105 — root cause: secured proxy requires X-App-Secret, but CI builds had blank BuildConfig (no env in workflow), so proxy returned 403 and metadata fetch failed. v2.6.105 worked because proxy was open. Fix: workflow now injects secret from GitHub secrets into project/local.properties and env, BuildConfig gets secret, proxy returns 200, metadata works like v2.6.105
-- Workflow: added Inject TMDB proxy secret step before Build APK, also fixed version safeguard to allow rebuild of same tag (equal VC OK)
+- Fixed metadata fetching issue that affected v2.6.106-107 — restored reliable poster and info loading
 
 ## v2.6.107 (156) — 2026-09-30
 
-- Fix: in-app download no longer cancels when scrolling settings or going to library — root cause: rememberCoroutineScope tied to composable lifecycle, cancelled on navigation. Fixed with global downloadScope SupervisorJob IO that survives navigation + NonCancellable file IO, progress via StateFlow that survives
-- UI: UpdateCheckOption now observes globalDownloading + globalProgress StateFlow, shows "Downloading: X% — continues even if you scroll or go to Library"
-- Both download buttons now use startDownloadInBackground instead of scope.launch downloadAndInstall directly
+- Fixed in-app download canceling when navigating away — downloads now continue in background
 
 ## v2.6.106 (155) — 2026-09-30
 
-- Secured proxy: requires X-App-Secret header, rate limit 30/10s, CORS blocked, /health 200 — 9/10 safe, tested live: without secret 403, with secret 200, rate limit headers present
-- Client TmdbProxyClient sends X-App-Secret from BuildConfig (injected from local.properties, not GitHub), @PublishedApi internal fix for compilation
-- Server SECURE_PROXY_SERVER.js deployed to Render, env TMDB_API_KEY + APP_SECRET set, deploys Live green (was Failed red due to missing env)
-- Version safeguard: single versionCode/versionName, workflow checks duplicate, tag match, increasing — prevents misleading version issue where 2.6.105 showed 2.6.104
-- Build 36734496075 SUCCESS with versionCode 154, now 155
+- Improved API security with request validation and rate limiting
+- Added version safeguards to ensure consistent version reporting
 
 ## v2.6.105 (154) — 2026-09-30
 
-- No API key needed — metadata via https://tmdb-proxy-xstu.onrender.com/api/ with retry for waking, confirmed working
-- AppContainer tmdb now uses proxy adapter, drop-in replacement, fetches automatically
-- Your videos, beautifully organized — header, Why it's different (focused local playback, offline-first, private & simple), Getting Started 30s, captioned screenshots, FAQ & Privacy links, stars/downloads
-- README rewritten to match — simple, focused
-- F-Droid full_description updated, short_description "Your videos, beautifully organized. Offline, private, no ads."
-- First-run: PermissionGate private/offline/open source, EmptyLibrary Where are my videos? tooltip + quick tour
-- Landing page: Why different, Getting Started, captioned screenshots, FAQ/Privacy links, stars/downloads, testimonials, presence
+- No API key required — metadata fetching works out of the box
+- Simplified onboarding and first-run experience
+- Updated documentation and store listings for clarity
 
-## v2.6.104 (153) — 2026-09-30 — Final
+## v2.6.104 (153) — 2026-09-30
 
-- Audio Only removed — fixes blank video until seek
-- Library scrolling fast — removed unnecessary animations, keeps Adaptive grid, border/clip 12dp, badges, discovery
-- RAM 8/12/16/20 + 32/48/64/96 LRU 30 pool 200 + Coil clear
-- Offline-first: check once when internet detected, subtitles cached
-- Install over existing same JKS, in-app FileProvider, full changelog visible
-- Screenshots real 5, simple professional naming, trust files, F-Droid MR 50679
+- Fixed video playback showing blank until seek
+- Improved library scrolling performance
+- Optimized memory usage for smoother experience on low-end devices
+- Offline-first improvements and reliable installation over existing versions
 
 ## Links
 
 - GitHub: https://github.com/opticastplayer-dev/opticast
-- Release: https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.105
-- F-Droid MR: https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50679
+- Latest release: https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.120
 - Website: https://opticastplayer-dev.github.io/opticast/
-- Proxy: https://tmdb-proxy-xstu.onrender.com/api/

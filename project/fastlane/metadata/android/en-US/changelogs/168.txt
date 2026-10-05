@@ -1,8 +1,6 @@
-OptiCast v2.6.119 — Clean and professional
+OptiCast v2.6.119 — Updates and polish
 
-• Clean professional repository and streamlined user experience
-• Simplified update checks with clear status and automatic checks on startup
-• Improved background download handling — ready to install from any screen
-• Removed intrusive update popups from library for cleaner experience
-• Enhanced movie detail view with larger, more immersive background artwork
-• Maintained clean architecture and efficient performance
+• Simplified update experience with clear status and automatic checks
+• Downloads continue in background and can be installed from any screen
+• Cleaner library view without intrusive popups
+• Larger artwork in movie details for better presentation

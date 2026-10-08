@@ -17,6 +17,6 @@
   "source": "https://github.com/opticastplayer-dev/opticast",
   "fdroid_mr": "https://gitlab.com/fdroid/fdroiddata/-/merge_requests/50919",
   "izzy_issue": "https://codeberg.org/IzzyOnDroid/repodata/issues/659",
-  "changelog": "Website polish + professional docs + CI green + own F-Droid repo docs — v2.6.120 professional polish and protection",
-  "notes": "Offline-first local video player. No ads, no tracking. Install via direct APK or via F-Droid/Izzy when merged."
+  "changelog": "Website and protection improvements — direct download, readability, and security compliance",
+  "notes": "Offline-first local video player. No ads, no tracking. Available via direct APK, F-Droid pipeline passed awaiting merge."
 }

@@ -1,0 +1,17 @@
+# <type>(<scope>): <short description>  — 50 chars max, lowercase, no period
+# Types: feat, fix, docs, refactor, chore, perf
+# Scopes: player, library, settings, metadata, subtitles, docs, website, build
+# Example: player: show battery and clock in top bar
+#          fix: allow Media3-only release build
+#          docs: update FAQ with naming guide
+#          refactor: simplify metadata to TMDB only
+#
+# Body (optional, only if needed to avoid confusion) — wrap at 72 chars:
+# - What changed, why, not how
+# - Keep short, no AI phrases like "No version bump, safe for F-Droid"
+#
+# Example body:
+# - Remove Fanart, OMDb, Wikidata
+# - Keep TMDB only for lightness
+#
+# Footer (optional): Fixes #123, Refs #456

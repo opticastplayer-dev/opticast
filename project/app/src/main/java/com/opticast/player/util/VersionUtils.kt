@@ -1,7 +1,7 @@
 package com.opticast.player.util
 
 /**
- * Version comparison utilities — extracted for testability
+ * Version comparison utilities - extracted for testability
  * Covers bugs fixed: misleading update when 2.6.71-optimized vs 2.6.71
  */
 object VersionUtils {

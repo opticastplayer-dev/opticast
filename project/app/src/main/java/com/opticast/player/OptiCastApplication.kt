@@ -80,7 +80,7 @@ class OptiCastApplication : Application() {
         // No second check at 12s - saves data, respects offline rule
         startupScope.launch {
             try {
-                // Delay 6s to let library be buttery smooth first, then check once if online
+                // Delay 6s to let library be smooth first, then check once if online
                 kotlinx.coroutines.delay(6000)
                 if (AppContainer.isOnline()) {
                     com.opticast.player.data.remote.UpdateChecker.checkWhenInternetDetected(this@OptiCastApplication)

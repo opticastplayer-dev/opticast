@@ -49,7 +49,7 @@ private data class SdResponse(
 )
 
 /**
- * Client for SubDL — the backup subtitle provider. Free key from the SubDL
+ * Client for SubDL - the backup subtitle provider. Free key from the SubDL
  * account panel. Search returns entries that map onto [SubtitleResult] with
  * source = "subdl"; downloads are raw files (unpack=1) or extracted zips.
  */

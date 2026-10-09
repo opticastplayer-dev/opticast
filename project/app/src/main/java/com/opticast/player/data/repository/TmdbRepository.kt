@@ -7,7 +7,7 @@ import com.opticast.player.data.remote.TmdbSearchResultDto
 import com.opticast.player.data.remote.TmdbTvDetailsDto
 
 /**
- * Repository interface for TMDB — separates data from UI, easy to test
+ * Repository interface for TMDB - separates data from UI, easy to test
  * interface + impl + fake, no God object
  */
 interface TmdbRepository {

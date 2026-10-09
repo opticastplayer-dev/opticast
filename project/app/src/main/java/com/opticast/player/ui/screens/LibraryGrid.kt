@@ -20,13 +20,12 @@ import com.opticast.player.data.model.LibraryEntry
 import com.opticast.player.ui.components.PosterCard
 
 /**
- * Optimized library grid — smooth like settings, fast startup
- * - Grid changeable: remember outside LazyVerticalGrid triggers recomposition
- * - Stable keys: video.id prevents reordering jank
+ * Library grid
+ * - Stable keys: video.id prevents reordering
  * - ContentType: helps Compose skip recomposition
  * - AnimateItem: smooth animations when grid changes
- * - Offline-first: uses cached posters, no network while scrolling
- * - SharedElement: poster morphs to detail header (gold standard)
+ * - Offline-first: uses cached posters
+ * - SharedElement: poster morphs to detail header
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -46,7 +45,7 @@ fun LibraryGrid(
     statsContent: @Composable () -> Unit = {},
     discoveryContent: @Composable () -> Unit = {}
 ) {
-    // Stability: Ensure grid changeable works — compute outside and use key
+    // Stability: Ensure grid changeable works - compute outside and use key
     // Remember libraryGrid to trigger recomposition when user changes grid in settings
     val gridCells = remember(libraryGrid) {
         GridCells.Adaptive(libraryPosterMinimumDp(libraryGrid).dp)

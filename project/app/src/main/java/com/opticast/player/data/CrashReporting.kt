@@ -8,7 +8,7 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Crash reporting — saves crash info for debugging, works offline
+ * Crash reporting - saves crash info for debugging, works offline
  * - Saves crashes to file, no internet needed
  * - Keeps last 5 crashes to save space
  * - Helps fix stability issues quickly
@@ -21,7 +21,7 @@ object CrashReporting {
     private const val MAX_BREADCRUMBS = 50
     
     fun init(context: Context) {
-        // Save crashes to file when app crashes — helps fix bugs
+        // Save crashes to file when app crashes - helps fix bugs
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             try {
@@ -109,7 +109,7 @@ object CrashReporting {
             crashFile.writeText(deviceInfo)
             Log.e(TAG, "Crash saved to ${crashFile.absolutePath}")
             
-            // Keep only last 5 crashes to save space — stability
+            // Keep only last 5 crashes to save space - stability
             val crashes = crashDir.listFiles()?.sortedByDescending { it.lastModified() } ?: emptyList()
             if (crashes.size > 5) {
                 crashes.drop(5).forEach {

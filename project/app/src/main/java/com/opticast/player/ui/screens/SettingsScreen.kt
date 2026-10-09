@@ -372,7 +372,7 @@ fun SettingsScreen(
                 SettingsGroup("File Management") {
                 SettingsCard(icon = Icons.Filled.FolderOff, title = "Excluded folders") {
                     Text(
-                        "Videos inside these folders are skipped when scanning — handy for camera clips, screen recordings and messenger videos.",
+                        "Videos inside these folders are skipped when scanning - handy for camera clips, screen recordings and messenger videos.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -781,7 +781,7 @@ private fun ApiKeysCard(settings: AppSettings, scope: CoroutineScope) {
                 Column(Modifier.weight(1f)) {
                     Text(settingsHeaderTitle("API keys"), style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "TMDB · OpenSubtitles · SubDL — lightweight, 2 keys only",
+                        "TMDB · OpenSubtitles · SubDL - lightweight, 2 keys only",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -826,7 +826,7 @@ private fun ApiKeysCard(settings: AppSettings, scope: CoroutineScope) {
                     }
                     ApiKeySection(
                         provider = API_PROVIDERS[2],
-                        description = "Backup subtitle provider — great for anime. Free key from your SubDL account panel.",
+                        description = "Backup subtitle provider - great for anime. Free key from your SubDL account panel.",
                     ) {
                         ApiKeyField(
                             value = settings.subdlApiKey,
@@ -1138,8 +1138,8 @@ private fun SubtitleFontSettingsCard(scope: CoroutineScope) {
         }
     }
     
-    SettingsCard(icon = Icons.Filled.Subtitles, title = "Subtitle fonts — custom") {
-        Text("Add your own subtitle fonts — offline, no internet needed. Supports .ttf and .otf. Falls back to system font.", style = MaterialTheme.typography.bodySmall)
+    SettingsCard(icon = Icons.Filled.Subtitles, title = "Subtitle fonts - custom") {
+        Text("Add your own subtitle fonts - offline, no internet needed. Supports .ttf and .otf. Falls back to system font.", style = MaterialTheme.typography.bodySmall)
         Spacer(Modifier.height(8.dp))
         Text("Available fonts: ${fonts.size}", style = MaterialTheme.typography.labelLarge)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1168,7 +1168,7 @@ private fun SubtitleFontSettingsCard(scope: CoroutineScope) {
             }
         }
         Spacer(Modifier.height(4.dp))
-        Text("Fonts saved to: ${fontManager.fontDirPath()} — 10MB max per font, offline-first, private, stays on device", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("Fonts saved to: ${fontManager.fontDirPath()} - 10MB max per font, offline-first, private, stays on device", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -1301,7 +1301,7 @@ private fun BehaviourSettingsCard(settings: AppSettings, scope: CoroutineScope) 
     SettingsCard(icon = Icons.Filled.PlayArrow, title = "Playback behaviour") {
         PrefToggle(
             label = "Start in landscape",
-            description = "Pressing play rotates straight to landscape fullscreen — no waiting, no taps.",
+            description = "Pressing play rotates straight to landscape fullscreen - no waiting, no taps.",
             checked = settings.autoLandscape,
         ) { enabled -> scope.launch { AppContainer.settings.setAutoLandscape(enabled) } }
         PrefToggle(
@@ -1326,7 +1326,7 @@ private fun BehaviourSettingsCard(settings: AppSettings, scope: CoroutineScope) 
 
         PrefToggle(
             label = "Enable network browsing (beta)",
-            description = "Show SMB/NFS network libraries — experimental, off by default for lightness. Requires local network.",
+            description = "Show SMB/NFS network libraries - experimental, off by default for lightness. Requires local network.",
             checked = settings.enableNetworkBrowsing,
         ) { enabled -> scope.launch { AppContainer.settings.setEnableNetworkBrowsing(enabled) } }
 

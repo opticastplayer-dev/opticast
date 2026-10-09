@@ -8,7 +8,7 @@ import com.opticast.player.data.AppSettings
 import kotlin.math.log10
 
 /**
- * Simplified tone and loudness processing — lightweight, no presets.
+ * Simplified tone and loudness processing - lightweight, no presets.
  * Only dialogue boost + volume boost, no EQ presets for solo maintainability.
  * Uses platform effects (Equalizer, BassBoost, LoudnessEnhancer) fail-soft.
  */
@@ -31,7 +31,7 @@ class AudioEffects {
         lastApplied?.let { apply(it) }
     }
 
-    /** Applies user's audio settings — simplified, no presets. */
+    /** Applies user's audio settings - simplified, no presets. */
     fun apply(prefs: AppSettings) {
         lastApplied = prefs
         if (sessionId <= 0) return

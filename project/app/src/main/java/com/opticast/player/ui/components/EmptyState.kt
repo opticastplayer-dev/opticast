@@ -39,9 +39,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /**
- * Empty State — premium, simple, professional
+ * Empty state
  * Used for library empty, search no results, offline, no internet
- * Spring animation, large icon, clear actions
  */
 @Composable
 fun EmptyState(
@@ -121,7 +120,7 @@ fun EmptyState(
 }
 
 @Composable
-fun EmptyLibraryPremium(
+fun EmptyLibrary(
     fromSearch: Boolean,
     onOpenSettings: (() -> Unit)? = null,
     onRefresh: (() -> Unit)? = null

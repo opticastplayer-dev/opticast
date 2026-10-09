@@ -168,7 +168,7 @@ class DetailViewModel(private val videoId: Long) : ViewModel() {
     }
 
     /**
-     * Cast list — offline-first, persisted bundle used directly.
+     * Cast list - offline-first, persisted bundle used directly.
      * Simplified: TMDB only, no OMDb/Fanart for lightness.
      */
     private fun enrich(metadata: Metadata?) {
@@ -281,7 +281,7 @@ class DetailViewModel(private val videoId: Long) : ViewModel() {
                     _state.update {
                         it.copy(
                             downloadingKey = null,
-                            message = "Subtitle saved — it loads automatically in the player.",
+                            message = "Subtitle saved - it loads automatically in the player.",
                         )
                     }
                 }
@@ -695,7 +695,7 @@ fun DetailScreen(
                             )
                             Spacer(Modifier.width(6.dp))
                             Text(
-                                if (state.watched) "Watched — tap to mark unwatched"
+                                if (state.watched) "Watched - tap to mark unwatched"
                                 else "Mark as watched",
                             )
                         }
@@ -863,7 +863,7 @@ private fun SubtitlesSheet(
 
             if (state.subtitles.isEmpty()) {
                 Text(
-                    "No saved subtitles yet. Search below — OpenSubtitles and SubDL are queried together, and downloaded tracks load automatically in the player.",
+                    "No saved subtitles yet. Search below - OpenSubtitles and SubDL are queried together, and downloaded tracks load automatically in the player.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

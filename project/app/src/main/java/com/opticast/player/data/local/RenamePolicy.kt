@@ -44,13 +44,13 @@ internal fun chooseRenameClue(name: String, relativePath: String, embedded: Stri
     filenameClue(name).takeIf { it.title.isNotBlank() }?.let { return it }
     embedded?.takeIf { it.isNotBlank() }?.let {
         val parsed = filenameClue(if (it.substringAfterLast('.', "").lowercase(Locale.ROOT) in setOf("mkv","mp4","avi","webm","mov","m4v")) it else "$it.mkv")
-        if (parsed.title.isNotBlank()) return parsed.copy(source = "Embedded title — verify before renaming")
+        if (parsed.title.isNotBlank()) return parsed.copy(source = "Embedded title - verify before renaming")
     }
     relativePath.trim('/').split('/').asReversed().take(3).forEach { folder ->
         val parsed = filenameClue("$folder.mkv")
         if (parsed.title.isNotBlank()) {
             val episode = NameParser.parse(name)
-            return parsed.copy(season = episode.season, episode = episode.episode, source = "Folder title — verify before renaming")
+            return parsed.copy(season = episode.season, episode = episode.episode, source = "Folder title - verify before renaming")
         }
     }
     return RenameClue()
@@ -103,7 +103,7 @@ internal fun renameSuggestion(entry: LibraryEntry, clue: RenameClue): RenameSugg
     if (proposed == entry.video.name) return null
     return RenameSuggestion(entry, proposed, when {
         metadata?.manuallyMatched == true -> "Your confirmed metadata match"
-        metadata != null -> "Cached metadata match — check the title before renaming"
-        else -> clue.source.ifBlank { "Filename cleanup — verify before renaming" }
+        metadata != null -> "Cached metadata match - check the title before renaming"
+        else -> clue.source.ifBlank { "Filename cleanup - verify before renaming" }
     })
 }

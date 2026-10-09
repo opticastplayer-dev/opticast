@@ -19,11 +19,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 /**
- * Fast poster cache — works offline, saves data, smooth scrolling
+ * Fast poster cache - works offline, saves data, smooth scrolling
  * - Downloads posters once, saves for offline viewing
  * - Uses small size on metered connection to save data (w185 vs w342)
  * - Only downloads when not playing video (saves battery, smooth playback)
- * - Small delay to let scroll settle — buttery smooth like settings
+ * - Small delay to let scroll settle - smooth like settings
  * - Lock-free lookup for 60fps scrolling
  */
 class PosterCache(context: Context) {
@@ -34,14 +34,14 @@ class PosterCache(context: Context) {
         .readTimeout(20, TimeUnit.SECONDS)
         .build()
 
-    // Concurrent sets for lock-free lookups — no waiting on UI thread
+    // Concurrent sets for lock-free lookups - no waiting on UI thread
     private val attempted = ConcurrentHashMap.newKeySet<String>()
     private val existingKeys = ConcurrentHashMap.newKeySet<String>()
 
     @Volatile
     private var primed = false
 
-    /** Reads poster folder once — fast for smooth scrolling */
+    /** Reads poster folder once - fast for smooth scrolling */
     fun warmUp() {
         if (primed) return
         val listing = runCatching { dir.listFiles() }.getOrNull() ?: run { primed = true; return }
@@ -61,7 +61,7 @@ class PosterCache(context: Context) {
 
     // Offline-first, data sipping: small size on metered or low memory, saves data
     private fun posterSize(): String {
-        // Check if on metered network or data saver enabled — use small size to save data
+        // Check if on metered network or data saver enabled - use small size to save data
         val metered = AppContainer.isMeteredNetwork()
         val dataSaver = AppContainer.dataSaver
         val lowRam = AppContainer.lowRamMode
@@ -80,14 +80,14 @@ class PosterCache(context: Context) {
 
     private fun fileFor(key: String): File = File(dir, "$key.jpg")
 
-    /** Fast local lookup — no waiting, critical for smooth scrolling */
+    /** Fast local lookup - no waiting, critical for smooth scrolling */
     fun localUrl(videoId: Long, metadata: Metadata?): String? {
         metadata ?: return null
         val key = keyFor(videoId, metadata) ?: return null
         if (primed) {
             return if (key in existingKeys) "file://${fileFor(key).absolutePath}" else null
         }
-        // Cold start fallback — single check
+        // Cold start fallback - single check
         val file = fileFor(key)
         return if (file.exists() && file.length() > 0) {
             existingKeys.add(key)
@@ -97,12 +97,12 @@ class PosterCache(context: Context) {
 
     suspend fun prefetch(entries: List<LibraryEntry>) {
         if (entries.isEmpty()) return
-        // Stability: Only download when not playing video — saves battery, keeps playback smooth
+        // Stability: Only download when not playing video - saves battery, keeps playback smooth
         // Critical for library scrolling responsiveness matching settings during startup
         com.opticast.player.data.PlaybackWorkBudget.awaitIdle()
-        kotlinx.coroutines.delay(500) // Small delay to let scroll settle — buttery smooth
+        kotlinx.coroutines.delay(500) // Small delay to let scroll settle - smooth
         if (!AppContainer.isOnline()) return
-        // Offline-first data sipping: check if on metered and data saver — still prefetch but small size
+        // Offline-first data sipping: check if on metered and data saver - still prefetch but small size
         // Uses w185 on metered to save data, already handled in posterSize()
 
         val targets = mutableListOf<Pair<String, String>>()
@@ -130,7 +130,7 @@ class PosterCache(context: Context) {
 
         var downloaded = 0
         targets.chunked(downloadConcurrency()).forEach { chunk ->
-            // Stability: Check idle again before each chunk — if user starts playing, pause downloads
+            // Stability: Check idle again before each chunk - if user starts playing, pause downloads
             com.opticast.player.data.PlaybackWorkBudget.awaitIdle()
             downloaded += coroutineScope {
                 chunk.map { (key, url) ->

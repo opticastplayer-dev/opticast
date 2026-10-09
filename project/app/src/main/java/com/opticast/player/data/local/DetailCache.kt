@@ -19,9 +19,9 @@ data class CachedCast(
 
 /**
  * Everything the detail page needs beyond core metadata: IMDb id and cast list.
- * Offline-first: written once per title and reused — opening detail page no longer
+ * Offline-first: written once per title and reused - opening detail page no longer
  * fires extra requests. Cached bundle never expires; clearing/rematching resets it.
- * Simplified: removed OMDb ratings and Fanart.tv artwork — TMDB only for lightness.
+ * Simplified: removed OMDb ratings and Fanart.tv artwork - TMDB only for lightness.
  */
 @Serializable
 data class CachedDetails(

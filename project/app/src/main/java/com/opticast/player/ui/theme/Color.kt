@@ -44,7 +44,7 @@ val OptiCastDarkColorScheme = darkColorScheme(
 
 // ---------------------------------------------------------------- themes -----
 
-/** Deep-ocean navy with a luminous cyan accent — modern, cool, cinematic. */
+/** Deep-ocean navy with a luminous cyan accent - modern, cool, cinematic. */
 val OptiCastOceanColorScheme = darkColorScheme(
     primary = Color(0xFF6FD3FF),
     onPrimary = Color(0xFF003448),

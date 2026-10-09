@@ -277,7 +277,7 @@ fun LibraryScreen(
         }
     }
 
-    // One collector for the whole screen — cards receive the version as a
+    // One collector for the whole screen - cards receive the version as a
     // plain parameter instead of each running their own flow collector.
     // NOTE: posterVersion global bust was causing choppiness - all cards reloaded when one poster downloaded
     val favVersion by AppContainer.favorites.version.collectAsStateWithLifecycle()
@@ -938,7 +938,7 @@ fun LibraryScreen(
         }
     }
 
-    // dialogs host extracted to library/LibraryDialogsHost.kt — saves 60+ lines
+    // dialogs host extracted to library/LibraryDialogsHost.kt - saves 60+ lines
     com.opticast.player.ui.screens.library.LibraryDialogsHost(
         showCustomize = showCustomize,
         tab = tab,
@@ -1005,7 +1005,7 @@ fun LibraryScreen(
     )
     }
 
-    // menu host extracted to library/LibraryMenuHost.kt — saves 50+ lines
+    // menu host extracted to library/LibraryMenuHost.kt - saves 50+ lines
     com.opticast.player.ui.screens.library.LibraryMenuHost(
         menuEntry = menuEntry,
         menuIsWholeShow = menuIsWholeShow,

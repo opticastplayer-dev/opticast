@@ -313,7 +313,7 @@ class TmdbApi(private val settings: SettingsRepository) {
         return cast
     }
 
-    /** IMDb id for a TMDB title (cached) — needed to enrich via OMDb. */
+    /** IMDb id for a TMDB title (cached) - needed to enrich via OMDb. */
     suspend fun imdbIdFor(tmdbId: Int, isTv: Boolean): String? {
         val key = apiKey() ?: return null
         val cacheKey = "${if (isTv) "tv" else "movie"}-$tmdbId"

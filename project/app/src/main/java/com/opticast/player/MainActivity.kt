@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
         if (!AppContainer.initialSettings.performanceMode) {
             preferHighestRefreshRate()
         }
-        // OptiCast is always dark — keep the status/nav bar icons light so they
+        // OptiCast is always dark - keep the status/nav bar icons light so they
         // stay readable while content scrolls under them.
         WindowCompat.getInsetsController(window, window.decorView).apply {
             isAppearanceLightStatusBars = false

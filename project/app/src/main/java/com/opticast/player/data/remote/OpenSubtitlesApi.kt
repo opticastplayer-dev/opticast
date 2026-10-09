@@ -124,7 +124,7 @@ class OpenSubtitlesApi(
                     response.code == 403 ->
                         throw SubtitleSearchException("OpenSubtitles rejected the API key (403).")
                     response.code == 429 ->
-                        throw SubtitleSearchException("OpenSubtitles rate limit reached — try again shortly.")
+                        throw SubtitleSearchException("OpenSubtitles rate limit reached - try again shortly.")
                     !response.isSuccessful ->
                         throw SubtitleSearchException("OpenSubtitles error: HTTP ${response.code}")
                     else -> response.body?.string().orEmpty()

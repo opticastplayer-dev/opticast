@@ -1480,7 +1480,7 @@ fun PlayerScreen(
             }
         }
 
-        // ------------------------------ gesture layer — pleasant & easy ------------------------------
+        // ------------------------------ gesture layer - pleasant & easy ------------------------------
         // Pinch-to-zoom (0.5x–2x, two-finger pan when zoomed), horizontal swipe to scrub with video following finger,
         // vertical swipe left/right for brightness/volume, double-tap left/right to seek, long-press for 2x.
         val haptic = LocalHapticFeedback.current
@@ -1594,12 +1594,12 @@ fun PlayerScreen(
                                         val deltaMs = (totalDrag.x / size.width) * 90_000f
                                         val target = (basePositionMs + deltaMs.toLong())
                                             .coerceIn(0L, durationMs)
-                                        // Video moves with finger — tactile, "the video moves when seeking"
+                                        // Video moves with finger - tactile, "the video moves when seeking"
                                         seekTranslateX = 0f
                                         // Subtle scale down while scrubbing feels like grabbing the timeline
                                         // (handled via seekTranslateX + gentle haptics, not extra scale, to keep it light)
                                         seekHudMs = target
-                                        // Live scrub — ExoPlayer seeks are cheap, and this makes the video
+                                        // Live scrub - ExoPlayer seeks are cheap, and this makes the video
                                         // appear to move with the finger. Throttle haptics to avoid buzzing.
                                         liveSeek(target)
                                         val now = System.currentTimeMillis()
@@ -1640,7 +1640,7 @@ fun PlayerScreen(
                             seekHudMs?.let { controller.seekTo(it) }
                             seekTranslateX = 0f
                         } else if (mode == 0) {
-                            // Tap / double-tap handling — with pinch-reset
+                            // Tap / double-tap handling - with pinch-reset
                             val fractionX = down.position.x / size.width.toFloat()
                             val now = System.currentTimeMillis()
                             if (now - tapState.lastTapMs < 300L) {
@@ -1707,7 +1707,7 @@ fun PlayerScreen(
         )
 
         // ------------------------------- gesture HUDs -------------------------------
-        // Enhanced seek HUD — shows delta, progress, and video-follows-finger hint
+        // Enhanced seek HUD - shows delta, progress, and video-follows-finger hint
         seekHudMs?.let { target ->
             val deltaSec = (target - positionMs) / 1000
             val deltaLabel = when {
@@ -1756,7 +1756,7 @@ fun PlayerScreen(
                 }
             }
         }
-        // Zoom HUD — pleasant pill that appears while pinching
+        // Zoom HUD - pleasant pill that appears while pinching
         zoomHudScale?.let { scale ->
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                 Surface(
@@ -1919,7 +1919,7 @@ fun PlayerScreen(
                                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Text(titleLine, Modifier.weight(1f, fill = false), color = Color.White,
                                     style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                                Text(if (movieLoading) "…" else if (movieLoadError != null) "· —" else "· ${collectionPositionLabel(movies, video.id, episodeCollection)}",
+                                Text(if (movieLoading) "…" else if (movieLoadError != null) "· -" else "· ${collectionPositionLabel(movies, video.id, episodeCollection)}",
                                     color = Color(0xFFBED5E5), style = MaterialTheme.typography.labelMedium, maxLines = 1)
                             }
                         }
@@ -2762,7 +2762,7 @@ fun PlayerScreen(
                     )
                 } else {
                     Text(
-                        "Pauses playback automatically — great for watching in bed.",
+                        "Pauses playback automatically - great for watching in bed.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -2921,7 +2921,7 @@ private fun mimeForName(name: String): String? {
         "mp4", "m4v", "mov" -> MimeTypes.VIDEO_MP4
         "mkv", "mka" -> MimeTypes.VIDEO_MATROSKA
         "webm" -> MimeTypes.VIDEO_WEBM
-        "avi" -> MimeTypes.VIDEO_MP4 // fallback — extractor will sniff, but hint helps for content:// without extension
+        "avi" -> MimeTypes.VIDEO_MP4 // fallback - extractor will sniff, but hint helps for content:// without extension
         "3gp", "3gpp" -> "video/3gpp"
         "ts", "m2ts", "mts" -> "video/mp2ts"
         "flv" -> "video/x-flv"
@@ -3045,17 +3045,17 @@ private fun PlaybackInfoPanel(
                 size.width > 0 -> "${size.width} x ${size.height}"
                 videoFormat?.width != null && videoFormat.width > 0 ->
                     "${videoFormat.width} x ${videoFormat.height}"
-                else -> "—"
+                else -> "-"
             },
         )
         InfoRow(
             "Frame rate",
-            videoFormat?.frameRate?.takeIf { it > 0f }?.let { "%.3f fps".format(it) } ?: "—",
+            videoFormat?.frameRate?.takeIf { it > 0f }?.let { "%.3f fps".format(it) } ?: "-",
         )
-        InfoRow("Video codec", nativeInfo?.videoCodec ?: videoFormat?.codecs ?: videoFormat?.sampleMimeType ?: "—")
-        InfoRow("Video bitrate", videoFormat?.bitrate?.takeIf { it > 0 }?.let { formatBitrate(it) } ?: "—")
-        InfoRow(if(engine == "mpv") "Hardware mode" else "Video decoder", if(engine == "mpv") nativeInfo?.hardwareMode ?: "—" else PlayerStats.videoDecoder ?: "—")
-        InfoRow("Audio codec", nativeInfo?.audioCodec ?: audioFormat?.sampleMimeType ?: "—")
+        InfoRow("Video codec", nativeInfo?.videoCodec ?: videoFormat?.codecs ?: videoFormat?.sampleMimeType ?: "-")
+        InfoRow("Video bitrate", videoFormat?.bitrate?.takeIf { it > 0 }?.let { formatBitrate(it) } ?: "-")
+        InfoRow(if(engine == "mpv") "Hardware mode" else "Video decoder", if(engine == "mpv") nativeInfo?.hardwareMode ?: "-" else PlayerStats.videoDecoder ?: "-")
+        InfoRow("Audio codec", nativeInfo?.audioCodec ?: audioFormat?.sampleMimeType ?: "-")
         InfoRow(
             "Audio",
             audioFormat?.let { f ->
@@ -3063,15 +3063,15 @@ private fun PlaybackInfoPanel(
                     f.channelCount.takeIf { it > 0 }?.let { "$it ch" },
                     f.sampleRate.takeIf { it > 0 }?.let { "$it Hz" },
                     f.bitrate.takeIf { it > 0 }?.let { formatBitrate(it) },
-                ).joinToString(" · ").ifBlank { "—" }
-            } ?: "—",
+                ).joinToString(" · ").ifBlank { "-" }
+            } ?: "-",
         )
-        if(engine != "mpv") InfoRow("Audio decoder", PlayerStats.audioDecoder ?: "—")
+        if(engine != "mpv") InfoRow("Audio decoder", PlayerStats.audioDecoder ?: "-")
         InfoRow(
             "Subtitles",
             textFormat?.let { it.label ?: it.language ?: "selected" } ?: "off",
         )
-        InfoRow("Dropped frames", if(engine == "mpv") nativeInfo?.droppedFrames ?: "—" else PlayerStats.droppedFrames.toString())
+        InfoRow("Dropped frames", if(engine == "mpv") nativeInfo?.droppedFrames ?: "-" else PlayerStats.droppedFrames.toString())
         if (engine == "mpv") InfoRow("Buffer", "Not reported · capture snapshot below")
         else InfoRow("Buffered timeline", "$buffered %")
         InfoRow(
@@ -3084,7 +3084,7 @@ private fun PlaybackInfoPanel(
         InfoRow("Position", "${positionMs.formatDuration()} / ${durationMs.formatDuration()}")
         Spacer(Modifier.height(10.dp))
         Text(
-            "Decoder names come from the renderer; “—” means the platform has not " +
+            "Decoder names come from the renderer; “-” means the platform has not " +
                 "reported it yet.",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -3123,7 +3123,7 @@ private fun InfoRow(label: String, value: String) {
 }
 
 /**
- * Audio controls — simplified: dialogue boost + volume boost only, no presets for lightness.
+ * Audio controls - simplified: dialogue boost + volume boost only, no presets for lightness.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

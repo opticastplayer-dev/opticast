@@ -14,23 +14,15 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 
 /**
- * Secure TMDB client via your Express proxy at https://tmdb-proxy-xstu.onrender.com/
+ * Secure TMDB client via proxy
  * 
  * Benefits:
- * - No API key in APK (key stays server-side in Render env var)
+ * - No API key in APK (key stays server-side)
  * - Single base URL, easy to rotate key server-side
- * - Handles Render free-tier cold start (server waking ~30-50s)
+ * - Handles cold start
  *
- * Proxy expected routes (your Express server should forward to api.themoviedb.org):
- * GET /3/search/movie?query=...
- * GET /3/search/tv?query=...
- * GET /3/movie/{id}
- * GET /3/tv/{id}
- * GET /3/tv/{id}/season/{season}
- * GET /3/movie/{id}/credits
- * GET /3/tv/{id}/credits
- * GET /3/movie/{id}/external_ids  (for imdb_id)
- * GET /3/tv/{id}/external_ids
+ * Proxy forwards to api.themoviedb.org:
+ * GET /3/search/movie, /3/search/tv, /3/movie/{id}, /3/tv/{id}, etc.
  */
 
 // ---------------------------------------------------------------------------
@@ -200,7 +192,7 @@ class TmdbProxyClient {
 }
 
 // ---------------------------------------------------------------------------
-// 2. DATA MODELS — Matching TMDB JSON exactly
+// 2. DATA MODELS - Matching TMDB JSON exactly
 // ---------------------------------------------------------------------------
 
 @Serializable
@@ -333,7 +325,7 @@ data class TmdbExternalIdsDto(
 )
 
 // ---------------------------------------------------------------------------
-// 3. HIGH-LEVEL SERVICE — Drop-in replacement for your old TmdbApi
+// 3. HIGH-LEVEL SERVICE - Drop-in replacement for your old TmdbApi
 // ---------------------------------------------------------------------------
 
 /**
@@ -432,7 +424,7 @@ class TmdbProxyService {
 }
 
 // ---------------------------------------------------------------------------
-// 4. UI HELPER — For your Compose UI to handle Render waking state
+// 4. UI HELPER - For your Compose UI to handle Render waking state
 // ---------------------------------------------------------------------------
 
 /**

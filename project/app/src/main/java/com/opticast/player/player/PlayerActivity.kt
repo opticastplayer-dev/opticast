@@ -244,7 +244,7 @@ class PlayerActivity : ComponentActivity() {
     private fun refreshPip() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         // While not in PiP we still want the next enterPip to use the right aspect,
-        // so update the params even when not yet floating — Android ignores it until needed.
+        // so update the params even when not yet floating - Android ignores it until needed.
         runCatching {
             setPictureInPictureParams(
                 PipActions.params(this, PiPController.isPlaying(), PiPController.videoWidth, PiPController.videoHeight)

@@ -129,7 +129,7 @@ object AppContainer {
     val networkSources: NetworkSourceStore by lazy { NetworkSourceStore(application) }
     val frameArtwork: FrameArtwork by lazy { FrameArtwork(application) }
     val thumbnails: ThumbnailCache by lazy { ThumbnailCache(application) }
-    // SECURE PROXY: No API key in APK — key stays server-side at https://tmdb-proxy-xstu.onrender.com/
+    // Secure proxy: No API key in APK - key stays server-side
     // Old direct TMDB client kept for fallback if needed, but proxy is primary
     val tmdbProxy: com.opticast.player.data.remote.TmdbProxyService by lazy { com.opticast.player.data.remote.TmdbProxyService() }
     val tmdbAdapter: com.opticast.player.data.remote.TmdbApiProxyAdapter by lazy { com.opticast.player.data.remote.TmdbApiProxyAdapter() }

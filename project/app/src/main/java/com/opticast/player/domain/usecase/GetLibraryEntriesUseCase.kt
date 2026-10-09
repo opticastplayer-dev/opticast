@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * UseCase — Get library entries, single responsibility
+ * UseCase - Get library entries, single responsibility
  */
 class GetLibraryEntriesUseCase(
     private val repository: LibraryRepository

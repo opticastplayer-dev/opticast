@@ -9,7 +9,7 @@ import kotlin.system.measureTimeMillis
 
 /**
  * Performance monitoring for low-RAM 32-bit devices
- * Helps track jank and improve buttery smoothness
+ * Helps track jank and improve smoothness
  */
 object PerformanceMonitor {
     private const val TAG = "OptiCastPerf"

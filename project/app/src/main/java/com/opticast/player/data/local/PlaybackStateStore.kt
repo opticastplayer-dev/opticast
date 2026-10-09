@@ -66,7 +66,7 @@ class PlaybackStateStore(context: Context) {
      */
     private val progressStates = androidx.compose.runtime.mutableStateMapOf<Long, PlaybackState>()
 
-    /** Increments on every save — a cheap key for list derivations. */
+    /** Increments on every save - a cheap key for list derivations. */
     var progressTick by androidx.compose.runtime.mutableIntStateOf(0)
         private set
 

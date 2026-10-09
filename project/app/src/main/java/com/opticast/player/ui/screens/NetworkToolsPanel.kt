@@ -52,7 +52,7 @@ internal fun NetworkToolsPanel(onOpenNetwork: () -> Unit) {
         job = scope.launch {
             try {
                 tools.discover(onFound = { discovered.add(it) }, onStatus = { status = it })
-                status = if (discovered.isEmpty()) "No advertised services found. A server may still be available—add its address manually."
+                status = if (discovered.isEmpty()) "No advertised services found. A server may still be available-add its address manually."
                     else "Found ${discovered.size} advertised service(s). Configure the path/share and credentials before browsing."
             } catch (e: CancellationException) { throw e }
             catch (_: Exception) { status = "Discovery could not run. Check your network or add a library manually." }

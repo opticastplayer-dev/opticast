@@ -5,7 +5,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import com.opticast.player.ui.components.EmptyLibraryPremium
+import com.opticast.player.ui.components.EmptyLibrary
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -397,7 +397,7 @@ internal fun UpToDateCard(version: String, onDismiss: (() -> Unit)? = null) {
             Text("✅", style = MaterialTheme.typography.headlineSmall)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    "Up To Date — v$version",
+                    "Up To Date - v$version",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -442,9 +442,9 @@ internal fun WhatsNewCard(version: String, onDismiss: () -> Unit) {
             stored.lines().filter { it.isNotBlank() }.take(4).joinToString("\n")
         } else {
             when {
-                version.contains("2.6.86") -> "• Library smooth like Settings — no white flash, fast scrolling\n• Scan never freezes — handles damaged files, crash log saved\n• Saves data — small posters on metered, only when not playing"
-                version.contains("2.6.85") -> "• Easy to understand for everyone — removed confusing technical words\n• Beautiful, fast, offline-first — works on all phones\n• Plays everything — simple language, no jargon"
-                version.contains("2.6.84") -> "• Mobile only — focused on phones for best experience\n• Faster and smoother — grid changeable, better file handling\n• Compact What's New shows real changes"
+                version.contains("2.6.86") -> "• Library smooth like Settings - no white flash, fast scrolling\n• Scan never freezes - handles damaged files, crash log saved\n• Saves data - small posters on metered, only when not playing"
+                version.contains("2.6.85") -> "• Easy to understand for everyone - removed confusing technical words\n• Beautiful, fast, offline-first - works on all phones\n• Plays everything - simple language, no jargon"
+                version.contains("2.6.84") -> "• Mobile only - focused on phones for best experience\n• Faster and smoother - grid changeable, better file handling\n• Compact What's New shows real changes"
                 version.contains("2.6.81") -> "• Fixed loading spinner when quickly switching videos\n• Picture-in-Picture auto-resumes playback\n• Beautiful poster fallback fixes black background"
                 else -> "• Stability and performance improvements\n• Works offline, fast and smooth"
             }
@@ -572,8 +572,7 @@ internal fun FilterChipsRow(sortBy: String, onSortChange: (String) -> Unit, sele
 
 @Composable
 internal fun EmptyLibrary(fromSearch: Boolean) {
-    // use premium empty state with spring animation
-    EmptyLibraryPremium(
+    EmptyLibrary(
         fromSearch = fromSearch,
         onOpenSettings = null,
         onRefresh = null

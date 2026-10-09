@@ -28,9 +28,9 @@ import java.util.concurrent.TimeUnit
  */
 object UpdateChecker {
 
-    // LIVE repo first (opticastplayer-dev is current live), desired org second (opticast-project doesn't exist yet — see screenshot error)
+    // LIVE repo first (opticastplayer-dev is current live), desired org second (opticast-project doesn't exist yet - see screenshot error)
     // Order: live first to avoid "Could not resolve to a Repository with the name 'opticast-project/opticast'" error
-    // When opticast-project org is created and repo transferred, both will work — fallback ensures no breakage
+    // When opticast-project org is created and repo transferred, both will work - fallback ensures no breakage
     private val GITHUB_API_URLS = listOf(
         "https://api.github.com/repos/opticastplayer-dev/opticast/releases/latest",
         "https://api.github.com/repos/opticast-project/opticast/releases/latest"
@@ -62,7 +62,7 @@ object UpdateChecker {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
-    // FIX: Download scope that survives navigation — not tied to composable lifecycle
+    // FIX: Download scope that survives navigation - not tied to composable lifecycle
     // Old: used rememberCoroutineScope() in Composable → cancelled when scrolling/navigating → download cancels
     // New: application-scoped SupervisorJob + IO, never cancelled by UI navigation
     private val downloadScope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + Dispatchers.IO)
@@ -449,7 +449,7 @@ object UpdateChecker {
     }
 
     suspend fun downloadAndInstall(context: Context, downloadUrl: String, onProgress: (Int) -> Unit = {}): Boolean = withContext(Dispatchers.IO) {
-        // FIX: Make download non-cancellable by UI navigation — use NonCancellable for file IO
+        // FIX: Make download non-cancellable by UI navigation - use NonCancellable for file IO
         // Old: withContext(Dispatchers.IO) was cancelled when composable scope cancelled (scrolling/settings/library)
         // New: use NonCancellable for download, plus global downloadScope for progress that survives
         try {
@@ -566,7 +566,7 @@ object UpdateChecker {
         try {
             // Try primary org first, fallback to current live repo
             val url = try {
-                // Quick check: if primary returns 404, open fallback — but for simplicity try primary,
+                // Quick check: if primary returns 404, open fallback - but for simplicity try primary,
                 // user will be redirected if not found. We open primary, and if it fails, fallback is handled in openReleasePage.
                 GITHUB_RELEASES_URL
             } catch (_: Exception) {

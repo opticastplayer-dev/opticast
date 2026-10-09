@@ -26,13 +26,10 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * ViewModel — split from LibraryScreen.kt + uses Domain UseCases
+ * ViewModel for library screen
  * - Single source of truth for library UI state
- * - Uses repository interface + use cases for testability (was God object with AppContainer directly)
- * - Business logic out of composable (was 800+ lines in screen) — now thin, delegates to use cases
+ * - Uses repository and use cases for testability
  * - Offline-first, survives rotation
- * - Easy to test with FakeLibraryRepository + Fake UseCases
- * - 8.5 → 9.0/10 architecture gold
  */
 class LibraryViewModel(
     private val repository: LibraryRepository? = null
@@ -55,7 +52,7 @@ class LibraryViewModel(
     private val matchingInFlight = AtomicBoolean(false)
     private var cachedVideos: List<LocalVideo> = emptyList()
 
-    // Domain UseCases — thin ViewModel, business logic in use cases, testable
+    // Domain UseCases - thin ViewModel, business logic in use cases, testable
     private val searchUseCase = repository?.let { SearchLibraryUseCase(it) }
     private val refreshUseCase = repository?.let { RefreshLibraryUseCase(it) }
     private val matchUseCase = MatchMetadataUseCase()
@@ -70,7 +67,6 @@ class LibraryViewModel(
                     rebuild(rescan = cachedVideos.isEmpty())
                 }
         }
-        // Observe repository if provided (gold standard)
         repository?.let { repo ->
             viewModelScope.launch {
                 repo.entries.collect { entries ->

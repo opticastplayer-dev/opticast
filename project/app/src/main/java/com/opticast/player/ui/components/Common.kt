@@ -90,7 +90,7 @@ import com.opticast.player.data.model.LocalVideo
 import androidx.compose.runtime.LaunchedEffect
 import java.io.File
 
-/** Builds a one-shot [ViewModelProvider.Factory] — keeps ViewModels simple without Hilt. */
+/** Builds a one-shot [ViewModelProvider.Factory] - keeps ViewModels simple without Hilt. */
 fun viewModelFactory(creator: () -> ViewModel): ViewModelProvider.Factory =
     object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -219,7 +219,7 @@ private fun StatusBadge(status: PosterBadge, modifier: Modifier = Modifier, sing
     val minimal = LocalMinimalStyle.current
     val colours = remember(status) { listOf(Color(status.gradientStart), Color(status.gradientEnd)) }
     val gradient = remember(status) { Brush.linearGradient(colours) }
-    // Infuse polish: shimmer for NEW badge only - low-RAM safe with rememberInfiniteTransition, only 1 badge at a time
+    // Shimmer for NEW badge only
     val shimmerAlpha = if (status == PosterBadge.NEW) {
         val infiniteTransition = rememberInfiniteTransition(label = "newShimmer")
         val alpha by infiniteTransition.animateFloat(
@@ -276,7 +276,7 @@ fun rememberFrameArtwork(videoId: Long?): File? {
     return artwork
 }
 
-/** Loads a poster image with placeholder for buttery smooth scrolling on low-RAM 32-bit 3GB devices. */
+/** Loads a poster image with placeholder for smooth scrolling on low-RAM 32-bit 3GB devices. */
 @Composable
 fun PosterImage(
     url: String?,
@@ -352,7 +352,7 @@ fun posterUrlFor(entry: LibraryEntry): String? =
     AppContainer.posterCache.localUrl(entry.video.id, entry.metadata)
         ?: tmdbPosterUrl(entry.metadata?.posterPath)
 
-/** Remote (TMDB) poster URL — fallback when the cached file is unavailable. */
+/** Remote (TMDB) poster URL - fallback when the cached file is unavailable. */
 fun posterRemoteUrlFor(entry: LibraryEntry): String? =
     tmdbPosterUrl(entry.metadata?.posterPath)
 
@@ -379,7 +379,7 @@ fun PosterCard(
     val fallbackTitle = remember(entry.video.name, entry.video.parsed.title) { entry.video.parsed.title.ifBlank { entry.video.name } }
     val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) }
 
-    // Keep ultra-fast for grid — sharedElement causes empty boxes in LazyVerticalGrid with animateItem
+    // Keep fast for grid
     // SharedElement only for detail header, not for grid cards (prevents messed up empty boxes)
     // Previous attempt caused MOVIES section 4 empty outlined boxes (see Screenshot_20261002_055504)
     val sharedModifier = modifier
@@ -450,7 +450,7 @@ fun PosterCard(
 /**
  * Show-level frame: a real bitmap from any episode when the show has no TMDB
  * poster. The old [ShowCard] passed no [videoId] so the grid was blank while
- * the per-episode row showed a thumbnail — this closes that gap.
+ * the per-episode row showed a thumbnail - this closes that gap.
  * Tries cached frames first for instant display, then generates on demand.
  */
 @Composable
@@ -502,7 +502,7 @@ fun ShowCard(
     val newlyAdded = episodes.any { it.video.isNewlyAdded() }
     // Show frame: used when no poster exists, and also as fallback if a poster
     // later fails to load (network error, missing key). Episodes already show
-    // their own frame — shows now do the same across all episodes.
+    // their own frame - shows now do the same across all episodes.
     val showFrame = if (posterUrl == null && remotePoster == null) rememberShowFrameArtwork(episodes) else null
     // Fallback id so PosterImage can show a frame if its poster request fails
     // (e.g. TMDB without API key, or offline). Pick the same episode that gave
@@ -533,7 +533,7 @@ fun ShowCard(
                 videoId = fallbackVideoId,
             )
         } else if (showFrame != null) {
-            // Direct frame — already resolved across all episodes, not just the
+            // Direct frame - already resolved across all episodes, not just the
             // representative, so the show card now mirrors episode artwork.
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -545,7 +545,7 @@ fun ShowCard(
                 modifier = Modifier.fillMaxSize(),
             )
         } else {
-            // No poster and frame not yet ready — placeholder with generation
+            // No poster and frame not yet ready - placeholder with generation
             // kicked off by rememberShowFrameArtwork; re-compose when done.
             FallbackPoster(showTitle, modifier = Modifier.fillMaxSize())
         }
@@ -581,7 +581,7 @@ fun ShowCard(
     }
 }
 
-/** Polish: Highlight matching text in search like Infuse — bold yellow for query */
+/** Highlight matching text in search */
 @Composable
 fun HighlightedText(
     text: String,
@@ -612,7 +612,7 @@ fun HighlightedText(
     )
 }
 
-/** Polish: Heart burst animation when adding favorite like Infuse - low-RAM safe single animation */
+/** Heart burst animation when adding favorite */
 @Composable
 fun HeartBurst(
     visible: Boolean,
@@ -630,7 +630,7 @@ fun HeartBurst(
     }
 }
 
-/** Polish: Streak for stats like Infuse — "5 days in a row" */
+/** Streak for stats */
 @Composable
 fun StreakBadge(
     days: Int,
@@ -658,7 +658,7 @@ fun StreakBadge(
     }
 }
 
-/** Polish: Illustration empty states like Infuse — cinema icon with gradient */
+/** Empty states illustration */
 @Composable
 fun IllustratedEmptyLibrary(
     fromSearch: Boolean,
@@ -670,7 +670,7 @@ fun IllustratedEmptyLibrary(
             .padding(horizontal = 40.dp, vertical = 60.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Cinema illustration with gradient like Infuse
+        // Cinema illustration
         Box(
             modifier = Modifier
                 .size(80.dp)

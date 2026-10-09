@@ -29,7 +29,7 @@ object PiPController {
     /** Lets the activity refresh the window's pause/play icon. */
     @Volatile var onPlayingChanged: ((Boolean) -> Unit)? = null
 
-    /** Current video dimensions — used to size the PiP window to the content. */
+    /** Current video dimensions - used to size the PiP window to the content. */
     @Volatile var videoWidth: Int = 0
     @Volatile var videoHeight: Int = 0
 

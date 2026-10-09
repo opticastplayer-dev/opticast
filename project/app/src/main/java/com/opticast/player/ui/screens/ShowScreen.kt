@@ -215,7 +215,7 @@ fun ShowScreen(
                         )
                     } else {
                         // No TMDB backdrop: use a real frame from any episode in
-                        // the show — not just the first, so the hero never stays
+                        // the show - not just the first, so the hero never stays
                         // blank when the first episode fails to decode (fix: shows
                         // were blank while episodes had thumbnails).
                         val heroFrame = if (episodes.isEmpty()) null else rememberShowFrameArtwork(episodes)

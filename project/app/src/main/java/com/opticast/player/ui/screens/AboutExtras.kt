@@ -50,7 +50,7 @@ internal fun UpdateCheckOption(version: String) {
                     Text("✅", style = MaterialTheme.typography.titleMedium)
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            "Up to date — ${installedVersion}",
+                            "Up to date - ${installedVersion}",
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -131,7 +131,7 @@ internal fun UpdateCheckOption(version: String) {
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
             onDismissRequest = { show = false },
-            title = { Text(if (info.isNewer) "Update available: ${info.version}" else "✅ Up to date — ${info.version}") },
+            title = { Text(if (info.isNewer) "Update available: ${info.version}" else "✅ Up to date - ${info.version}") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Installed: $version")
@@ -166,7 +166,7 @@ internal fun UpdateCheckOption(version: String) {
                 if (info.isNewer) {
                     TextButton(
                         onClick = {
-                            // FIX: Use background scope that survives navigation — old used rememberCoroutineScope which cancels on scroll/library navigation
+                            // FIX: Use background scope that survives navigation - old used rememberCoroutineScope which cancels on scroll/library navigation
                             downloading = true
                             progress = 0
                             show = false
@@ -242,12 +242,12 @@ internal fun WhatsNewDialog() {
     if (show) {
         val changelog = when {
             version.contains("2.6.60") -> """
-                • Signed release 56M with mpv — plays all videos
-                • Background auto check for updates on app startup — now allowed and enabled by default
+                • Signed release 56M with mpv - plays all videos
+                • Background auto check for updates on app startup - now allowed and enabled by default
                 • Auto update dialog shows when new version available on startup
                 • Changed wording: official signed full mpv → signed release
                 • Fixed YAML syntax error in release workflow (block style)
-                • Secrets correctly implemented — restore signing key success
+                • Secrets correctly implemented - restore signing key success
             """.trimIndent()
             version.contains("2.6.59") -> """
                 • Fixed PiP: expanding PiP now auto-resumes playback on 32-bit devices

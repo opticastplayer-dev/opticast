@@ -15,7 +15,7 @@ import com.opticast.player.data.model.LocalVideo
  * Launches a video in the user's chosen external player (whatever third-party
  * player they have installed)
  * and captures the position the player reports when it exits, so OptiCast can
- * resume from there — in the external player or the built-in one.
+ * resume from there - in the external player or the built-in one.
  *
  * Returns a `launch(video, resumeMs, title)` callback.
  */
@@ -60,7 +60,7 @@ fun rememberExternalPlayer(
     }
 }
 
-/** Reads int/long/string extras defensively — players are inconsistent. */
+/** Reads int/long/string extras defensively - players are inconsistent. */
 private fun numericExtra(intent: Intent, key: String): Long? =
     runCatching {
         when (val value = intent.extras?.get(key)) {

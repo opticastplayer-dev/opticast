@@ -11,7 +11,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 
 /**
- * UseCase — Match metadata + cache subtitles offline-first
+ * UseCase - Match metadata + cache subtitles offline-first
  * - Business logic out of ViewModel (was in LibraryViewModel autoMatch)
  * - Pure, testable, uses repositories
  * - Offline-first: subtitles cached during scan when online

@@ -55,7 +55,7 @@ object PipActions {
         val builder = PictureInPictureParams.Builder()
             .setActions(actions(context, isPlaying))
         builder.setAspectRatio(aspectFor(width, height))
-        // Android 12+ — keep the window bounded and smooth; aspect is enough.
+        // Android 12+ - keep the window bounded and smooth; aspect is enough.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             builder.setAutoEnterEnabled(false)
         }
@@ -65,7 +65,7 @@ object PipActions {
     private fun aspectFor(w: Int, h: Int): Rational {
         if (w > 0 && h > 0) {
             val aspect = w.toFloat() / h.toFloat()
-            // Android enforces 0.418069…2.390… — clamp rather than crash.
+            // Android enforces 0.418069…2.390… - clamp rather than crash.
             return when {
                 aspect < 0.42f -> Rational(9, 21) // ~0.428
                 aspect > 2.39f -> Rational(239, 100)

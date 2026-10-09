@@ -19,11 +19,11 @@ import coil.request.ImageRequest
 import coil.request.CachePolicy
 
 /**
- * Optimized poster for smooth scrolling — works great on all phones including older ones.
+ * Optimized poster for smooth scrolling - works great on all phones including older ones.
  * - Placeholder shows immediately (12dp rounded, matches design)
  * - Crossfade 200ms prevents white flash, feels solid
  * - Memory cache reduces work, smooth 60fps
- * - Stable key prevents recomposition, buttery smooth like settings
+ * - Stable key prevents recomposition, smooth like settings
  * - Offline-first: uses cached file:// when available, no network while scrolling
  */
 @Composable
@@ -34,7 +34,7 @@ fun OptimizedPoster(
     cornerRadius: Int = 12
 ) {
     val context = LocalContext.current
-    // Stable placeholder brush — remember without keys for stability
+    // Stable placeholder brush - remember without keys for stability
     val placeholderBrush = remember {
         Brush.linearGradient(
             colors = listOf(
@@ -44,7 +44,7 @@ fun OptimizedPoster(
             )
         )
     }
-    // Stable posterUrl for recomposition — remember to avoid reloading on scroll
+    // Stable posterUrl for recomposition - remember to avoid reloading on scroll
     val stableUrl = remember(posterUrl) { posterUrl }
     
     Box(
@@ -75,7 +75,7 @@ fun OptimizedPoster(
 
 /**
  * Placeholder that matches 12dp border/clip design
- * Shows immediately while real poster loads — no white flash
+ * Shows immediately while real poster loads - no white flash
  */
 @Composable
 fun PosterPlaceholder(

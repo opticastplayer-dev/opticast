@@ -67,7 +67,7 @@ private data class GraphQLRequest(
 )
 
 /**
- * Client for AniList's free GraphQL API — no API key required. Used for
+ * Client for AniList's free GraphQL API - no API key required. Used for
  * anime recognition (release-group style filenames) and manual anime matching.
  */
 class AniListApi {

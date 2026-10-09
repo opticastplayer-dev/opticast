@@ -56,7 +56,7 @@ class MetadataStore(context: Context) {
         }
         val parsed = runCatching { json.decodeFromString<Metadata>(file.readText()) }.getOrNull()
         // A parse failure (half-written file, older schema) must NOT be treated
-        // as "no metadata" — that used to hide posters for the whole session.
+        // as "no metadata" - that used to hide posters for the whole session.
         if (parsed != null) memory[videoId] = parsed
         return parsed
     }
@@ -77,7 +77,7 @@ class MetadataStore(context: Context) {
         _version.value++
     }
 
-    /** In-memory snapshot of everything already parsed — used by statistics. */
+    /** In-memory snapshot of everything already parsed - used by statistics. */
     fun cached(videoId: Long): Metadata? = memory[videoId]
 
     fun clear(videoId: Long) {

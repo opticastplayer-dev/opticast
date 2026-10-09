@@ -73,7 +73,7 @@ class OptiCastPlaybackService : MediaSessionService() {
             }
         }
 
-        // Audio boost — simplified, no presets, only dialogue + volume boost
+        // Audio boost - simplified, no presets, only dialogue + volume boost
         serviceScope.launch {
             AppContainer.settings.settings.collect { prefs ->
                 audioEffects.apply(prefs)

@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
-// Expressive shape scale — everything is generously rounded, Infuse-style.
+// Expressive shape scale - everything is generously rounded, Infuse-style.
 val OptiCastShapes = Shapes(
     extraSmall = RoundedCornerShape(10.dp),
     small = RoundedCornerShape(14.dp),

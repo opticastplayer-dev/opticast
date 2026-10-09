@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * UseCase — Refresh library, offline-first, single responsibility
+ * UseCase - Refresh library, offline-first, single responsibility
  * - Scans MediaStore via repository
  * - Handles errors without crashing
  * - Easy to test with FakeLibraryRepository

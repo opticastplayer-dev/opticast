@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Drop-in replacement for old TmdbApi — same method names, but uses secure proxy
+ * Drop-in replacement for old TmdbApi - same method names, but uses secure proxy
  * No API key needed. Handles Render waking.
  *
  * To migrate: in AppContainer.kt change:

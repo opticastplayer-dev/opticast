@@ -27,20 +27,20 @@ Thank you for considering contributing to OptiCast — a beautifully organized, 
 5. Update documentation if needed
 6. Submit a PR with a clear description and link to related issues
 
-### Commit Style — Short and brief like VLC
+### Commit Style
 
-We follow VLC/mpv style — short, component prefix, little description only where needed:
+Keep commits short and brief, conventional format:
 
 ```
 <type>(<scope>): <short description>
 
-- optional bullet, only if needed to avoid confusion
+- optional bullet, only if needed
 ```
 
 **Types:** `feat`, `fix`, `docs`, `refactor`, `chore`, `perf`
 **Scopes:** `player`, `library`, `settings`, `metadata`, `subtitles`, `docs`, `website`, `build`
 
-**Examples (VLC-style):**
+**Examples:**
 - `player: show battery and clock`
 - `fix: allow Media3-only build`
 - `docs: update FAQ`
@@ -49,10 +49,8 @@ We follow VLC/mpv style — short, component prefix, little description only whe
 - `settings: hide network behind beta toggle`
 
 **Rules:**
-- Title ≤50 chars, lowercase, no period, no em dash
-- No AI phrases: no "No version bump, safe for F-Droid", no "lightweight for solo", no "professional"
-- Body only if needed to avoid confusion — 1-2 short bullets max
-- Keep brief like VLC: https://github.com/videolan/vlc/commits/master/
+- Title ≤50 chars, lowercase, no period
+- Body only if needed — 1-2 short bullets max
 
 ### Code Style
 

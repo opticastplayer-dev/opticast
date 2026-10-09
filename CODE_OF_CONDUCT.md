@@ -1,6 +1,6 @@
 # Code of Conduct — OptiCast
 
-**Current:** v2.6.119 (168)
+**Current:** v2.6.120 (169)
 
 ## Our Pledge
 

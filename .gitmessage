@@ -1,4 +1,4 @@
-# <type>(<scope>): <short description> — 50 chars max, lowercase, no period
+# <type>(<scope>): <short description> - 50 chars max, lowercase, no period
 # Types: feat, fix, docs, refactor, chore, perf
 # Scopes: player, library, settings, metadata, subtitles, docs, website, build
 # Example: player: show battery and clock

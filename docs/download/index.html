@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Direct Download — OptiCast APK</title>
-<meta name="description" content="Direct APK download for OptiCast Video Player — offline-first, no ads, open source. Latest version direct link.">
+<title>Direct Download - OptiCast APK</title>
+<meta name="description" content="Direct APK download for OptiCast Video Player - offline-first, no ads, open source. Latest version direct link.">
 <link rel="canonical" href="https://opticastplayer-dev.github.io/opticast/download/">
 <meta http-equiv="refresh" content="5;url=https://github.com/opticastplayer-dev/opticast/releases/latest">
 <style>
@@ -23,14 +23,14 @@ h1{font-size:1.8rem;font-weight:800;margin:0 0 12px;letter-spacing:-0.02em}
 <div class="card">
 <h1>⬇ Direct Download</h1>
 <p class="lead">Fetching latest APK from GitHub Releases...<br>If not redirected in 5 seconds, tap button below.</p>
-<div class="verified">✓ Verified · GPL-3.0 · Official · F-Droid Pipeline Passed ✅</div>
+<div class="verified">✓ Verified · GPL-3.0 · Official</div>
 <div id="info" class="small">Loading latest version...</div>
 <div style="margin-top:20px">
 <a class="btn" id="dlBtn" href="https://github.com/opticastplayer-dev/opticast/releases/latest">Download APK Direct</a><br>
 <a class="btn sec" href="https://opticastplayer-dev.github.io/opticast/">← Back to website</a>
 <a class="btn sec" href="https://github.com/opticastplayer-dev/opticast/releases/latest">All Releases</a>
 </div>
-<div class="small" style="margin-top:20px">OptiCast — Your videos, beautifully organized.<br>Offline-first, no ads, open source. Android 8+.</div>
+<div class="small" style="margin-top:20px">OptiCast - Your videos, beautifully organized.<br>Offline-first, no ads, open source. Android 8+.</div>
 </div>
 <script>
 (async()=>{
@@ -47,11 +47,11 @@ h1{font-size:1.8rem;font-weight:800;margin:0 0 12px;letter-spacing:-0.02em}
       // Auto redirect after 1s
       setTimeout(()=>{window.location.href=apk.browser_download_url},1000);
     }else{
-      info.textContent='Latest: '+data.tag_name+' — redirecting to releases page';
+      info.textContent='Latest: '+data.tag_name+' - redirecting to releases page';
       setTimeout(()=>{window.location.href='https://github.com/opticastplayer-dev/opticast/releases/latest'},1500);
     }
   }catch(e){
-    info.textContent='Could not fetch latest — redirecting to releases page in 3s';
+    info.textContent='Could not fetch latest - redirecting to releases page in 3s';
     setTimeout(()=>{window.location.href='https://github.com/opticastplayer-dev/opticast/releases/latest'},3000);
   }
 })();

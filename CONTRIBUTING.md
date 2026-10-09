@@ -1,6 +1,6 @@
 # Contributing to OptiCast
 
-Thank you for considering contributing to OptiCast — a beautifully organized, offline-first, open source local video player for Android.
+Thank you for considering contributing to OptiCast - a beautifully organized, offline-first, open source local video player for Android.
 
 **Current:** v2.6.120 (169)
 
@@ -22,7 +22,7 @@ Thank you for considering contributing to OptiCast — a beautifully organized, 
 
 1. Fork the repository and create a branch `feat/your-feature`
 2. Follow existing code style: Kotlin, Compose, Material 3
-3. Keep the app lightweight and efficient — avoid adding unnecessary dependencies
+3. Keep the app lightweight and efficient - avoid adding unnecessary dependencies
 4. Test your changes thoroughly
 5. Update documentation if needed
 6. Submit a PR with a clear description and link to related issues
@@ -50,13 +50,13 @@ Keep commits short and brief, conventional format:
 
 **Rules:**
 - Title ≤50 chars, lowercase, no period
-- Body only if needed — 1-2 short bullets max
+- Body only if needed - 1-2 short bullets max
 
 ### Code Style
 
 - Kotlin and Jetpack Compose
 - Material 3 design principles
-- Avoid forced unwrapping — use safe calls
+- Avoid forced unwrapping - use safe calls
 - Keep files focused and under 1000 lines where possible
 - Offline-first design: minimize network usage and support offline viewing
 
@@ -71,7 +71,7 @@ Requires Android Studio and JDK 17.
 
 ### License
 
-GPL-3.0-only — by contributing you agree to license your contributions under the same license.
+GPL-3.0-only - by contributing you agree to license your contributions under the same license.
 
 ### Contact
 

@@ -1,4 +1,4 @@
-# OptiCast controlled mpv build — unchanged engine supplied with 2.6.54
+# OptiCast controlled mpv build - unchanged engine supplied with 2.6.54
 
 This release uses **our own source-built native libraries and JNI adapter**, not the unaudited Maven `mpv-android:1.0.0` binary. mpv, FFmpeg and libplacebo are pinned to the source revisions identified in that wrapper's version constants; other dependencies and all used submodules are explicitly pinned in `sources.lock.json`. The configuration is not byte-identical to mpvEx: OpenGL ES, no Vulkan/shaderc, no Lua/libcurl, NDK r28c, API 26, ARM64 and ARMv7 (32-bit ARM/NEON). Hardware-first is a preference, not proof of which decoder a given phone uses.
 

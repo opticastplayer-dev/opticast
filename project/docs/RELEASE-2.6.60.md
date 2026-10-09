@@ -1,4 +1,4 @@
-# OptiCast 2.6.60 (110) — Update Checker Dual-Repo Fallback
+# OptiCast 2.6.60 (110) - Update Checker Dual-Repo Fallback
 
 ## What's New
 

@@ -1,4 +1,4 @@
-# OptiCast — Your videos, beautifully organized.
+# OptiCast - Your videos, beautifully organized.
 
 [![Release](https://img.shields.io/github/v/release/opticastplayer-dev/opticast?label=Release)](https://github.com/opticastplayer-dev/opticast/releases)
 [![License](https://img.shields.io/github/license/opticastplayer-dev/opticast)](../LICENSE)
@@ -8,10 +8,10 @@
 
 **Current:** v2.6.120 (169)
 
-Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and plays them flawlessly offline.
+Get a great local video player experience with OptiCast. It finds and organizes your Movies and TV shows with posters and info, and plays them offline.
 
-**Official distribution:** GitHub Releases, Website, F-Droid MR !50919 — Pipeline Passed, awaiting merge, IzzyOnDroid #659
+**Official distribution:** GitHub Releases, Website, F-Droid MR !50919 awaiting merge
 
-See root [README.md](../README.md) for full details, [website](https://opticastplayer-dev.github.io/opticast/) for direct download, [Releases](https://github.com/opticastplayer-dev/opticast/releases/latest) for APK, and [OFFICIAL_DISTRIBUTION.md](../OFFICIAL_DISTRIBUTION.md) for distribution policy.
+See root [README.md](../README.md) for details, [website](https://opticastplayer-dev.github.io/opticast/) for download, [Releases](https://github.com/opticastplayer-dev/opticast/releases/latest) for APK.
 
 Contact: opticastproject@gmail.com

@@ -1,67 +1,65 @@
 # Privacy Policy — OptiCast Video Player
 
-**Version:** v2.6.119 (168)
-
-**Last updated:** 2026-10-02
+**Version:** v2.6.120 (169)
+**Last updated:** 2026-10-06
 
 ### Summary
-OptiCast is **100% private, no ads, no tracking, open source**. Your local cinema — plays your own videos, no movies or accounts included.
+OptiCast is private, with no ads, no tracking, and open source. Your videos stay on your device.
 
-### What We Collect
-**Nothing.** No analytics, no tracking, no ads.
+### What we collect
+Nothing — no analytics, no tracking, no ads.
 
-- **Your videos stay on your device:** Finds videos on your phone, fetches movie info only if you want it, subtitles only when you search
-- **Works offline:** Works fully without internet after saving posters and subtitles
-- **Update check:** Only checks for updates when you have internet, uses minimal data, only checks version number, no personal info
+- **Your videos stay on your device:** Finds videos on your phone, fetches movie information only when needed
+- **Works offline:** Fully functional without internet after initial setup
+- **Update check:** Only checks version number when online, uses minimal data, no personal information
 - **No accounts:** No login, no cloud, no sync
 
-### Permissions — Only What's Needed
+### Permissions — only what's needed
 
-- **Internet** — To fetch movie information and subtitles, and check for updates (only when internet available)
-- **Network State** — To check if internet is available before update check (saves data)
-- **Video Library Access** — To find your video files
+- **Internet** — To fetch movie information and subtitles, and check for updates
+- **Network state** — To check internet availability before update checks
+- **Video library access** — To find your video files
 - **Notifications** — To show playback controls
-- **Background Playback** — To keep playing in background and Picture-in-Picture
-- **Install Updates** — To install app updates inside the app without browser
-- **Keep Screen Awake** — To keep screen on while watching (if enabled)
+- **Background playback** — For background play and picture-in-picture
+- **Install updates** — To install app updates inside the app
+- **Keep screen awake** — To keep screen on while watching (if enabled)
 
 No location, no contacts, no microphone, no camera.
 
-### Works Offline
+### Offline-first
 
-- **Library:** Found on your device, saved locally, no cloud
-- **Posters:** Saved for offline viewing, beautiful blurred fallback never shows black
-- **Subtitles:** Saved on your device for offline viewing, supports two at once
-- **Movie Info:** Saved for offline, no internet needed later
+- **Library:** Found on device, saved locally, no cloud
+- **Posters:** Saved for offline viewing
+- **Subtitles:** Saved on device for offline viewing, supports dual subtitles
+- **Movie information:** Saved for offline use
 
-### Optional Services (Only If You Want)
+### Optional services
 
-- **Movie Info:** Optional, fetches movie and TV information, posters
+- **Movie information:** Optional, fetches posters and details
 - **Subtitles:** Optional subtitle search and download
-- **Extra Info:** Optional ratings and extra artwork
 
-All optional services have their own terms. OptiCast doesn't claim ownership.
+All optional services have their own terms.
 
 ### Updates
 
-- Checks for updates only when internet is available, uses minimal data
-- Downloads inside app, installs automatically, no browser
-- What's New shows real changes, easy to close
+- Checks for updates only when online, uses minimal data
+- Downloads inside app and installs with system confirmation
+- Clear changelog for each version
 
-### Kids
+### Children
 
 No data collection, no ads, safe for all ages. Plays only your own videos.
 
 ### Changes
 
-Any changes will be in GitHub and website.
+Any changes will be posted on GitHub and the official website.
 
 ### Contact
 
-`opticastproject@gmail.com` — Email only.
+opticastproject@gmail.com and https://github.com/opticastplayer-dev/opticast/issues
 
 ### License
 
-Open source — source code available in GitHub releases.
+GPL-3.0-only — source code available on GitHub.
 
-**Works on:** Android 8 and newer, all phones, mobile only, offline-first
+**Compatibility:** Android 8 and newer, phones only, offline-first

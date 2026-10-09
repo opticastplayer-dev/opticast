@@ -1,48 +1,30 @@
 # OptiCast FAQ — Common Questions
 
-**Current:** v2.6.119 (168)
+**Current:** v2.6.120 (169)
 
 ### Is OptiCast for TV?
-**No — designed for phones.** This is a phone app for Android 8 and newer. It works great on all phones including older ones. No TV support — focused on making the phone experience perfect.
+No — designed for phones. Works on Android 8 and newer, including older devices. Focused on the best phone experience.
 
 ### Does it work offline?
-**Yes — works fully offline.** It finds your videos, saves posters and subtitles for offline viewing, and plays everything without internet. It only uses internet to check for updates when you have connection, and to fetch movie information and subtitles — all saved for offline later.
+Yes — works fully offline after initial setup. Your videos, posters, and subtitles are saved to your device. Internet is only used to fetch movie information and subtitles, and to check for updates — all saved for offline use.
 
 ### How do I update?
-Just install the new version over the old one — it keeps all your data. You can also update inside the app: Settings → Check for updates → Download & Install. No browser needed, shows progress.
-
-### What's New shows old information?
-Fixed — now it shows what's really new in each update, with a clear compact card you can close.
-
-### Loading spinner stays when quickly switching videos?
-Fixed — now it hides automatically and never gets stuck.
-
-### Picture-in-Picture doesn't continue playing when expanded?
-Fixed — now it automatically continues playing when you expand.
-
-### Can't change the library grid layout?
-Fixed — now you can change between Compact and Comfortable layouts easily.
-
-### Movie page shows black background?
-Fixed — now it shows a beautiful blurred poster instead of black when no backdrop is available.
+Install the new version over the old one — your data is preserved. You can also update inside the app: Settings → Check for updates → Download & Install.
 
 ### Are subtitles saved offline?
-Yes — it finds and saves subtitles during scan for offline viewing. Saved on your device, works without internet. Supports two subtitles at once.
+Yes — subtitles are found during library scan and saved to your device for offline viewing. Supports two subtitles at once.
 
-### How to update without browser?
-Settings → Check for updates. It downloads inside the app and installs automatically with progress bar.
-
-### Why no TV support?
-Focused on phones to keep the app small, fast, and easy to use. No TV clutter.
-
-### How to install?
-Download APK from GitHub Releases and install. Grant video permission and it finds your videos automatically.
+### How do I install?
+Download APK from GitHub Releases or official website and install. Grant video access permission and your videos are organized automatically.
 
 ### Is it private?
-Yes — no ads, no tracking, open source, your media stays on your device, no accounts needed.
+Yes — no ads, no tracking, open source. Your media stays on your device, no accounts required.
+
+### Where are my videos?
+OptiCast looks in your Movies, DCIM, and Download folders. If a video is missing, check Settings → Excluded folders and pull to refresh in Library.
 
 ### How big is the app?
-Small download, efficient, works great even on older phones.
+Small and efficient, works well even on older phones. Official GitHub release includes full video engine, F-Droid build is Media3-only.
 
 ### Contact?
-`opticastproject@gmail.com` — Email only.
+opticastproject@gmail.com and GitHub Issues: https://github.com/opticastplayer-dev/opticast/issues

@@ -22,7 +22,7 @@ Get a great local video player experience with OptiCast! It finds and organizes 
 |--------|-----|
 | GitHub Releases | https://github.com/opticastplayer-dev/opticast/releases/latest |
 | Website | https://opticastplayer-dev.github.io/opticast/ |
-| F-Droid | https://f-droid.org/packages/com.opticast.player (MR !50919) |
+| F-Droid | https://f-droid.org/packages/com.opticast.player (MR !50919 — Pipeline Passed ✅) |
 | IzzyOnDroid | https://apt.izzysoft.de/fdroid/index/apk/com.opticast.player (Issue #659) |
 
 For security and to ensure you receive verified builds, please use only the official sources listed above. See [OFFICIAL_DISTRIBUTION.md](OFFICIAL_DISTRIBUTION.md) for full policy.
@@ -45,15 +45,15 @@ Most players try to do everything. OptiCast focuses on one thing: playing your o
 
 ### Screenshots — real app
 
-| Library | Movie detail | TV show |
-|---------|--------------|---------|
-| ![Library](docs/showcase/1.jpg) | Your collection at a glance with Continue Watching and Recently Added | ![Detail](docs/showcase/2.jpg) | Clear posters, cast, and details saved for offline viewing | ![TV Show](docs/showcase/3.jpg) | Browse seasons and episodes with progress remembered |
+| Library | Movie detail | TV shows |
+|---------|--------------|----------|
+| Your collection at a glance with Continue Watching and Recently Added | Clear posters, cast, and details saved for offline viewing | Browse seasons and episodes with progress remembered |
 
 | Player | Settings |
 |--------|----------|
-| ![Player](docs/showcase/4.jpg) | Simple controls, adjustable speed, picture-in-picture, and sleep timer | ![Settings](docs/showcase/5.jpg) | Customize your experience and check for updates |
+| Simple controls, adjustable speed, picture-in-picture, and sleep timer | Customize your experience and check for updates |
 
-*Real screenshots from OptiCast*
+*Real screenshots available on the official website: https://opticastplayer-dev.github.io/opticast/*
 
 ### Features
 

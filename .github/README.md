@@ -10,7 +10,7 @@
 
 Get a great local video player experience with OptiCast! It finds and organizes your Movies and TV shows with posters and info, and plays them flawlessly offline.
 
-**Official distribution:** GitHub Releases, Website, F-Droid MR !50919, IzzyOnDroid #659
+**Official distribution:** GitHub Releases, Website, F-Droid MR !50919 — Pipeline Passed ✅, IzzyOnDroid #659
 
 See root [README.md](../README.md) for full details, [website](https://opticastplayer-dev.github.io/opticast/) for direct download, [Releases](https://github.com/opticastplayer-dev/opticast/releases/latest) for APK, and [OFFICIAL_DISTRIBUTION.md](../OFFICIAL_DISTRIBUTION.md) for distribution policy.
 

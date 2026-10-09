@@ -2,7 +2,7 @@
 
 Thank you for considering contributing to OptiCast — a beautifully organized, offline-first, open source local video player for Android.
 
-**Current:** v2.6.119 (168)
+**Current:** v2.6.120 (169)
 
 ## How to Contribute
 

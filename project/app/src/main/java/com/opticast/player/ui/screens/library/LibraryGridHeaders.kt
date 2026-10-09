@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 /**
- * Gold Standard — Grid headers extracted from LibraryScreen.kt
+ * Grid headers extracted from LibraryScreen.kt
  * Single responsibility: file availability, matching
  * Was 50+ lines inside LazyVerticalGrid, now reusable, safe
  */

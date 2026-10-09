@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 
 /**
- * Gold Standard — Fast-scroll thumb extracted from LibraryScreen.kt
+ * Fast-scroll thumb extracted from LibraryScreen.kt
  * Low-RAM safe with derivedStateOf + graphicsLayer, like Infuse
  */
 @Composable

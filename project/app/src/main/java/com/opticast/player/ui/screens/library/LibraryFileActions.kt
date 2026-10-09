@@ -8,7 +8,7 @@ import android.widget.Toast
 import com.opticast.player.data.AppContainer
 
 /**
- * Gold Standard — File actions extracted from LibraryScreen.kt
+ * File actions extracted from LibraryScreen.kt
  * Single responsibility: share / delete / mime handling
  * Was 200+ lines inside LibraryScreen composable, now reusable, testable
  */

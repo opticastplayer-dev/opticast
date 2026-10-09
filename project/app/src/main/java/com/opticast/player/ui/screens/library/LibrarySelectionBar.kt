@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.opticast.player.data.AppContainer
 
 /**
- * Gold Standard — Selection bar extracted from LibraryScreen.kt
+ * Selection bar extracted from LibraryScreen.kt
  * Single responsibility: floating multi-select action bar
  */
 @Composable

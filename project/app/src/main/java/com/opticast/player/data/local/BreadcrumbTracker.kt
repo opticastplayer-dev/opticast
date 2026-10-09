@@ -8,7 +8,7 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * 10/10 Breadcrumb tracker - logs last 50 actions for crash debugging
+ * Breadcrumb tracker - logs last 50 actions for crash debugging
  * - Stays on device, private, no internet
  * - Helps fix stability issues quickly
  * - Lightweight, no performance impact

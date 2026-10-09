@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Gold Standard UseCase — pure business logic, no Android, testable
+ * UseCase — pure business logic, no Android, testable
  * Searches library offline-first, uses repository cache
  */
 class SearchLibraryUseCase(

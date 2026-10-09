@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
 /**
- * 10/10 Fast scroll thumb like Infuse - alphabet thumb for quick navigation
+ * Fast scroll thumb like Infuse - alphabet thumb for quick navigation
  * - Shows when scrolling, hides after 1s
  * - Drag to fast scroll through library
  * - Lightweight, no performance impact

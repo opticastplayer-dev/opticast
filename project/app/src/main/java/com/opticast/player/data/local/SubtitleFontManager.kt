@@ -4,7 +4,7 @@ import android.content.Context
 import java.io.File
 
 /**
- * 10/10 Custom subtitle fonts - user can add fonts to filesDir/fonts
+ * Custom subtitle fonts - user can add fonts to filesDir/fonts
  * - Offline, no internet needed
  * - Supports .ttf, .otf
  * - Falls back to system font

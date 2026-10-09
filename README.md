@@ -22,7 +22,7 @@ Get a great local video player experience with OptiCast! It finds and organizes 
 |--------|-----|
 | GitHub Releases | https://github.com/opticastplayer-dev/opticast/releases/latest |
 | Website | https://opticastplayer-dev.github.io/opticast/ |
-| F-Droid | https://f-droid.org/packages/com.opticast.player (MR !50919 — Pipeline Passed ✅) |
+| F-Droid | https://f-droid.org/packages/com.opticast.player (MR !50919 — Pipeline Passed, awaiting merge) |
 | IzzyOnDroid | https://apt.izzysoft.de/fdroid/index/apk/com.opticast.player (Issue #659) |
 
 For security and to ensure you receive verified builds, please use only the official sources listed above. See [OFFICIAL_DISTRIBUTION.md](OFFICIAL_DISTRIBUTION.md) for full policy.

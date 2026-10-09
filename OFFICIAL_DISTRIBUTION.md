@@ -12,7 +12,7 @@ OptiCast is officially distributed only from sources maintained by the OptiCast 
 |--------|-----|--------|
 | **GitHub Releases** | https://github.com/opticastplayer-dev/opticast/releases | Official — direct APK and checksums |
 | **Official Website** | https://opticastplayer-dev.github.io/opticast/ | Official — direct download and documentation |
-| **F-Droid** | https://f-droid.org/packages/com.opticast.player | Pipeline Passed ✅ — MR !50919 awaiting merge |
+| **F-Droid** | https://f-droid.org/packages/com.opticast.player | Pipeline Passed — MR !50919 awaiting merge |
 | **IzzyOnDroid** | https://apt.izzysoft.de/fdroid/index/apk/com.opticast.player | Pending — Issue #659 under review |
 
 All official builds are signed with the same release key, allowing seamless updates while preserving user data. If Android reports a conflicting signature during installation, the APK originates from an unofficial source.
@@ -60,4 +60,4 @@ Starting from v2.6.120, the app displays installation source information in Sett
 - GitHub Issues: https://github.com/opticastplayer-dev/opticast/issues
 - Website: https://opticastplayer-dev.github.io/opticast/
 
-**Last updated:** 2026-10-02 — v2.6.119 (168)
+**Last updated:** 2026-10-09 — v2.6.120 (169)

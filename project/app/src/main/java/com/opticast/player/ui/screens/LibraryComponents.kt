@@ -572,7 +572,7 @@ internal fun FilterChipsRow(sortBy: String, onSortChange: (String) -> Unit, sele
 
 @Composable
 internal fun EmptyLibrary(fromSearch: Boolean) {
-    // Gold Standard: use premium empty state with spring animation
+    // use premium empty state with spring animation
     EmptyLibraryPremium(
         fromSearch = fromSearch,
         onOpenSettings = null,

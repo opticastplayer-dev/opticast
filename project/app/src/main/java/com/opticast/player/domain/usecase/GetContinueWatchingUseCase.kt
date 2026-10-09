@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 /**
- * Gold Standard UseCase — Continue Watching, offline-first
+ * UseCase — Continue Watching, offline-first
  * Combines library entries + playback progress
  */
 class GetContinueWatchingUseCase(

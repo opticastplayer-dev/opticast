@@ -67,7 +67,7 @@ fun LibraryGrid(
             key = { it.video.id },
             contentType = { "poster" }
         ) { entry ->
-            // Gold: SharedElement for poster morph + animateItem for smooth grid
+            // SharedElement for poster morph + animateItem for smooth grid
             PosterCard(
                 entry = entry,
                 onClick = { onPosterClick(entry) },

@@ -3,7 +3,7 @@ package com.opticast.player.data.local
 import com.opticast.player.data.model.LibraryEntry
 
 /**
- * 10/10 Fuzzy search - typo tolerance like Infuse
+ * Fuzzy search - typo tolerance like Infuse
  * - Levenshtein distance 1-2 for typo tolerance
  * - Search "Avngers" finds "Avengers"
  * - Fast, no extra dependencies

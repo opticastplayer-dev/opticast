@@ -20,7 +20,7 @@ class OptiCastApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Detect low-RAM early so all later decisions use correct budget - 10/10 adaptive
+        // Detect low-RAM early so all later decisions use correct budget - adaptive
         val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
         val lowRam = activityManager?.isLowRamDevice == true
         val memClass = activityManager?.memoryClass ?: 256
@@ -93,7 +93,7 @@ class OptiCastApplication : Application() {
 
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
-        // 10/10 granular trim - matches Infuse memory handling
+        // granular trim - matches Infuse memory handling
         when {
             level >= android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE -> {
                 // Most aggressive - clear everything

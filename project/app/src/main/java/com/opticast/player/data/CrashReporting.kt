@@ -32,7 +32,7 @@ object CrashReporting {
             // Let system handle crash normally
             defaultHandler?.uncaughtException(thread, throwable)
         }
-        // 10/10: ANR watchdog - detect main thread stalls
+        // ANR watchdog - detect main thread stalls
         try {
             val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
             var lastTick = System.currentTimeMillis()
@@ -87,7 +87,7 @@ object CrashReporting {
             val timestamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US).format(Date())
             val crashFile = File(crashDir, "crash_$timestamp.txt")
             
-            // 10/10: Include breadcrumbs in crash report
+            // Include breadcrumbs in crash report
             val breadcrumbText = try {
                 val bcFile = File(context.filesDir, "$CRASH_DIR/$BREADCRUMB_FILE")
                 if (bcFile.exists()) "\nBreadcrumbs (last 50 actions):\n${bcFile.readText()}\n" else "\nNo breadcrumbs\n"

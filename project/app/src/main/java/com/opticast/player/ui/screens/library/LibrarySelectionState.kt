@@ -11,7 +11,7 @@ import com.opticast.player.data.model.LibraryEntry
 import com.opticast.player.data.model.showCollection
 
 /**
- * Gold Standard — Selection state extracted from LibraryScreen.kt
+ * Selection state extracted from LibraryScreen.kt
  * Single responsibility: multi-select mode
  */
 class LibrarySelectionState(

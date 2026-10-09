@@ -183,7 +183,7 @@ class PosterCache(context: Context) {
     }
 
     private suspend fun download(key: String, url: String): Boolean {
-        // 10/10: Exponential backoff retry - 1s, 2s, 4s max 3 times, prevents network loop on bad URL
+        // Exponential backoff retry - 1s, 2s, 4s max 3 times, prevents network loop on bad URL
         var attempt = 0
         var delayMs = 1000L
         while (attempt < 3) {

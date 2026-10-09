@@ -8,7 +8,7 @@ import com.opticast.player.data.remote.TmdbTvDetailsDto
 
 /**
  * Repository interface for TMDB — separates data from UI, easy to test
- * Gold standard: interface + impl + fake, no God object
+ * interface + impl + fake, no God object
  */
 interface TmdbRepository {
     suspend fun searchMovies(query: String, year: Int? = null): ApiResult<List<TmdbSearchResultDto>>

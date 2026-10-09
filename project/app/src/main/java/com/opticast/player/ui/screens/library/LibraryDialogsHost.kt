@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import com.opticast.player.data.model.LibraryEntry
 
 /**
- * Gold Standard — Dialogs host extracted from LibraryScreen.kt bottom 200 lines
+ * Dialogs host extracted from LibraryScreen.kt bottom 200 lines
  * Single responsibility: customize, collections, smart collections, missing files, rename, genre, delete confirm
  */
 @Composable

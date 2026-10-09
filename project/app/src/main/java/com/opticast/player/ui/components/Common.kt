@@ -379,7 +379,7 @@ fun PosterCard(
     val fallbackTitle = remember(entry.video.name, entry.video.parsed.title) { entry.video.parsed.title.ifBlank { entry.video.name } }
     val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) }
 
-    // Gold: Keep ultra-fast for grid — sharedElement causes empty boxes in LazyVerticalGrid with animateItem
+    // Keep ultra-fast for grid — sharedElement causes empty boxes in LazyVerticalGrid with animateItem
     // SharedElement only for detail header, not for grid cards (prevents messed up empty boxes)
     // Previous attempt caused MOVIES section 4 empty outlined boxes (see Screenshot_20261002_055504)
     val sharedModifier = modifier

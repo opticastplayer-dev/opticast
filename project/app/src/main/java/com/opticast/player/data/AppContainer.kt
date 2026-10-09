@@ -52,7 +52,7 @@ object AppContainer {
     fun setLowRamMode(enabled: Boolean) { lowRamMode = enabled }
     fun setMemoryClass(mb: Int) { memoryClassMb = mb.coerceIn(64, 1024) }
 
-    // 10/10: Adaptive budgets using memoryClass
+    // Adaptive budgets using memoryClass
     fun adaptiveImageMemoryBudget(): Int = com.opticast.player.data.imageMemoryBudgetBytes(lowRamMode, memoryClassMb)
     fun adaptiveImageDiskBudget(): Long = com.opticast.player.data.imageDiskBudgetBytes(lowRamMode, memoryClassMb)
     fun adaptivePosterConcurrency(): Int = com.opticast.player.data.posterDownloadConcurrency(lowRamMode, memoryClassMb)
@@ -139,7 +139,7 @@ object AppContainer {
     val subDl: SubDlApi by lazy { SubDlApi(settings, metadataStore) }
     val subtitles: SubtitleSources by lazy { SubtitleSources(openSubtitles, subDl, settings) }
 
-    // 10/10: Clean - removed placeholder cloud/cast that didn't benefit end user (0 benefit)
+    // Clean - removed placeholder cloud/cast that didn't benefit end user (0 benefit)
     // Cloud Drive/SMB/WebDAV + Cast will be added later when real implementation ready, offline-first #1
     val breadcrumb: com.opticast.player.data.local.BreadcrumbTracker by lazy { com.opticast.player.data.local.BreadcrumbTracker(application) }
     val subtitleFonts: com.opticast.player.data.local.SubtitleFontManager by lazy { com.opticast.player.data.local.SubtitleFontManager(application) }

@@ -3,7 +3,7 @@ package com.opticast.player.player
 import com.opticast.player.data.model.LibraryEntry
 
 /**
- * 10/10 Gapless queue - preloads next episode when 90% watched
+ * Gapless queue - preloads next episode when 90% watched
  * - Smooth next episode transition like Infuse
  * - Only preloads when not on metered network or user allows
  * - Saves battery, no jank

@@ -69,7 +69,7 @@ class MediaScanner(private val context: Context) {
                         modifiedSec = try { cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED)) } catch (_: Exception) { 0L },
                     )
                 } catch (e: SecurityException) {
-                    // 10/10: Android 13+ MediaStore can throw SecurityException for restricted files
+                    // Android 13+ MediaStore can throw SecurityException for restricted files
                     android.util.Log.w("MediaScanner", "Skipping restricted file at cursor ${cursor.position}: ${e.message}")
                     continue
                 } catch (e: IllegalStateException) {

@@ -8,7 +8,7 @@ import com.opticast.player.data.model.showTitleOf
 import com.opticast.player.ui.screens.EntryMenuSheet
 
 /**
- * Gold Standard — Menu host extracted from LibraryScreen.kt
+ * Menu host extracted from LibraryScreen.kt
  * Single responsibility: entry menu sheet handling
  */
 @Composable

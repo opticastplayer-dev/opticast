@@ -368,7 +368,7 @@ fun LibraryScreen(
     var menuEntry by remember { mutableStateOf<LibraryEntry?>(null) }
     var menuIsWholeShow by remember { mutableStateOf(false) }
 
-    // Gold: selection state extracted to library/LibrarySelectionState.kt
+    // selection state extracted to library/LibrarySelectionState.kt
     val selectionState = com.opticast.player.ui.screens.library.rememberLibrarySelectionState()
     var selectionMode by selectionState.selectionMode
     val selectedIds = selectionState.selectedIds
@@ -386,7 +386,7 @@ fun LibraryScreen(
     fun shareVideos(ids: List<Long>) =
         com.opticast.player.ui.screens.library.LibraryFileActions.shareVideos(context, ids)
 
-    // Gold: delete handling extracted to library/LibraryDeleteHandler.kt
+    // delete handling extracted to library/LibraryDeleteHandler.kt
     val deleteHandler = com.opticast.player.ui.screens.library.rememberLibraryDeleteHandler(
         selectionState = selectionState,
         viewModel = viewModel,
@@ -414,7 +414,7 @@ fun LibraryScreen(
     BackHandler(enabled = searchOpen && !selectionMode) { closeSearch() }
 
 
-    // Gold: permission handling extracted to library/LibraryPermissionHandler.kt
+    // permission handling extracted to library/LibraryPermissionHandler.kt
     val permissionState = com.opticast.player.ui.screens.library.rememberLibraryPermissionState()
     var hasPermission by permissionState.hasPermission
     val permissionLauncher = permissionState.permissionLauncher
@@ -444,7 +444,7 @@ fun LibraryScreen(
         val q = query.trim().lowercase()
         if (q.isEmpty()) state.entries
         else {
-            // 10/10: Fuzzy search with typo tolerance like Infuse - Avngers finds Avengers
+            // Fuzzy search with typo tolerance like Infuse - Avngers finds Avengers
             val exact = state.entries.filter { entry ->
                 entry.metadata?.displayTitle?.lowercase()?.contains(q) == true ||
                     entry.metadata?.title?.lowercase()?.contains(q) == true ||
@@ -566,7 +566,7 @@ fun LibraryScreen(
 
         // FIX WEAKNESS: Library grid changeable wasn't working - remember inside columns param was not triggering recomposition
         // Now compute grid cells outside, keyed to libraryGrid, and use key() to force LazyVerticalGrid recomposition when grid changes
-        // 10/10: Breadcrumb for grid change + adaptive RAM log
+        // Breadcrumb for grid change + adaptive RAM log
         val currentGridCells = remember(appSettings.libraryGrid) {
             GridCells.Adaptive(libraryPosterMinimumDp(appSettings.libraryGrid).dp)
         }
@@ -611,7 +611,7 @@ fun LibraryScreen(
                     }
                 }
             }
-            // Gold: file availability extracted to library/LibraryGridHeaders.kt
+            // file availability extracted to library/LibraryGridHeaders.kt
             libraryFileAvailability(
                 missingCount = missingFiles.size,
                 fileScanError = state.fileScanError,
@@ -632,7 +632,7 @@ fun LibraryScreen(
                         )
                 }
             }
-            // Gold: matching extracted to library/LibraryGridHeaders.kt
+            // matching extracted to library/LibraryGridHeaders.kt
             libraryMatching(
                 isMatching = state.isMatching,
                 matchingDone = state.matchingDone,
@@ -938,7 +938,7 @@ fun LibraryScreen(
         }
     }
 
-    // Gold: dialogs host extracted to library/LibraryDialogsHost.kt — saves 60+ lines
+    // dialogs host extracted to library/LibraryDialogsHost.kt — saves 60+ lines
     com.opticast.player.ui.screens.library.LibraryDialogsHost(
         showCustomize = showCustomize,
         tab = tab,
@@ -982,7 +982,7 @@ fun LibraryScreen(
     )
 
 
-    // Gold: Floating multi-select action bar extracted to library/LibrarySelectionBar.kt
+    // Floating multi-select action bar extracted to library/LibrarySelectionBar.kt
     if (selectionMode) com.opticast.player.ui.screens.library.LibrarySelectionBar(
         selectedIds = selectedIds.toList(),
         tab = tab,
@@ -1005,7 +1005,7 @@ fun LibraryScreen(
     )
     }
 
-    // Gold: menu host extracted to library/LibraryMenuHost.kt — saves 50+ lines
+    // menu host extracted to library/LibraryMenuHost.kt — saves 50+ lines
     com.opticast.player.ui.screens.library.LibraryMenuHost(
         menuEntry = menuEntry,
         menuIsWholeShow = menuIsWholeShow,
@@ -1029,7 +1029,7 @@ fun LibraryScreen(
 }
 
 /** Fast-scroll thumb overlay like Infuse - low-RAM safe with derivedStateOf + graphicsLayer
- * Gold: extracted to library/LibraryFastScrollThumb.kt, kept wrapper for backward compat
+ * extracted to library/LibraryFastScrollThumb.kt, kept wrapper for backward compat
  */
 @Composable
 fun FastScrollThumb(

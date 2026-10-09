@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 
 /**
- * Gold Standard — Permission handling extracted from LibraryScreen.kt
+ * Permission handling extracted from LibraryScreen.kt
  * Single responsibility: video permission + notification permission
  */
 class LibraryPermissionState(

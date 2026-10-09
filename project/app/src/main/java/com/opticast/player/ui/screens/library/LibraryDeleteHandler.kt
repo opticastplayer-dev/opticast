@@ -18,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Gold Standard — Delete handling extracted from LibraryScreen.kt
+ * Delete handling extracted from LibraryScreen.kt
  * Single responsibility: delete flow with MediaStore + legacy Android 10 handling
  */
 class LibraryDeleteHandler(

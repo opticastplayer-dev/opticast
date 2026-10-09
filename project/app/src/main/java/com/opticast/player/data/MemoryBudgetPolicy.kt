@@ -1,7 +1,7 @@
 package com.opticast.player.data
 
 /** Artwork LRU only, not total process PSS. Optimized for low RAM 270MB avg - reduced from 24/32/48/96 to 12/16/24/32 to fix 350MB vs 270MB regression.
- * 10/10: Adaptive to memoryClass, keeps smooth scrolling without reloading, low-RAM safe.
+ * Adaptive to memoryClass, keeps smooth scrolling without reloading, low-RAM safe.
  */
 internal fun imageMemoryBudgetBytes(lowRam: Boolean, memoryClass: Int = if (lowRam) 128 else 256): Int {
     val mb = when {

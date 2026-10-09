@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Gold Standard ViewModel — split from LibraryScreen.kt + uses Domain UseCases
+ * ViewModel — split from LibraryScreen.kt + uses Domain UseCases
  * - Single source of truth for library UI state
  * - Uses repository interface + use cases for testability (was God object with AppContainer directly)
  * - Business logic out of composable (was 800+ lines in screen) — now thin, delegates to use cases
@@ -55,7 +55,7 @@ class LibraryViewModel(
     private val matchingInFlight = AtomicBoolean(false)
     private var cachedVideos: List<LocalVideo> = emptyList()
 
-    // Gold Standard: Domain UseCases — thin ViewModel, business logic in use cases, testable
+    // Domain UseCases — thin ViewModel, business logic in use cases, testable
     private val searchUseCase = repository?.let { SearchLibraryUseCase(it) }
     private val refreshUseCase = repository?.let { RefreshLibraryUseCase(it) }
     private val matchUseCase = MatchMetadataUseCase()
@@ -116,7 +116,7 @@ class LibraryViewModel(
     }
 
     fun clearMetadata(videoId: Long) {
-        // Gold: use use case, fallback to AppContainer for backward compat
+        // use use case, fallback to AppContainer for backward compat
         try {
             clearMetadataUseCase(videoId)
         } catch (_: Exception) {

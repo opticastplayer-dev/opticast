@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 /**
- * Gold Standard — Bottom sheets extracted from LibraryScreen.kt
+ * Bottom sheets extracted from LibraryScreen.kt
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

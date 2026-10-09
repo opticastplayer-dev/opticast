@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Privacy Policy — OptiCast Video Player</title>
-<meta name="description" content="Privacy Policy for OptiCast — private, no ads, no tracking, open source. Your videos stay on your device.">
+<title>Privacy Policy - OptiCast Video Player</title>
+<meta name="description" content="Privacy Policy for OptiCast - private, no ads, no tracking, open source. Your videos stay on your device.">
 <link rel="canonical" href="https://opticastplayer-dev.github.io/opticast/privacy/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
 <style>
@@ -27,14 +27,14 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border2);colo
 </head>
 <body>
 <header>
-<h1>Privacy Policy — OptiCast Video Player</h1>
-<p class="sub">Version: v2.6.120 (169) — Last updated: 2026-10-06</p>
+<h1>Privacy Policy - OptiCast Video Player</h1>
+<p class="sub">Version: v2.6.120 (169) - Last updated: 2026-10-06</p>
 <div style="margin-top:16px"><a class="btn" href="../">← Home</a><a class="btn" href="../faq/">FAQ</a><a class="btn" href="../download/">Direct Download</a></div>
 </header>
 
 <div class="card"><h2>Summary</h2><p>OptiCast is private, with no ads, no tracking, and open source. Your videos stay on your device.</p></div>
 
-<div class="card"><h2>What we collect</h2><p>Nothing — no analytics, no tracking, no ads.</p>
+<div class="card"><h2>What we collect</h2><p>Nothing - no analytics, no tracking, no ads.</p>
 <ul>
 <li><strong>Your videos stay on your device:</strong> Finds videos on your phone, fetches movie information only when needed</li>
 <li><strong>Works offline:</strong> Fully functional without internet after initial setup</li>
@@ -42,15 +42,15 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border2);colo
 <li><strong>No accounts:</strong> No login, no cloud, no sync</li>
 </ul></div>
 
-<div class="card"><h2>Permissions — only what's needed</h2>
+<div class="card"><h2>Permissions - only what's needed</h2>
 <ul>
-<li><strong>Internet</strong> — To fetch movie information and subtitles, and check for updates</li>
-<li><strong>Network state</strong> — To check internet availability</li>
-<li><strong>Video library access</strong> — To find your video files</li>
-<li><strong>Notifications</strong> — To show playback controls</li>
-<li><strong>Background playback</strong> — For background play and picture-in-picture</li>
-<li><strong>Install updates</strong> — To install app updates inside the app</li>
-<li><strong>Keep screen awake</strong> — To keep screen on while watching</li>
+<li><strong>Internet</strong> - To fetch movie information and subtitles, and check for updates</li>
+<li><strong>Network state</strong> - To check internet availability</li>
+<li><strong>Video library access</strong> - To find your video files</li>
+<li><strong>Notifications</strong> - To show playback controls</li>
+<li><strong>Background playback</strong> - For background play and picture-in-picture</li>
+<li><strong>Install updates</strong> - To install app updates inside the app</li>
+<li><strong>Keep screen awake</strong> - To keep screen on while watching</li>
 </ul>
 <p>No location, no contacts, no microphone, no camera.</p></div>
 
@@ -64,10 +64,21 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border2);colo
 
 <div class="card"><h2>Optional services</h2>
 <ul>
-<li><strong>Movie information:</strong> Optional, fetches posters and details</li>
+<li><strong>Movie information:</strong> Optional, fetches posters and details via secure proxy</li>
 <li><strong>Subtitles:</strong> Optional subtitle search and download</li>
 </ul>
 <p>All optional services have their own terms.</p></div>
+
+<div class="card"><h2>How movie info works - proxy details</h2>
+<p>To keep the app key-free and F-Droid compliant, movie info requests go through a secure proxy instead of direct TMDB calls:</p>
+<ul>
+<li><strong>What is sent:</strong> Only movie title, year, or TMDB ID - e.g., <code>Dune Part Two 2024</code> - no personal data, no device ID, no location</li>
+<li><strong>What is NOT sent:</strong> Your videos, file paths, contacts, or any identifier</li>
+<li><strong>Server protection:</strong> Requests protected by secret header, rate limiting, and CORS - abuse blocked by IP</li>
+<li><strong>Server logs:</strong> IP temporarily used for rate limiting (to prevent abuse), not tracked, logs deleted after 24 hours, no analytics</li>
+<li><strong>Offline-first:</strong> After first fetch, posters and details are saved locally and work offline. Proxy only used when you need new metadata</li>
+</ul>
+<p>This is why v2.6.105 says "no API key required" - key stays server-side, not in app.</p></div>
 
 <div class="card"><h2>Updates</h2>
 <ul>
@@ -82,10 +93,10 @@ footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--border2);colo
 
 <div class="card"><h2>Contact</h2><p>opticastproject@gmail.com and <a href="https://github.com/opticastplayer-dev/opticast/issues">GitHub Issues</a></p></div>
 
-<div class="card"><h2>License</h2><p>GPL-3.0-only — source code available on GitHub.</p><p><strong>Compatibility:</strong> Android 8 and newer, phones only, offline-first</p></div>
+<div class="card"><h2>License</h2><p>GPL-3.0-only - source code available on GitHub.</p><p><strong>Compatibility:</strong> Android 8 and newer, phones only, offline-first</p></div>
 
 <footer>
-<p>OptiCast v2.6.120 — Your videos, beautifully organized — GPL-3.0</p>
+<p>OptiCast v2.6.120 - Your videos, beautifully organized - GPL-3.0</p>
 <p><a href="../">Home</a> · <a href="../faq/">FAQ</a> · <a href="https://github.com/opticastplayer-dev/opticast">GitHub</a> · <a href="https://github.com/opticastplayer-dev/opticast/releases">Releases</a></p>
 </footer>
 </body>

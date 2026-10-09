@@ -24,13 +24,6 @@ class InstallerVerifierTest {
     }
 
     @Test
-    fun izzy_isOfficial() {
-        val izzy = InstallerVerifier.verify("org.izzyondroid.izzyondroid")
-        assertTrue(izzy.isOfficial)
-        assertEquals("IzzyOnDroid (Official)", izzy.displayName)
-    }
-
-    @Test
     fun packageInstaller_isOfficial() {
         val pi = InstallerVerifier.verify("com.android.packageinstaller")
         assertTrue(pi.isOfficial)

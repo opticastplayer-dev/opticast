@@ -23,8 +23,23 @@ Yes — no ads, no tracking, open source. Your media stays on your device, no ac
 ### Where are my videos?
 OptiCast looks in your Movies, DCIM, and Download folders. If a video is missing, check Settings → Excluded folders and pull to refresh in Library.
 
+### How should I name files?
+**Movies:** Title + year works best — spaces, dots or underscores all work:
+- `Dune Part Two (2024).mkv`
+- `Dune.Part.Two.2024.2160p.WEB.mkv`
+
+**TV shows:** Use season & episode code S01E01:
+- `The Bear S02E05.mkv`
+- `The.Bear.S02E05.1080p.WEB.mkv`
+- Folders optional but tidy: `TV Shows/The Bear/Season 2/The Bear S02E05.mkv`
+
+**Anime:** Fansub-style names recognised via AniList:
+- `[SubGroup] Frieren - 01 [1080p].mkv`
+
+Tips: Add year to movies, keep one movie per file, avoid cryptic names like `movie_final2.mp4`, wrong match? Long-press poster → Find metadata.
+
 ### How big is the app?
-Small and efficient, works well even on older phones. Official GitHub release includes full video engine, F-Droid build is Media3-only.
+Small and efficient, works well even on older phones. Official GitHub release includes full video engine, F-Droid build is Media3-only. Current codebase ~26k lines — lightweight for solo dev.
 
 ### Contact?
 opticastproject@gmail.com and GitHub Issues: https://github.com/opticastplayer-dev/opticast/issues

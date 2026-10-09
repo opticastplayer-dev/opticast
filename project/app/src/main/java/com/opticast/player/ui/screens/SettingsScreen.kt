@@ -108,7 +108,6 @@ import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.opticast.player.R
-import com.opticast.player.player.AudioPreset
 
 private val LANGUAGE_OPTIONS = listOf(
     "en" to "English",
@@ -180,8 +179,6 @@ private val API_PROVIDERS = listOf(
     ApiProvider("TMDB", "TM", 0xFF01B4E4, "https://www.themoviedb.org/settings/api"),
     ApiProvider("OpenSubtitles", "OS", 0xFF8AC926, "https://www.opensubtitles.com/en/consumers"),
     ApiProvider("SubDL", "SD", 0xFFFF595E, "https://subdl.com/settings"),
-    ApiProvider("OMDb", "OM", 0xFFFFC300, "https://www.omdbapi.com/apikey.aspx"),
-    ApiProvider("Fanart.tv", "FT", 0xFF9B5DE5, "https://fanart.tv/get-an-api-key/"),
 )
 
 private val GRID_OPTIONS = listOf(
@@ -471,8 +468,10 @@ fun SettingsScreen(
                         }
                     }
                 }
-                SettingsCard(icon = Icons.Filled.Folder, title = "Network libraries") {
-                    NetworkToolsPanel(onOpenNetwork)
+                if (settings.enableNetworkBrowsing) {
+                    SettingsCard(icon = Icons.Filled.Folder, title = "Network libraries (beta)") {
+                        NetworkToolsPanel(onOpenNetwork)
+                    }
                 }
 
                 SettingsCard(icon = Icons.Filled.Storage, title = "Storage & backups") {
@@ -498,7 +497,6 @@ fun SettingsScreen(
                         Text("Clear all saved metadata")
                     }
                 }
-                NamingGuideCard()
                 }
             }
             item(key = "Media Settings") {
@@ -783,7 +781,7 @@ private fun ApiKeysCard(settings: AppSettings, scope: CoroutineScope) {
                 Column(Modifier.weight(1f)) {
                     Text(settingsHeaderTitle("API keys"), style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "TMDB · OpenSubtitles · SubDL · OMDb · Fanart.tv",
+                        "TMDB · OpenSubtitles · SubDL — lightweight, 2 keys only",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -835,30 +833,6 @@ private fun ApiKeysCard(settings: AppSettings, scope: CoroutineScope) {
                             placeholder = "SubDL API key",
                             onSave = { key ->
                                 scope.launch { AppContainer.settings.setSubdlApiKey(key) }
-                            },
-                        )
-                    }
-                    ApiKeySection(
-                        provider = API_PROVIDERS[3],
-                        description = "IMDb votes, Rotten Tomatoes and Metacritic scores. Free key (1,000 calls/day).",
-                    ) {
-                        ApiKeyField(
-                            value = settings.omdbApiKey,
-                            placeholder = "OMDb API key",
-                            onSave = { key ->
-                                scope.launch { AppContainer.settings.setOmdbApiKey(key) }
-                            },
-                        )
-                    }
-                    ApiKeySection(
-                        provider = API_PROVIDERS[4],
-                        description = "Clearlogos and richer backgrounds — the Infuse look. Anime (AniList) needs no key.",
-                    ) {
-                        ApiKeyField(
-                            value = settings.fanartApiKey,
-                            placeholder = "Fanart.tv API key",
-                            onSave = { key ->
-                                scope.launch { AppContainer.settings.setFanartApiKey(key) }
                             },
                         )
                     }
@@ -1107,11 +1081,7 @@ private fun EngineSettingsCard(settings: AppSettings, scope: CoroutineScope) {
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         Spacer(Modifier.height(10.dp))
-        PrefToggle("Remember successful engine", "Reuses a video’s working engine after 10 seconds of playback. Explicit Media3 takes priority.", settings.engineMemoryEnabled) {
-            scope.launch { AppContainer.settings.setEngineMemoryEnabled(it) }
         }
-        PrefToggle("Smaller local playback buffer", "Uses less memory for local files. Automatically tries a larger buffer if sustained buffer starvation occurs. Reopen the video after changing this.", settings.localBufferTrial) {
-            scope.launch { AppContainer.settings.setLocalBufferTrial(it) }
         }
         var enginesCleared by remember { mutableStateOf(false) }
         TextButton(onClick = {
@@ -1354,6 +1324,12 @@ private fun BehaviourSettingsCard(settings: AppSettings, scope: CoroutineScope) 
             checked = settings.autoNextEpisode,
         ) { enabled -> scope.launch { AppContainer.settings.setAutoNextEpisode(enabled) } }
 
+        PrefToggle(
+            label = "Enable network browsing (beta)",
+            description = "Show SMB/NFS network libraries — experimental, off by default for lightness. Requires local network.",
+            checked = settings.enableNetworkBrowsing,
+        ) { enabled -> scope.launch { AppContainer.settings.setEnableNetworkBrowsing(enabled) } }
+
     }
 }
 
@@ -1386,36 +1362,10 @@ private fun SoundSettingsCard(settings: AppSettings, scope: CoroutineScope) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        Text(
-            "Audio preset",
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(top = 14.dp),
-        )
-        Spacer(Modifier.height(6.dp))
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            AudioPreset.entries.forEach { preset ->
-                FilterChip(
-                    selected = settings.audioPreset == preset.id,
-                    onClick = { scope.launch { AppContainer.settings.setAudioPreset(preset.id) } },
-                    label = { Text(preset.label) },
-                )
-            }
-        }
-        Text(
-            AudioPreset.forId(settings.audioPreset).blurb +
-                " Applied to playback immediately; needs no restart.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
         Spacer(Modifier.height(6.dp))
         PrefToggle(
             label = "Dialogue boost",
-            description = "Adds presence to speech so quiet dialogue stays clear at low " +
-                "volume. Works with any preset, and stacks with the audio boost above.",
+            description = "Adds presence to speech so quiet dialogue stays clear at low volume. Stacks with audio boost.",
             checked = settings.dialogueBoost,
         ) { enabled -> scope.launch { AppContainer.settings.setDialogueBoost(enabled) } }
     }
@@ -1564,143 +1514,6 @@ private fun LanguageDropdownCard(settings: AppSettings, scope: CoroutineScope) {
             }
         }
     }
-}
-
-// -------------------------------------------------------------- naming guide --
-
-@Composable
-private fun NamingGuideCard() {
-    val query = LocalSettingsQuery.current
-    if (!settingsSearchMatches("File naming help", query)) return
-
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    var searchCollapsed by remember(query) { mutableStateOf(false) }
-    val showContent = if (query.isNotBlank()) !searchCollapsed else expanded
-    val chevron by animateFloatAsState(
-        targetValue = if (showContent) 180f else 0f,
-        animationSpec = tween(260, easing = FastOutSlowInEasing),
-        label = "namingChevron",
-    )
-    Box(modifier = settingsCategoryModifier("File naming help")) {
-        Column(
-            // Deliberately asymmetric, generous inset: the first glyph of every
-            // title sits well clear of the card edge.
-            Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-        ) {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .clickable { if (query.isNotBlank()) searchCollapsed = !searchCollapsed else expanded = !expanded }
-                    .heightIn(min = 48.dp)
-                    .padding(vertical = 2.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(Modifier.size(40.dp), contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.Description, null, Modifier.size(22.dp), tint = MaterialTheme.colorScheme.primary)
-                }
-                Spacer(Modifier.width(14.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(settingsHeaderTitle("File naming help"), style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        "Movie and episode filename examples",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Icon(
-                    Icons.Filled.ExpandMore,
-                    contentDescription = if (showContent) "Collapse" else "Expand",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 8.dp).size(24.dp).rotate(chevron),
-                )
-            }
-            AnimatedVisibility(
-                visible = showContent,
-                enter = fadeIn(tween(220)) + expandVertically(tween(260, easing = FastOutSlowInEasing)),
-                exit = fadeOut(tween(180)) + shrinkVertically(tween(220, easing = FastOutSlowInEasing)),
-            ) {
-                Column {
-                    Spacer(Modifier.height(10.dp))
-                    NamingSection(
-                        "Movies",
-                        "Title plus year works best — spaces, dots or underscores all work:",
-                        listOf(
-                            "Dune Part Two (2024).mkv",
-                            "Dune.Part.Two.2024.2160p.WEB.mkv",
-                        ),
-                    )
-                    NamingSection(
-                        "TV shows",
-                        "Use the season & episode code S01E01 — the most reliable pattern there is:",
-                        listOf(
-                            "The Bear S02E05.mkv",
-                            "The.Bear.S02E05.1080p.WEB.mkv",
-                        ),
-                        "Folders are optional but tidy:  TV Shows/The Bear/Season 2/The Bear S02E05.mkv",
-                    )
-                    NamingSection(
-                        "Anime",
-                        "Fansub-style names are recognised too (matched via AniList):",
-                        listOf("[SubGroup] Frieren - 01 [1080p].mkv"),
-                    )
-                    Text(
-                        "Tips",
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier.padding(top = 6.dp),
-                    )
-                    listOf(
-                        "·  Add the year to movie titles — it removes ambiguity.",
-                        "·  Keep one movie per file; split parts are treated separately.",
-                        "·  Avoid cryptic names like \"movie_final2.mp4\" — they can't be matched.",
-                        "·  Wrong match? Long-press the poster → Find metadata to fix it.",
-                    ).forEach { tip ->
-                        Text(
-                            tip,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(vertical = 1.dp),
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun NamingSection(heading: String, blurb: String, examples: List<String>, extra: String? = null) {
-    Text(settingsHeaderTitle(heading), style = MaterialTheme.typography.labelLarge)
-    Text(
-        blurb,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-    Spacer(Modifier.height(4.dp))
-    examples.forEach { example ->
-        Surface(
-            shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 2.dp),
-        ) {
-            Text(
-                example,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-            )
-        }
-    }
-    if (extra != null) {
-        Text(
-            extra,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 3.dp),
-        )
-    }
-    Spacer(Modifier.height(10.dp))
 }
 
 @Composable

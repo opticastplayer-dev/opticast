@@ -22,8 +22,6 @@ data class AppSettings(
     val captionStyle: Int = 1,
     val autoSubtitles: Boolean = false,
     val excludedFolders: List<String> = emptyList(),
-    val omdbApiKey: String = "",
-    val fanartApiKey: String = "",
     val subdlApiKey: String = "",
     val useDeviceColors: Boolean = false,
     val useExternalPlayer: Boolean = false,
@@ -38,16 +36,14 @@ data class AppSettings(
     val preservePitch: Boolean = true,
     val audioBoostPct: Int = 100,
     val playbackEngine: String = "mpv", // mpv first with Media3 fallback | media3 only
-    val engineMemoryEnabled: Boolean = true,
-    val localBufferTrial: Boolean = true,
     val preferredAudioLanguage: String = "",
     val embeddedSubtitleLanguage: String = "",
     val embeddedSubtitleMode: String = "default",
     val avoidCommentary: Boolean = true,
-    val audioPreset: String = "flat",
     val dialogueBoost: Boolean = false,
     val autoNextEpisode: Boolean = true,
     val resumePlayback: Boolean = true,
+    val enableNetworkBrowsing: Boolean = false, // Advanced: SMB/NFS browsing, off by default for lightness
     // Progress bar look, and which buttons the playing screen shows.
     val showChapterStamps: Boolean = false,
     val progressBarStyle: String = "thick", // thick | gradient | hidden
@@ -85,8 +81,6 @@ class SettingsRepository(private val context: Context) {
     private val captionStyleKey = intPreferencesKey("caption_style")
     private val autoSubsKey = booleanPreferencesKey("auto_subtitles")
     private val excludedKey = stringPreferencesKey("excluded_folders")
-    private val omdbKey = stringPreferencesKey("omdb_api_key")
-    private val fanartKey = stringPreferencesKey("fanart_api_key")
     private val subdlKey = stringPreferencesKey("subdl_api_key")
     private val deviceColorsKey = booleanPreferencesKey("use_device_colors")
     private val performanceModeKey = booleanPreferencesKey("performance_mode")
@@ -98,10 +92,8 @@ class SettingsRepository(private val context: Context) {
     private val embeddedLanguageKey = stringPreferencesKey("embedded_subtitle_language")
     private val embeddedModeKey = stringPreferencesKey("embedded_subtitle_mode")
     private val avoidCommentaryKey = booleanPreferencesKey("avoid_commentary")
-    private val localBufferTrialKey = booleanPreferencesKey("local_buffer_trial")
-    private val engineMemoryKey = booleanPreferencesKey("engine_memory")
-    private val audioPresetKey = stringPreferencesKey("audio_preset")
     private val dialogueBoostKey = booleanPreferencesKey("dialogue_boost")
+    private val networkBrowsingKey = booleanPreferencesKey("enable_network_browsing")
     private val holdToSpeedKey = booleanPreferencesKey("hold_to_speed")
     private val holdSpeedFactorKey = floatPreferencesKey("hold_speed_factor")
     private val gestureSeekKey = booleanPreferencesKey("gesture_seek")
@@ -134,8 +126,6 @@ class SettingsRepository(private val context: Context) {
                 ?.split("|")
                 ?.filter { it.isNotBlank() }
                 ?: emptyList(),
-            omdbApiKey = prefs[omdbKey] ?: "",
-            fanartApiKey = prefs[fanartKey] ?: "",
             subdlApiKey = prefs[subdlKey] ?: "",
             useDeviceColors = prefs[deviceColorsKey] ?: false,
             performanceMode = prefs[performanceModeKey] ?: false,
@@ -153,16 +143,14 @@ class SettingsRepository(private val context: Context) {
             // New preference generation intentionally adopts the requested mpv-first default
             // for upgrades too. New explicit Media3 choices remain persistent.
             playbackEngine = if (prefs[playbackEngineKey] == "media3") "media3" else "mpv",
-            engineMemoryEnabled = prefs[engineMemoryKey] ?: true,
-            localBufferTrial = prefs[localBufferTrialKey] ?: true,
             preferredAudioLanguage = prefs[audioLanguageKey].orEmpty(),
             embeddedSubtitleLanguage = prefs[embeddedLanguageKey].orEmpty(),
             embeddedSubtitleMode = prefs[embeddedModeKey]?.takeIf { it in listOf("default", "forced", "full", "off") } ?: "default",
             avoidCommentary = prefs[avoidCommentaryKey] ?: true,
-            audioPreset = prefs[audioPresetKey] ?: "flat",
             dialogueBoost = prefs[dialogueBoostKey] ?: false,
             autoNextEpisode = prefs[autoNextKey] ?: true,
             resumePlayback = prefs[resumeKey] ?: true,
+            enableNetworkBrowsing = prefs[networkBrowsingKey] ?: false,
             showChapterStamps = prefs[chapterStampsKey] ?: false,
             progressBarStyle = resolvedProgressStyle(prefs[progressBarStyleKey]),
             playerControls = resolvedPlayerControls(
@@ -212,14 +200,6 @@ class SettingsRepository(private val context: Context) {
         context.settingsDataStore.edit { it[excludedKey] = folders.joinToString("|") }
     }
 
-    suspend fun setOmdbApiKey(key: String) {
-        context.settingsDataStore.edit { it[omdbKey] = key.trim() }
-    }
-
-    suspend fun setFanartApiKey(key: String) {
-        context.settingsDataStore.edit { it[fanartKey] = key.trim() }
-    }
-
     suspend fun setSubdlApiKey(key: String) {
         context.settingsDataStore.edit { it[subdlKey] = key.trim() }
     }
@@ -247,13 +227,13 @@ class SettingsRepository(private val context: Context) {
      */
     fun importSettings(values: Map<String, String>) {
         if (values.isEmpty()) return
-        runCatching {
+                runCatching {
             kotlinx.coroutines.runBlocking {
                 context.settingsDataStore.edit { prefs ->
                     // New playback preferences also restore on a clean installation with no existing key.
                     listOf(audioLanguageKey, embeddedLanguageKey).forEach { key -> values[key.name]?.let { prefs[key] = it } }
                     values[embeddedModeKey.name]?.takeIf { it in listOf("default", "forced", "full", "off") }?.let { prefs[embeddedModeKey] = it }
-                    listOf(engineMemoryKey, avoidCommentaryKey, localBufferTrialKey).forEach { key -> values[key.name]?.toBooleanStrictOrNull()?.let { prefs[key] = it } }
+                    listOf(avoidCommentaryKey).forEach { key -> values[key.name]?.toBooleanStrictOrNull()?.let { prefs[key] = it } }
                     prefs.asMap().forEach { (key, current) ->
                         val raw = values[key.name] ?: return@forEach
                         when (current) {
@@ -296,18 +276,8 @@ class SettingsRepository(private val context: Context) {
         context.settingsDataStore.edit { it[externalPlayerKey] = enabled }
     }
 
-    suspend fun setLocalBufferTrial(enabled: Boolean) { context.settingsDataStore.edit { it[localBufferTrialKey] = enabled } }
-
-    suspend fun setEngineMemoryEnabled(enabled: Boolean) {
-        context.settingsDataStore.edit { it[engineMemoryKey] = enabled }
-    }
-
     suspend fun setPlaybackEngine(engine: String) {
         context.settingsDataStore.edit { it[playbackEngineKey] = engine }
-    }
-
-    suspend fun setAudioPreset(id: String) {
-        context.settingsDataStore.edit { it[audioPresetKey] = id }
     }
 
     suspend fun setDialogueBoost(enabled: Boolean) {
@@ -386,5 +356,9 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setLibraryGrid(grid: String) {
         context.settingsDataStore.edit { it[gridKey] = grid }
+    }
+
+    suspend fun setEnableNetworkBrowsing(enabled: Boolean) {
+        context.settingsDataStore.edit { it[networkBrowsingKey] = enabled }
     }
 }

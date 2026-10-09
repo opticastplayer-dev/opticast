@@ -286,7 +286,7 @@ fun PlayerScreen(
     // Freeze the remembered engine for this request; recording success must not recreate the session.
     val rememberedEngine = remember(requestedId, preferenceKey) { preferenceKey?.let(videoPreferences::engine) }
     val selectedEngine = engineOverride ?: initialPlaybackEngine(appSettings.playbackEngine,
-        Uri.parse(video?.uri ?: remoteUri.orEmpty()).scheme, rememberedEngine, appSettings.engineMemoryEnabled)
+        Uri.parse(video?.uri ?: remoteUri.orEmpty()).scheme, rememberedEngine, true)
     // An old controller's intentional release must not mark the replacement disconnected.
     var connectionLost by remember(connectionAttempt, selectedEngine) { mutableStateOf(false) }
     val controllerFuture = remember(connectionAttempt, selectedEngine) {
@@ -1267,8 +1267,8 @@ fun PlayerScreen(
         selectedTextOption = textOptions.indexOfFirst { trackKey(it) == text }.takeIf { it >= 0 }
         textDisabled = text == TRACK_OFF
     }
-    LaunchedEffect(controller, video.id, appSettings.engineMemoryEnabled) {
-        if (!appSettings.engineMemoryEnabled || preferenceKey == null || Uri.parse(video.uri).scheme !in listOf(null, "file", "content")) return@LaunchedEffect
+    LaunchedEffect(controller, video.id) {
+        if (preferenceKey == null || Uri.parse(video.uri).scheme !in listOf(null, "file", "content")) return@LaunchedEffect
         val success = EngineSuccessWindow()
         var recorded = false
         while (true) {
@@ -2211,7 +2211,6 @@ fun PlayerScreen(
                 TextButton(onClick = { showAudioSheet = false; showTracksSheet = true }) { Text("Choose audio / subtitle track") }
             } else AudioControls(
                 settings = appSettings,
-                onPreset = { id -> scope.launch { AppContainer.settings.setAudioPreset(id) } },
                 onDialogueBoost = { enabled ->
                     scope.launch { AppContainer.settings.setDialogueBoost(enabled) }
                 },
@@ -3124,15 +3123,12 @@ private fun InfoRow(label: String, value: String) {
 }
 
 /**
- * Audio controls, shared by the in-player sheet and the settings screen.
- * Presets are named curves rather than raw band sliders on purpose: they behave
- * predictably on devices whose equalisers have different band counts.
+ * Audio controls — simplified: dialogue boost + volume boost only, no presets for lightness.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AudioControls(
     settings: AppSettings,
-    onPreset: (String) -> Unit,
     onDialogueBoost: (Boolean) -> Unit,
     onVolumeBoost: (Int) -> Unit,
 ) {
@@ -3143,28 +3139,6 @@ fun AudioControls(
     ) {
         Text("Audio", style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(12.dp))
-
-        Text("Preset", style = MaterialTheme.typography.titleMedium)
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.padding(vertical = 8.dp),
-        ) {
-            AudioPreset.entries.forEach { preset ->
-                FilterChip(
-                    selected = settings.audioPreset == preset.id,
-                    onClick = { onPreset(preset.id) },
-                    label = { Text(preset.label) },
-                )
-            }
-        }
-        Text(
-            AudioPreset.forId(settings.audioPreset).blurb,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        Spacer(Modifier.height(14.dp))
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,

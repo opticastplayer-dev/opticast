@@ -37,7 +37,6 @@ class OptiCastPlaybackService : MediaSessionService() {
     private var player: Player? = null
     private var session: MediaSession? = null
     private val audioEffects = AudioEffects()
-    private var localBufferTrial = AppContainer.initialSettings.localBufferTrial
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun onCreate() {
@@ -74,15 +73,10 @@ class OptiCastPlaybackService : MediaSessionService() {
             }
         }
 
-        // Audio boost (Settings > Playback & control): amplify quiet recordings
-        // above 100% volume using the platform LoudnessEnhancer.
-        // Volume boost, tone presets and dialogue boost are all applied here:
-        // one collector, one place, so the settings never fight each other.
+        // Audio boost — simplified, no presets, only dialogue + volume boost
         serviceScope.launch {
             AppContainer.settings.settings.collect { prefs ->
                 audioEffects.apply(prefs)
-                localBufferTrial = prefs.localBufferTrial
-                (player as? com.opticast.player.player.mpv.MpvPlayer)?.localBufferTrial = prefs.localBufferTrial
             }
         }
     }
@@ -238,7 +232,6 @@ class OptiCastPlaybackService : MediaSessionService() {
         outgoing?.pause(); outgoing?.stop()
         audioEffects.release()
         val replacement: Player = if (native) com.opticast.player.player.mpv.MpvPlayer(this).also { mpv ->
-            mpv.localBufferTrial = localBufferTrial
             mpv.addListener(object : Player.Listener {
                 override fun onIsPlayingChanged(isPlaying: Boolean) { persistPosition() }
                 override fun onPlaybackStateChanged(playbackState: Int) {

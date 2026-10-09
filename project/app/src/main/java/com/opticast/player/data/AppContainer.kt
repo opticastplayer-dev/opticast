@@ -9,12 +9,10 @@ import com.opticast.player.data.local.MetadataStore
 import com.opticast.player.data.local.PlaybackStateStore
 import com.opticast.player.data.local.PosterCache
 import com.opticast.player.data.remote.AniListApi
-import com.opticast.player.data.remote.FanartApi
 import com.opticast.player.data.local.ChapterIndexer
 import com.opticast.player.data.local.FrameArtwork
 import com.opticast.player.data.model.NetworkSourceStore
 import com.opticast.player.data.local.ThumbnailCache
-import com.opticast.player.data.remote.OmdbApi
 import com.opticast.player.data.remote.OpenSubtitlesApi
 import com.opticast.player.data.remote.SubDlApi
 import com.opticast.player.data.remote.SubtitleSources
@@ -138,8 +136,6 @@ object AppContainer {
     val tmdb: com.opticast.player.data.remote.TmdbApiProxyAdapter by lazy { tmdbAdapter } // drop-in replacement, no key required
     val openSubtitles: OpenSubtitlesApi by lazy { OpenSubtitlesApi(settings, metadataStore) }
     val anilist: AniListApi by lazy { AniListApi() }
-    val omdb: OmdbApi by lazy { OmdbApi(settings) }
-    val fanart: FanartApi by lazy { FanartApi(settings) }
     val subDl: SubDlApi by lazy { SubDlApi(settings, metadataStore) }
     val subtitles: SubtitleSources by lazy { SubtitleSources(openSubtitles, subDl, settings) }
 

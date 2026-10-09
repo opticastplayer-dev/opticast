@@ -14,7 +14,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.util.concurrent.TimeUnit
 
-/** Public APIs only; no embedded credentials or unofficial scraping endpoints. */
+/** Public APIs only; no embedded credentials. Simplified: Wikipedia + TVmaze only, no Wikidata for lightness. */
 class KeylessMetadata {
     private val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(15, TimeUnit.SECONDS).callTimeout(20, TimeUnit.SECONDS).build()
@@ -33,7 +33,7 @@ class KeylessMetadata {
                 lastRequest = android.os.SystemClock.elapsedRealtime()
                 try {
                     client.newCall(Request.Builder().url(url)
-                        .header("User-Agent", "LumaPlayer/2.6.1 (Android; personal media metadata)")
+                        .header("User-Agent", "OptiCast/2.6.120 (Android; personal media metadata)")
                         .build()).execute().use { response ->
                         if (response.code == 429 || response.code == 503) {
                             val seconds = response.header("Retry-After")?.toLongOrNull() ?: 60L
@@ -53,9 +53,8 @@ class KeylessMetadata {
     private fun clean(text: String?) = Html.fromHtml(text.orEmpty(), Html.FROM_HTML_MODE_LEGACY).toString().trim()
 
     suspend fun autoMatch(video: LocalVideo): Metadata? =
-        if (video.isEpisode) tvmaze(video) else wikipedia(video) ?: wikidata(video)
+        if (video.isEpisode) tvmaze(video) else wikipedia(video)
 
-    /** Conservative matching: exact normalized title and supplied release year. */
     private suspend fun wikipedia(video: LocalVideo): Metadata? {
         val title = video.parsed.title
         if (title.isBlank()) return null
@@ -91,55 +90,7 @@ class KeylessMetadata {
                 sourceUrl = "https://en.wikipedia.org/?curid=$id",
                 attribution = "Wikipedia contributors · CC BY-SA 4.0 · Introductory text; see article history for authors.")
         }
-        // Do not silently choose between remakes when no release year was supplied.
         return candidates
-    }
-
-    /** Structured film fallback from Wikidata's CC0 public entity API. */
-    private suspend fun wikidata(video: LocalVideo): Metadata? {
-        val root = get("https://www.wikidata.org/w/api.php", mapOf(
-            "action" to "wbsearchentities", "format" to "json", "language" to "en",
-            "search" to video.parsed.title, "limit" to "10", "maxlag" to "5"
-        )) as? JsonObject ?: return null
-        val hits = (root["search"] as? JsonArray)?.mapNotNull { it as? JsonObject }.orEmpty()
-        val hit = hits.filter {
-            normalized(it.text("label").orEmpty()) == normalized(video.parsed.title) &&
-                Regex("\\bfilm\\b", RegexOption.IGNORE_CASE).containsMatchIn(it.text("description").orEmpty()) &&
-                (video.parsed.year == null || Regex("\\b${video.parsed.year}\\b")
-                    .containsMatchIn(it.text("description").orEmpty()))
-        }.singleOrNull() ?: return null
-        val id = hit.text("id")?.takeIf { it.matches(Regex("Q[0-9]+")) } ?: return null
-        val entityRoot = get("https://www.wikidata.org/w/api.php", mapOf(
-            "action" to "wbgetentities", "format" to "json", "ids" to id,
-            "props" to "claims", "maxlag" to "5"
-        )) as? JsonObject ?: return null
-        val claims = entityRoot.obj("entities")?.obj(id)?.obj("claims") ?: return null
-        fun values(property: String): List<JsonObject> = (claims[property] as? JsonArray)?.mapNotNull {
-            (it as? JsonObject)?.obj("mainsnak")?.obj("datavalue")?.obj("value")
-        }.orEmpty()
-        val year = values("P577").mapNotNull { it.text("time")?.removePrefix("+")?.take(4)?.toIntOrNull() }.minOrNull()
-            ?: Regex("\\b(?:18|19|20)\\d{2}\\b").find(hit.text("description").orEmpty())?.value?.toIntOrNull()
-        if (video.parsed.year != null && year != video.parsed.year) return null
-        val quantity = values("P2047").firstOrNull()
-        val amount = quantity?.text("amount")?.toDoubleOrNull()
-        val minutes = when (quantity?.text("unit")?.substringAfterLast('/')) {
-            "Q7727" -> amount
-            "Q11574" -> amount?.div(60)
-            "Q25235" -> amount?.times(60)
-            else -> null
-        }?.toInt()?.takeIf { it > 0 }
-        val genreIds = values("P136").mapNotNull { it.text("id") }.distinct().take(10)
-        val genres = if (genreIds.isEmpty()) emptyList() else {
-            val labels = get("https://www.wikidata.org/w/api.php", mapOf(
-                "action" to "wbgetentities", "format" to "json", "ids" to genreIds.joinToString("|"),
-                "props" to "labels", "languages" to "en", "maxlag" to "5"
-            )) as? JsonObject
-            genreIds.mapNotNull { labels?.obj("entities")?.obj(it)?.obj("labels")?.obj("en")?.text("value") }
-        }
-        return Metadata(tmdbId = id.drop(1).toIntOrNull() ?: return null, type = "movie",
-            title = hit.text("label").orEmpty(), overview = hit.text("description").orEmpty(),
-            year = year, runtimeMinutes = minutes, genres = genres, source = "wikidata",
-            sourceUrl = "https://www.wikidata.org/wiki/$id", attribution = "Wikidata contributors · CC0 public-domain structured data.")
     }
 
     private suspend fun tvmaze(video: LocalVideo): Metadata? {

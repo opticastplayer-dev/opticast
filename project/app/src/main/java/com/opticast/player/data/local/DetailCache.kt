@@ -2,8 +2,6 @@ package com.opticast.player.data.local
 
 import android.content.Context
 import com.opticast.player.data.remote.CastMember
-import com.opticast.player.data.remote.FanartArtwork
-import com.opticast.player.data.remote.OmdbRatings
 import java.io.File
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -20,106 +18,32 @@ data class CachedCast(
 )
 
 /**
- * Everything the detail page needs beyond the core metadata: ratings, extra
- * artwork, the IMDb id and the cast list.
- *
- * OptiCast is meant to work offline, so this is written ONCE per title and then
- * reused — opening a detail page no longer fires TMDB/OMDb/Fanart requests
- * every time. A cached bundle never expires; clearing/rematching a title explicitly resets it.
+ * Everything the detail page needs beyond core metadata: IMDb id and cast list.
+ * Offline-first: written once per title and reused — opening detail page no longer
+ * fires extra requests. Cached bundle never expires; clearing/rematching resets it.
+ * Simplified: removed OMDb ratings and Fanart.tv artwork — TMDB only for lightness.
  */
 @Serializable
 data class CachedDetails(
     val imdbId: String? = null,
-    val imdb: String? = null,
-    val imdbVotes: String? = null,
-    val rottenTomatoes: String? = null,
-    val metacritic: String? = null,
-    val rated: String? = null,
-    val awards: String? = null,
-    val boxOffice: String? = null,
-    val director: String? = null,
-    val writer: String? = null,
-    val logo: String? = null,
-    val fanartBackground: String? = null,
-    val banner: String? = null,
-    val discart: String? = null,
-    val clearart: String? = null,
     val cast: List<CachedCast> = emptyList(),
     val savedAt: Long = 0L,
 ) {
-    val hasRatings: Boolean
-        get() = imdb != null || rottenTomatoes != null || metacritic != null || awards != null
-
-    val hasArtwork: Boolean
-        get() = logo != null || fanartBackground != null || banner != null ||
-            discart != null || clearart != null
-
-    /** Still usable as-is (no refresh needed). */
-    val isFresh: Boolean
-        get() = savedAt > 0L
-
-    fun toRatings(): OmdbRatings? =
-        if (!hasRatings) null
-        else OmdbRatings(
-            imdb = imdb,
-            imdbVotes = imdbVotes,
-            rottenTomatoes = rottenTomatoes,
-            metacritic = metacritic,
-            rated = rated,
-            awards = awards,
-            boxOffice = boxOffice,
-            director = director,
-            writer = writer,
-        )
-
-    fun toArtwork(): FanartArtwork? =
-        if (!hasArtwork) null
-        else FanartArtwork(
-            logo = logo,
-            background = fanartBackground,
-            banner = banner,
-            discart = discart,
-            clearart = clearart,
-        )
+    val isFresh: Boolean get() = savedAt > 0L
 
     fun toCast(): List<CastMember> = cast.map {
         CastMember(id = it.id, name = it.name, character = it.character, profilePath = it.profilePath)
     }
 
-    /** URLs worth keeping on disk so the page renders offline. */
-    fun imageUrls(): List<String> = buildList {
-        logo?.let(::add)
-        fanartBackground?.let(::add)
-        banner?.let(::add)
-        clearart?.let(::add)
-        discart?.let(::add)
-        cast.mapNotNullTo(this) { it.profilePath }
-    }
+    fun imageUrls(): List<String> = cast.mapNotNull { it.profilePath }
 
     companion object {
-
         fun from(
             imdbId: String?,
-            ratings: OmdbRatings?,
-            artwork: FanartArtwork?,
             cast: List<CastMember>,
             previous: CachedDetails?,
         ): CachedDetails = CachedDetails(
             imdbId = imdbId ?: previous?.imdbId,
-            imdb = ratings?.imdb ?: previous?.imdb,
-            imdbVotes = ratings?.imdbVotes ?: previous?.imdbVotes,
-            rottenTomatoes = ratings?.rottenTomatoes ?: previous?.rottenTomatoes,
-            metacritic = ratings?.metacritic ?: previous?.metacritic,
-            rated = ratings?.rated ?: previous?.rated,
-            awards = ratings?.awards ?: previous?.awards,
-            boxOffice = ratings?.boxOffice ?: previous?.boxOffice,
-            director = ratings?.director ?: previous?.director,
-            writer = ratings?.writer ?: previous?.writer,
-            logo = artwork?.logo ?: previous?.logo,
-            fanartBackground = artwork?.background ?: previous?.fanartBackground,
-            banner = artwork?.banner ?: previous?.banner,
-            discart = artwork?.discart ?: previous?.discart,
-            clearart = artwork?.clearart ?: previous?.clearart,
             cast = if (cast.isNotEmpty()) {
                 cast.map {
                     CachedCast(
@@ -155,7 +79,6 @@ class DetailCache(context: Context) {
 
     fun get(videoId: Long): CachedDetails? = synchronized(cache) { cache[videoId.toString()] }
 
-    /** Number of titles whose ratings/artwork/cast are stored on disk. */
     fun count(): Int = synchronized(cache) { cache.size }
 
     fun save(videoId: Long, details: CachedDetails) {

@@ -19,7 +19,6 @@ class OfflineLibrary(context: android.content.Context) {
     private fun initialAttemptKey(video: LocalVideo): String = "initial:" + fingerprint(
         "${video.id}|${video.uri}|${video.name}|${video.sizeBytes}|${video.dateAddedSec}")
 
-    /** A file relocation must not restart a failed automatic identification attempt. */
     fun preserveAttempt(old: LocalVideo, moved: LocalVideo) {
         val edit = attempts.edit()
         var changed = false
@@ -41,9 +40,6 @@ class OfflineLibrary(context: android.content.Context) {
             if (com.opticast.player.data.local.requiresRenameClue(video.name) && AppContainer.renameSuggestions.clue(video).title.isBlank()) return false
             return shouldAttemptUnmatched(attempts.getBoolean(initialAttemptKey(video), false), manual)
         }
-        // SECURE PROXY: now works without key, so hasKey is always true for tmdb source
-        // Old logic: hasKey = key.isNotBlank() — blocked proxy
-        // New: hasKey = true (proxy injects key server-side)
         return shouldUpgradeMetadata(metadata, true,
             !manual && attempts.getString(attemptKey(video, metadata), null) == fingerprint(key.ifBlank { "proxy" }))
     }
@@ -59,9 +55,6 @@ class OfflineLibrary(context: android.content.Context) {
         if (!AppContainer.isOnline()) return@withLock existing
         val key = AppContainer.settings.current().tmdbApiKey.trim().ifBlank { "proxy" }
         if (!needsMatch(video, existing, key, manual)) return@withLock existing
-        // SECURE PROXY: Now always tries tmdb via proxy, no key needed
-        // Old: if (key.isNotBlank()) AppContainer.tmdb.autoMatch else null — blocked when key blank
-        // New: always call tmdb.autoMatch via proxy
         val clue = AppContainer.renameSuggestions.clue(video)
         val lookup = if (clue.title.isNotBlank()) video.copy(parsed = clue.parsed()) else video
         val result = resolveMetadata(existing,
@@ -80,22 +73,15 @@ class OfflineLibrary(context: android.content.Context) {
         }
     }
 
-    /** Only missing bundles/images are downloaded. Stored data never expires. */
+    /** Only missing cast/images are downloaded. Stored data never expires. Simplified: TMDB only, no OMDb/Fanart. */
     suspend fun prepare(videoId: Long, metadata: Metadata) = gate.withLock {
         if (!AppContainer.isOnline()) return@withLock
         var details = AppContainer.detailCache.get(videoId)
         if (metadata.source == "tmdb" && details == null) {
-            val settings = AppContainer.settings.current()
-            // SECURE PROXY: cast & imdb now work without key via proxy
             val cast = optional { AppContainer.tmdb.castFor(metadata.tmdbId, metadata.type == "tv") }
             val imdb = optional { AppContainer.tmdb.imdbIdFor(metadata.tmdbId, metadata.type == "tv") }
-            val ratings = if (imdb != null && settings.omdbApiKey.isNotBlank())
-                optional { AppContainer.omdb.byImdbId(imdb) } else null
-            val artwork = if (settings.fanartApiKey.isNotBlank() && !settings.dataSaverArtwork)
-                optional { AppContainer.fanart.artworkFor(metadata.tmdbId, metadata.type == "tv") } else null
-            if (cast != null || imdb != null || ratings != null || artwork != null) {
-                details = CachedDetails.from(imdbId = imdb, ratings = ratings, artwork = artwork,
-                    cast = cast.orEmpty(), previous = null)
+            if (cast != null || imdb != null) {
+                details = CachedDetails.from(imdbId = imdb, cast = cast.orEmpty(), previous = null)
                 details?.let { AppContainer.detailCache.save(videoId, it) }
             }
         }
@@ -109,10 +95,8 @@ class OfflineLibrary(context: android.content.Context) {
     }
 }
 
-/** Pure policy: existing TMDB and explicitly selected matches are never replaced. */
 internal fun shouldUpgradeMetadata(metadata: Metadata, hasKey: Boolean, alreadyTriedKey: Boolean): Boolean =
     hasKey && metadata.source != "tmdb" && !metadata.manuallyMatched && !alreadyTriedKey
-
 
 internal suspend fun resolveMetadata(
     existing: Metadata?,
@@ -126,5 +110,4 @@ internal suspend fun resolveMetadata(
     return attempt(tmdb) ?: existing ?: attempt(keyless) ?: attempt(anime)
 }
 
-/** An unsuccessful automatic attempt stays suppressed until explicit user retry. */
 internal fun shouldAttemptUnmatched(attempted: Boolean, manual: Boolean): Boolean = manual || !attempted

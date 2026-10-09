@@ -13,9 +13,9 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
-/** MediaSession-compatible mpv engine. JNI, provider IO and teardown never run on main. */
+/** MediaSession-compatible mpv engine. Simplified: always use smaller local buffer trial for lightness. */
 class MpvPlayer(private val context: Context) : SimpleBasePlayer(Looper.getMainLooper()) {
-    @Volatile var localBufferTrial: Boolean = true
+    private val localBufferTrial: Boolean = true // always enabled, no setting for lightness
     private var localTrialApplied = false // native worker only
     private var adaptiveBuffer = AdaptiveBufferPolicy()
     private var nextBufferCheck = 0L

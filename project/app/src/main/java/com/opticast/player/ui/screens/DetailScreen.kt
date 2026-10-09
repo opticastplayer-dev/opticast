@@ -90,8 +90,6 @@ import com.opticast.player.data.local.PlaybackState
 import com.opticast.player.data.model.LocalVideo
 import com.opticast.player.data.model.Metadata
 import com.opticast.player.data.model.SavedSubtitle
-import com.opticast.player.data.remote.FanartArtwork
-import com.opticast.player.data.remote.OmdbRatings
 import com.opticast.player.data.remote.SubtitleResult
 import com.opticast.player.data.remote.tmdbImageUrl
 import com.opticast.player.ui.components.CastRow
@@ -126,8 +124,6 @@ class DetailViewModel(private val videoId: Long) : ViewModel() {
         val downloadingKey: String? = null,
         val results: List<SubtitleResult> = emptyList(),
         val message: String? = null,
-        val ratings: OmdbRatings? = null,
-        val artwork: FanartArtwork? = null,
         val cast: List<CastMember> = emptyList(),
         val favorite: Boolean = false,
         /** True while a background refresh is running with cached data shown. */
@@ -172,29 +168,18 @@ class DetailViewModel(private val videoId: Long) : ViewModel() {
     }
 
     /**
-     * Ratings (OMDb), extra artwork (Fanart.tv), the IMDb id and the cast list.
-     *
-     * Offline-first: the persisted [CachedDetails] bundle is used directly and
-     * NO network request is made while it is fresh. A refresh only happens when
-     * nothing is cached yet or the bundle has aged out, and a failed refresh
-     * always keeps the cached copy.
+     * Cast list — offline-first, persisted bundle used directly.
+     * Simplified: TMDB only, no OMDb/Fanart for lightness.
      */
     private fun enrich(metadata: Metadata?) {
         if (metadata == null || metadata.source != "tmdb") {
-            _state.update { it.copy(ratings = null, artwork = null, cast = emptyList()) }
+            _state.update { it.copy(cast = emptyList()) }
             return
         }
         viewModelScope.launch(Dispatchers.IO) {
             val cached = AppContainer.detailCache.get(videoId)
-            // 1. Whatever is on disk is shown immediately.
             if (cached != null) {
-                _state.update {
-                    it.copy(
-                        ratings = cached.toRatings(),
-                        artwork = cached.toArtwork(),
-                        cast = cached.toCast(),
-                    )
-                }
+                _state.update { it.copy(cast = cached.toCast()) }
                 prefetchDetailImages(metadata, cached, force = false)
             }
             if (cached != null && cached.isFresh) return@launch
@@ -209,8 +194,6 @@ class DetailViewModel(private val videoId: Long) : ViewModel() {
 
             _state.update {
                 it.copy(
-                    ratings = merged.toRatings() ?: it.ratings,
-                    artwork = merged.toArtwork() ?: it.artwork,
                     cast = merged.toCast().ifEmpty { it.cast },
                     refreshing = false,
                 )
@@ -230,13 +213,7 @@ class DetailViewModel(private val videoId: Long) : ViewModel() {
             add(tmdbBackdropUrl(metadata.episodeStillPath))
             add(tmdbPosterUrl(metadata.posterPath))
             details.imageUrls().forEach { path ->
-                // Cast paths are TMDB relative paths; Fanart URLs are absolute
-                // HD images, which the data saver avoids.
-                if (path.startsWith("http")) {
-                    if (!AppContainer.dataSaver) add(path)
-                } else {
-                    add(tmdbImageUrl(path, "w185"))
-                }
+                add(tmdbImageUrl(path, "w185"))
             }
         }
         if (force) {
@@ -371,9 +348,8 @@ fun DetailScreen(
     }
 
     val metadata = state.metadata
-    val backdropUrl = state.artwork?.background
-        ?: tmdbBackdropUrl(metadata?.backdropPath ?: metadata?.episodeStillPath)
-    val logoUrl = state.artwork?.logo
+    val backdropUrl = tmdbBackdropUrl(metadata?.backdropPath ?: metadata?.episodeStillPath)
+    val logoUrl: String? = null
     val posterVersion by AppContainer.posterCache.version.collectAsStateWithLifecycle()
     val posterUrl = AppContainer.posterCache.localUrl(videoId, metadata)
         ?: tmdbPosterUrl(metadata?.posterPath)
@@ -630,12 +606,6 @@ fun DetailScreen(
                 }
             }
 
-            state.ratings?.let { ratings ->
-                item(key = "ratings") {
-                    RatingsRow(ratings)
-                }
-            }
-
             item(key = "actions") {
                 Row(
                     Modifier
@@ -865,70 +835,6 @@ fun DetailScreen(
             onSearch = viewModel::searchSubtitles,
             onDownload = viewModel::downloadSubtitle,
             onDelete = viewModel::deleteSubtitle,
-        )
-    }
-}
-
-/** Cross-provider rating badges (OMDb): IMDb · Rotten Tomatoes · Metacritic. */
-@Composable
-private fun RatingsRow(ratings: OmdbRatings) {
-    Column(Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ratings.imdb?.let {
-                RatingChip(text = "IMDb $it", highlight = true)
-            }
-            ratings.rottenTomatoes?.let {
-                RatingChip(text = "🍅 $it%")
-            }
-            ratings.metacritic?.let {
-                RatingChip(text = "MC $it")
-            }
-            ratings.rated?.let {
-                RatingChip(text = it)
-            }
-        }
-        val extra = listOfNotNull(
-            ratings.imdbVotes?.let { "$it IMDb votes" },
-            ratings.boxOffice,
-        ).joinToString(" · ")
-        if (extra.isNotBlank()) {
-            Spacer(Modifier.height(6.dp))
-            Text(
-                extra,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        ratings.awards?.let {
-            Text(
-                "🏆 $it",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 2.dp),
-            )
-        }
-    }
-}
-
-@Composable
-private fun RatingChip(text: String, highlight: Boolean = false) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = if (highlight) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.surfaceContainerHigh
-        },
-    ) {
-        Text(
-            text,
-            style = MaterialTheme.typography.labelMedium,
-            color = if (highlight) {
-                MaterialTheme.colorScheme.onPrimaryContainer
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
         )
     }
 }

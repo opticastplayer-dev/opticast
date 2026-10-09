@@ -71,7 +71,6 @@ import com.opticast.player.ui.components.rememberShowFrameArtwork
 import com.opticast.player.data.model.LibraryEntry
 import com.opticast.player.data.model.LocalVideo
 import com.opticast.player.data.model.Metadata
-import com.opticast.player.data.remote.FanartArtwork
 import com.opticast.player.data.remote.tmdbImageUrl
 import com.opticast.player.ui.components.CastRow
 import com.opticast.player.ui.components.SectionHeader
@@ -88,7 +87,6 @@ class ShowViewModel(private val showName: String) : ViewModel() {
     data class UiState(
         val episodes: List<LibraryEntry> = emptyList(),
         val showMeta: Metadata? = null,
-        val artwork: FanartArtwork? = null,
         val cast: List<CastMember> = emptyList(),
         val loading: Boolean = true,
     )
@@ -116,8 +114,7 @@ class ShowViewModel(private val showName: String) : ViewModel() {
             // must not trigger fresh API requests or misinterpret another provider's ID.
             val metadata = episodes.firstNotNullOfOrNull { it.metadata }
             val cached = episodes.firstNotNullOfOrNull { AppContainer.detailCache.get(it.video.id) }
-            _state.update { it.copy(showMeta = metadata, artwork = cached?.toArtwork(),
-                cast = cached?.toCast().orEmpty()) }
+            _state.update { it.copy(showMeta = metadata, cast = cached?.toCast().orEmpty()) }
 
         }
     }
@@ -149,9 +146,8 @@ fun ShowScreen(
     val episodes = state.episodes
     val anyMeta = episodes.firstNotNullOfOrNull { it.metadata }
     val showMeta = state.showMeta
-    val backdropUrl = state.artwork?.background
-        ?: tmdbBackdropUrl(showMeta?.backdropPath ?: anyMeta?.backdropPath)
-    val logoUrl = state.artwork?.logo
+    val backdropUrl = tmdbBackdropUrl(showMeta?.backdropPath ?: anyMeta?.backdropPath)
+    val logoUrl: String? = null
     val title = showMeta?.title ?: anyMeta?.showTitle ?: showName
     val year = showMeta?.year ?: anyMeta?.year
     val rating = showMeta?.voteAverage ?: anyMeta?.voteAverage ?: 0.0

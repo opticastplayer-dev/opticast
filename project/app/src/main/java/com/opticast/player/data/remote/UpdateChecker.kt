@@ -63,6 +63,7 @@ object UpdateChecker {
         data class Asset(val name: String = "", val browser_download_url: String = "", val size: Long = 0L)
     }
 
+    @Serializable
     data class UpdateInfo(
         val version: String,
         val versionCode: Long,
@@ -124,7 +125,7 @@ object UpdateChecker {
             val isNewer = isVersionNewer(tag, installed.first)
             val apk = release.assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains("OptiCast", true) } ?: release.assets.firstOrNull { it.name.endsWith(".apk") }
             val info = UpdateInfo(tag, parseVersionCode(tag), release.body, apk?.browser_download_url ?: release.html_url, release.html_url.ifBlank { GITHUB_RELEASES_URL }, apk?.size ?: 0L, isNewer)
-            prefs(context).edit().putString(KEY_AVAILABLE_UPDATE_JSON, json.encodeToString(UpdateInfo.serializer(), info)).apply()
+            prefs(context).edit().putString(KEY_AVAILABLE_UPDATE_JSON, json.encodeToString(info)).apply()
             if (isNewer) {
                 prefs(context).edit().putString(KEY_LAST_VERSION, tag).putString(KEY_WHATS_NEW_VERSION, tag).putString(KEY_WHATS_NEW_CHANGELOG, release.body).putBoolean(KEY_WHATS_NEW_SHOWN, true).apply()
             } else {
@@ -145,7 +146,7 @@ object UpdateChecker {
         checkForUpdate(context, force = false)
     }
 
-    fun isVersionNewer(remote: String, installed: String): Boolean = try {
+    fun isVersionNewer(remote: String, installed: String): Boolean { return try {
         val r = remote.split(".", "-").mapNotNull { it.toIntOrNull() }
         val i = installed.split(".", "-").mapNotNull { it.toIntOrNull() }
         for (idx in 0 until maxOf(r.size, i.size)) {
@@ -155,7 +156,7 @@ object UpdateChecker {
             if (rv < iv) return false
         }
         false
-    } catch (_: Exception) { remote != installed }
+    } catch (_: Exception) { remote != installed } }
 
     fun parseVersionCode(version: String): Long = try {
         var code = 0L

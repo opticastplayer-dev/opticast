@@ -74,10 +74,7 @@ data class AppSettings(
     // New features
     val trashEnabled: Boolean = true,
     val trashRetentionDays: Int = 30,
-    val gestureCustomization: String = "default", // default, custom
-    val organizeAssistantEnabled: Boolean = false,
-    val organizeLevel: Int = 1, // 1 suggest only, 2 rename only, 3 allow moves
-)
+    val gestureCustomization: String = "default", // default, custom)
 
 private val Context.settingsDataStore: DataStore<Preferences> by
     preferencesDataStore(name = "opticast_settings")
@@ -126,9 +123,7 @@ class SettingsRepository(private val context: Context) {
     private val trashEnabledKey = booleanPreferencesKey("trash_enabled")
     private val trashRetentionKey = intPreferencesKey("trash_retention_days")
     private val gestureCustomKey = stringPreferencesKey("gesture_customization")
-    private val organizeEnabledKey = booleanPreferencesKey("organize_assistant_enabled")
-    private val organizeLevelKey = intPreferencesKey("organize_level")
-
+    private    private
     val settings: Flow<AppSettings> = context.settingsDataStore.data.map { prefs ->
         AppSettings(
             tmdbApiKey = prefs[tmdbKey].orEmpty(),
@@ -187,10 +182,7 @@ class SettingsRepository(private val context: Context) {
             libraryGrid = resolvedLibraryGrid(prefs[gridKey]),
             trashEnabled = prefs[trashEnabledKey] ?: true,
             trashRetentionDays = prefs[trashRetentionKey] ?: 30,
-            gestureCustomization = prefs[gestureCustomKey] ?: "default",
-            organizeAssistantEnabled = prefs[organizeEnabledKey] ?: false,
-            organizeLevel = prefs[organizeLevelKey] ?: 1,
-        )
+            gestureCustomization = prefs[gestureCustomKey] ?: "default",        )
     }
 
     suspend fun setPreferredAudioLanguage(value: String) { context.settingsDataStore.edit { it[audioLanguageKey] = value } }

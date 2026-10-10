@@ -956,6 +956,8 @@ private fun SoundSettingsCard(settings: AppSettings, scope: CoroutineScope) {
             description = "Adds presence to speech so quiet dialogue stays clear at low volume. Stacks with audio boost.",
             checked = settings.dialogueBoost,
         ) { enabled -> scope.launch { AppContainer.settings.setDialogueBoost(enabled) } }
+    }
+}
 
 @Composable
 private fun CombinedPlaybackCard(

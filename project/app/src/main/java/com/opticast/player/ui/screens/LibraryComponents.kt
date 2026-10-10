@@ -53,7 +53,6 @@ import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Queue
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -660,16 +659,6 @@ internal fun EntryMenuSheet(
                 overflow = TextOverflow.Ellipsis
             )
             MenuActionRow(Icons.Filled.PlayArrow, "Play now", onPlay)
-            MenuActionRow(Icons.Filled.Queue, "Play next", onClick = {
-                targets.forEach { AppContainer.queueStore.addNext(it.video.id) }
-                android.widget.Toast.makeText(context, if (targets.size == 1) "Added to play next" else "${targets.size} added to play next", android.widget.Toast.LENGTH_SHORT).show()
-                onDismiss()
-            })
-            MenuActionRow(Icons.Filled.Queue, "Add to queue", onClick = {
-                targets.forEach { AppContainer.queueStore.addToQueue(it.video.id) }
-                android.widget.Toast.makeText(context, if (targets.size == 1) "Added to queue" else "${targets.size} added to queue", android.widget.Toast.LENGTH_SHORT).show()
-                onDismiss()
-            })
             MenuActionRow(Icons.Filled.Info, "Details", onDetails)
             MenuActionRow(
                 Icons.Filled.Check,

@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -258,38 +257,6 @@ private fun StatusBadge(status: PosterBadge, modifier: Modifier = Modifier, sing
     }
 }
 
-@Composable
-private fun QueueIndicatorBadge(isNext: Boolean) {
-    val minimal = LocalMinimalStyle.current
-    val container = if (isNext) Color(0xFF7C4DFF) else Color(0xFF37474F)
-    val gradient = Brush.linearGradient(listOf(container, container.copy(alpha = 0.95f)))
-    val icon = if (isNext) Icons.Filled.PlayArrow else Icons.Filled.PlaylistAdd
-    val label = if (isNext) "NEXT" else "QUEUE"
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        color = Color.Transparent,
-        contentColor = Color.White,
-        border = BorderStroke(1.2.dp, Color.White.copy(alpha = if (minimal) 0.4f else 1f)),
-        shadowElevation = if (minimal) 0.dp else 6.dp
-    ) {
-        Row(
-            Modifier.background(gradient).padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(if (isNext) 14.dp else 12.dp), tint = Color.White)
-            Text(
-                label,
-                fontSize = if (isNext) 11.sp else 10.sp,
-                lineHeight = 12.sp,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 0.6.sp,
-                color = Color.White
-            )
-        }
-    }
-}
-
 /**
  * Artwork for a title with no poster to show.
  *
@@ -412,10 +379,6 @@ fun PosterCard(
     val remotePosterUrl = remember(entry.metadata?.posterPath) { posterRemoteUrlFor(entry) }
     val fallbackTitle = remember(entry.video.name, entry.video.parsed.title) { (entry.video.parsed.title.ifBlank { entry.video.name }).trim().trimEnd('(', ')', '[', ']', ' ', '-', '_', '.').trim() }
     val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) }
-    val queue by AppContainer.queueStore.queue.collectAsState()
-    val queueItem = remember(entry.video.id, queue) { queue.firstOrNull { it.videoId == entry.video.id } }
-    val isNext = queueItem?.order == 0
-    val isQueued = queueItem != null
 
     // Keep fast for grid
     // SharedElement only for detail header, not for grid cards (prevents messed up empty boxes)
@@ -474,23 +437,11 @@ fun PosterCard(
 
         // One primary ribbon prevents NEW and WATCHED overlapping on small cards.
         val episodeTag = entry.video.seasonEpisodeTag
-        val isWatched = playback?.isWatched == true
-        val badge = primaryPosterBadge(entry.video.isNewlyAdded(), isWatched, playback?.isResumable == true)
+        val badge = primaryPosterBadge(entry.video.isNewlyAdded(), playback?.isWatched == true, playback?.isResumable == true)
         Column(Modifier.align(Alignment.TopStart).padding(posterBadgeInsetDp(if(LocalMinimalStyle.current) 8f else 22f).dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)) {
             badge?.let { StatusBadge(it) }
             episodeTag?.let { PosterPill(it, Color.Black.copy(alpha = 0.8f), Color.White) }
-        }
-        // Queue / Next badge – high visibility at TopEnd, hidden when watched
-        if (!isWatched) {
-            when {
-                isNext -> Box(Modifier.align(Alignment.TopEnd).padding(posterBadgeInsetDp(if(LocalMinimalStyle.current) 8f else 22f).dp)) {
-                    QueueIndicatorBadge(isNext = true)
-                }
-                isQueued -> Box(Modifier.align(Alignment.TopEnd).padding(posterBadgeInsetDp(if(LocalMinimalStyle.current) 8f else 22f).dp)) {
-                    QueueIndicatorBadge(isNext = false)
-                }
-            }
         }
 
 

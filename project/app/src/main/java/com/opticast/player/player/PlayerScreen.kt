@@ -235,7 +235,14 @@ fun PlayerScreen(
     val storeVersion by AppContainer.metadataStore.version.collectAsState()
     val appSettings by AppContainer.settings.settings.collectAsState(initial = AppContainer.initialSettings)
 
-    HandlePlayerOrientation(activity = activity, appSettings = appSettings)
+    // Instant landscape: rotate immediately on entry when toggle is on.
+    // Uses SENSOR_LANDSCAPE to start in landscape but still allow sensor rotation.
+    LaunchedEffect(Unit) {
+        if (AppContainer.initialSettings.autoLandscape) {
+            activity?.requestedOrientation =
+                android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        }
+    }
 
     // Internal id so "Up next" can switch episodes without re-navigating.
     var activeVideoId by remember(videoId, remoteUri) { mutableLongStateOf(videoId) }
@@ -1168,6 +1175,19 @@ fun PlayerScreen(
         }
     }
 
+    // Orientation mode handling - respects autoLandscape toggle
+    LaunchedEffect(appSettings.orientationMode, appSettings.autoLandscape) {
+        val act = activity ?: return@LaunchedEffect
+        val autoLand = appSettings.autoLandscape
+        act.requestedOrientation = when (appSettings.orientationMode) {
+            "portrait" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            "landscape" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            "sensor" -> if (autoLand) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            "locked" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED
+            else -> if (autoLand) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }
+
     // Auto-hide controls while playing.
     LaunchedEffect(controlsVisible) {
         if (!controlsVisible) return@LaunchedEffect
@@ -1380,7 +1400,15 @@ fun PlayerScreen(
                     view.resizeMode = surfaceResizeMode(resizeMode)
                     val surfaceScale = if(selectedEngine == "mpv") 1f else aggressiveVideoScale(resizeMode)
                     view.videoSurfaceView?.apply { scaleX = surfaceScale; scaleY = surfaceScale }
-                    configureSubtitleView(view.subtitleView, appSettings.captionStyle, appSettings.captionScale)
+                    view.subtitleView?.apply {
+                        setStyle(captionStyleFor(appSettings.captionStyle))
+                        setFractionalTextSize(
+                            SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * appSettings.captionScale * 0.9f
+                        )
+                        setApplyEmbeddedStyles(false)
+                        setApplyEmbeddedFontSizes(false)
+                        setBottomPaddingFraction(0.12f)
+                    }
                 },
             )
 
@@ -1961,9 +1989,6 @@ fun PlayerScreen(
                         }
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        PlayerActionButton(onClick = { zoomScale = 1f; zoomOffset = Offset.Zero; zoomHudScale = 1f; poke() }) {
-                            Icon(Icons.Filled.ZoomOutMap, "Reset zoom (${zoomPercent(zoomScale)}%)", tint = Color.White)
-                        }
                         PlayerActionButton(onClick = {
                             if ((activity as? PlayerActivity)?.enterPipFromControls() != true)
                                 Toast.makeText(context, "Picture-in-picture is unavailable or disabled on this device.", Toast.LENGTH_LONG).show()
@@ -2003,17 +2028,30 @@ fun PlayerScreen(
                     }
                 }
 
-                // Second subtitle line extracted for maintainability
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter)
-                ) {
-                    SecondarySubtitleOverlay(
-                        secondaryCues = secondaryCues,
-                        positionMs = positionMs,
-                        controlsVisible = controlsVisible
-                    )
+                // Second subtitle line, drawn above the control bar so it never
+                // collides with Media3's own subtitle rendering underneath.
+                SubtitleCues.cueAt(secondaryCues, positionMs)?.let { line ->
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                            .padding(horizontal = 24.dp)
+                            .padding(bottom = if (controlsVisible) 128.dp else 88.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = line,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .background(
+                                    Color.Black.copy(alpha = 0.55f),
+                                    RoundedCornerShape(6.dp),
+                                )
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                        )
+                    }
                 }
 
                 // Bottom seek bar
@@ -2183,7 +2221,6 @@ fun PlayerScreen(
             if(video.id>0L) TrackRow("Intro / credits ranges", false) { showMoreControls=false;showSkipRanges=true }
             if (selectedEngine != "mpv") TrackRow("Playback diagnostics", false) { showMoreControls=false;showDiagnostics=true }
             if (selectedEngine != "mpv") TrackRow("Sound / Equalizer", false) { showMoreControls = false; showAudioSheet = true }
-            TrackRow("Now Playing", false) { showMoreControls = false; showMovieBrowser = true }
             if (appSettings.playerControls.contains("chapters") && chapters.isNotEmpty())
                 TrackRow("Chapters", false) { showMoreControls = false; showChaptersSheet = true }
             if (appSettings.playerControls.contains("sleep"))
@@ -2194,33 +2231,6 @@ fun PlayerScreen(
             TrackRow("A-B Loop: ${if (abLoopManager.abLoop.isActive) "ON ${abLoopManager.abLoop.pointA?.let { it/1000 }}s-${abLoopManager.abLoop.pointB?.let { it/1000 }}s" else if (abLoopManager.abLoop.pointA != null) "A set" else "Off"}", false) {
                 showMoreControls = false
                 showABLoopControls = true
-                poke()
-            }
-            // Auto Crop
-            TrackRow("Auto Crop: ${if (autoCropManager.isEnabled) "On" else "Off"}", false) {
-                autoCropManager.toggle()
-                scope.launch { AppContainer.settings.setAutoCrop(autoCropManager.isEnabled) }
-                if (autoCropManager.isEnabled) {
-                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                } else {
-                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-                }
-                poke()
-            }
-            // Orientation lock
-            TrackRow("Orientation: ${appSettings.orientationMode}", false) {
-                val modes = listOf("auto", "portrait", "landscape", "sensor", "locked")
-                val currentIdx = modes.indexOf(appSettings.orientationMode)
-                val next = modes[(currentIdx + 1) % modes.size]
-                scope.launch { AppContainer.settings.setOrientationMode(next) }
-                // Apply immediately
-                activity?.requestedOrientation = when (next) {
-                    "portrait" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    "landscape" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    "sensor" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
-                    "locked" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED
-                    else -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                }
                 poke()
             }
             TrackRow("Capture frame", false) {
@@ -3010,7 +3020,29 @@ private fun mimeForName(name: String): String? {
     }
 }
 
-
+private fun captionStyleFor(index: Int): CaptionStyleCompat = when (index) {
+    1 -> CaptionStyleCompat(
+        Color.White.toArgb(),
+        0xB3000000.toInt(), // translucent black box
+        Color.Transparent.toArgb(),
+        CaptionStyleCompat.EDGE_TYPE_NONE,
+        Color.Transparent.toArgb(),
+        null, // typeface
+    )
+    3 -> CaptionStyleCompat(
+        Color.White.toArgb(), Color.Transparent.toArgb(), Color.Transparent.toArgb(),
+        CaptionStyleCompat.EDGE_TYPE_NONE, Color.Transparent.toArgb(), null,
+    )
+    2 -> CaptionStyleCompat(
+        Color.Yellow.toArgb(),
+        Color.Transparent.toArgb(),
+        Color.Transparent.toArgb(),
+        CaptionStyleCompat.EDGE_TYPE_OUTLINE,
+        Color.Black.toArgb(),
+        null, // typeface
+    )
+    else -> CaptionStyleCompat.DEFAULT
+}
 
 /**
  * A single scrub-preview frame plus its timestamp. Uses whatever thumbnail the

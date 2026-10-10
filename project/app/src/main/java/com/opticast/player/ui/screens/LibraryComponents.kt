@@ -642,6 +642,7 @@ internal fun EntryMenuSheet(
     onForget: () -> Unit,
     groupEntries: List<LibraryEntry>? = null
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val targets = groupEntries ?: listOf(entry)
     val watched = targets.isNotEmpty() && targets.all { AppContainer.playbackState.state(it.video.id)?.isWatched == true }
     val favorite = targets.isNotEmpty() && targets.all { AppContainer.favorites.isFavorite(it.video.id) }
@@ -661,10 +662,12 @@ internal fun EntryMenuSheet(
             MenuActionRow(Icons.Filled.PlayArrow, "Play now", onPlay)
             MenuActionRow(Icons.Filled.Queue, "Play next", onClick = {
                 targets.forEach { AppContainer.queueStore.addNext(it.video.id) }
+                android.widget.Toast.makeText(context, if (targets.size == 1) "Added to play next" else "${targets.size} added to play next", android.widget.Toast.LENGTH_SHORT).show()
                 onDismiss()
             })
             MenuActionRow(Icons.Filled.Queue, "Add to queue", onClick = {
                 targets.forEach { AppContainer.queueStore.addToQueue(it.video.id) }
+                android.widget.Toast.makeText(context, if (targets.size == 1) "Added to queue" else "${targets.size} added to queue", android.widget.Toast.LENGTH_SHORT).show()
                 onDismiss()
             })
             MenuActionRow(Icons.Filled.Info, "Details", onDetails)

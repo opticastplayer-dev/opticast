@@ -2,6 +2,7 @@
 
 package com.opticast.player.ui.screens
 
+import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.flow.getAndUpdate
 
 import com.opticast.player.data.local.batchRenameItems
@@ -260,6 +261,7 @@ fun LibraryScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     val appSettings by AppContainer.settings.settings
         .collectAsStateWithLifecycle(initialValue = AppContainer.initialSettings)
@@ -481,10 +483,10 @@ fun LibraryScreen(
             .associate { it.key to it.value }
     }
     val filtered by remember(allMovies, allShows) { androidx.compose.runtime.derivedStateOf { allMovies + allShows.values.flatten() } }
-    val movies by remember(allMovies, includeCompletedInGrid) { androidx.compose.runtime.derivedStateOf { allMovies.filter { includeInMainResults(isWatched(it), includeCompletedInGrid) } } }
-    val shows by remember(allShows, includeCompletedInGrid) { androidx.compose.runtime.derivedStateOf { allShows.filterValues { episodes -> episodes.any { includeInMainResults(isWatched(it), includeCompletedInGrid) } } } }
-    val watchedMovies = remember(allMovies) { allMovies.filter { isWatched(it) } }
-    val watchedShows = remember(allShows) { allShows.filterValues { episodes -> completedLibrarySeries(episodes.map { isWatched(it) }) } }
+    val movies by remember(allMovies, includeCompletedInGrid, progressTick) { androidx.compose.runtime.derivedStateOf { allMovies.filter { includeInMainResults(isWatched(it), includeCompletedInGrid) } } }
+    val shows by remember(allShows, includeCompletedInGrid, progressTick) { androidx.compose.runtime.derivedStateOf { allShows.filterValues { episodes -> episodes.any { includeInMainResults(isWatched(it), includeCompletedInGrid) } } } }
+    val watchedMovies = remember(allMovies, progressTick) { allMovies.filter { isWatched(it) } }
+    val watchedShows = remember(allShows, progressTick) { allShows.filterValues { episodes -> completedLibrarySeries(episodes.map { isWatched(it) }) } }
     val favMovies = remember(allMovies, favVersion) { allMovies.filter { AppContainer.favorites.isFavorite(it.video.id) } }
     val favShows = remember(allShows, favVersion) { allShows.filterValues { episodes -> episodes.any { AppContainer.favorites.isFavorite(it.video.id) } } }
     val stats = remember(state.entries) {
@@ -990,7 +992,14 @@ fun LibraryScreen(
         tab = tab,
         onMarkWatched = {
             val chosen = state.entries.filter { it.video.id in selectedIds }
-            chosen.forEach { viewModel.setWatched(it.video.id, it.video.durationMs, true) }
+            val allWatched = chosen.isNotEmpty() && chosen.all { AppContainer.playbackState.state(it.video.id)?.isWatched == true }
+            chosen.forEach { viewModel.setWatched(it.video.id, it.video.durationMs, !allWatched) }
+            val msg = if (allWatched) {
+                if (chosen.size == 1) "Marked as unwatched" else "${chosen.size} marked as unwatched"
+            } else {
+                if (chosen.size == 1) "Marked as watched" else "${chosen.size} marked as watched"
+            }
+            scope.launch { snackbarHostState.showSnackbar(msg) }
             exitSelection()
         },
         onToggleFavorite = {

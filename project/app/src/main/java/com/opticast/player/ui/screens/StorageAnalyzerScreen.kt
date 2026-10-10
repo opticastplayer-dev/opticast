@@ -64,7 +64,7 @@ fun StorageAnalyzerScreen(
                             Text(entry.video.name, maxLines = 1, style = MaterialTheme.typography.bodyMedium)
                             Text(entry.video.uri, maxLines = 1, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        Text(StorageAnalyzer.formatSize(try { java.io.File(entry.video.uri).length() } catch (_: Exception) { 0L }), style = MaterialTheme.typography.labelMedium)
+                        Text(StorageAnalyzer.formatSize(entry.video.sizeBytes), style = MaterialTheme.typography.labelMedium)
                     }
                 }
             }

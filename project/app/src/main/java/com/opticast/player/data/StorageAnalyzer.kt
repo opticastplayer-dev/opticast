@@ -21,20 +21,22 @@ object StorageAnalyzer {
         val movies = entries.filter { !it.video.isEpisode }
         val shows = entries.filter { it.video.isEpisode }
 
-        val moviesSize = movies.sumOf { getFileSize(it.video.uri) }
-        val showsSize = shows.sumOf { getFileSize(it.video.uri) }
+        val moviesSize = movies.sumOf { it.video.sizeBytes }
+        val showsSize = shows.sumOf { it.video.sizeBytes }
         val totalSize = moviesSize + showsSize
 
-        val biggestFiles = entries.sortedByDescending { getFileSize(it.video.uri) }.take(10)
+        val biggestFiles = entries.sortedByDescending { it.video.sizeBytes }.take(10)
 
         val stat = try {
-            val path = entries.firstOrNull()?.video?.uri?.let { File(it).parent } ?: "/storage/emulated/0"
-            val statFs = StatFs(path)
-            val available = statFs.availableBytes
-            val total = statFs.totalBytes
-            Pair(available, total)
+            val statFs = StatFs("/storage/emulated/0")
+            Pair(statFs.availableBytes, statFs.totalBytes)
         } catch (_: Exception) {
-            Pair(0L, 0L)
+            try {
+                val statFs = StatFs("/storage/emulated/0/Movies")
+                Pair(statFs.availableBytes, statFs.totalBytes)
+            } catch (_: Exception) {
+                Pair(0L, 0L)
+            }
         }
 
         return StorageStats(
@@ -47,14 +49,6 @@ object StorageAnalyzer {
             moviesCount = movies.size,
             showsCount = shows.size
         )
-    }
-
-    private fun getFileSize(path: String): Long {
-        return try {
-            File(path).length()
-        } catch (_: Exception) {
-            0L
-        }
     }
 
     fun formatSize(bytes: Long): String {

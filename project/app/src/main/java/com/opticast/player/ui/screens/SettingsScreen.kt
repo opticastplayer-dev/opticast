@@ -1,7 +1,6 @@
 package com.opticast.player.ui.screens
 
 import androidx.compose.material.icons.filled.SystemUpdate
-import com.opticast.player.ui.screens.settings.EngineSettingsCard
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.background
@@ -114,53 +113,7 @@ private val LANGUAGE_OPTIONS = listOf(
     "en" to "English",
     "fr" to "French",
     "es" to "Spanish",
-    "de" to "German",
-    "it" to "Italian",
-    "pt" to "Portuguese",
-    "pt-BR" to "Portuguese (Brazil)",
-    "nl" to "Dutch",
-    "ru" to "Russian",
-    "uk" to "Ukrainian",
-    "pl" to "Polish",
-    "cs" to "Czech",
-    "sk" to "Slovak",
-    "hu" to "Hungarian",
-    "ro" to "Romanian",
-    "bg" to "Bulgarian",
-    "sr" to "Serbian",
-    "hr" to "Croatian",
-    "sl" to "Slovenian",
-    "el" to "Greek",
-    "tr" to "Turkish",
-    "ar" to "Arabic",
-    "he" to "Hebrew",
-    "fa" to "Persian",
-    "hi" to "Hindi",
-    "bn" to "Bengali",
-    "ta" to "Tamil",
-    "te" to "Telugu",
-    "ml" to "Malayalam",
-    "ur" to "Urdu",
     "zh" to "Chinese",
-    "zh-TW" to "Chinese (Traditional)",
-    "ja" to "Japanese",
-    "ko" to "Korean",
-    "vi" to "Vietnamese",
-    "th" to "Thai",
-    "id" to "Indonesian",
-    "ms" to "Malay",
-    "sv" to "Swedish",
-    "no" to "Norwegian",
-    "da" to "Danish",
-    "fi" to "Finnish",
-    "is" to "Icelandic",
-    "et" to "Estonian",
-    "lv" to "Latvian",
-    "lt" to "Lithuanian",
-    "af" to "Afrikaans",
-    "sw" to "Swahili",
-    "ny" to "Chichewa",
-    "zu" to "Zulu",
 )
 
 private val THEME_OPTIONS = listOf(
@@ -370,7 +323,7 @@ fun SettingsScreen(
             item(key = "Playback & Controls") {
                 SettingsGroup("Playback & Controls") {
                 EngineSettingsCard(settings, scope)
-                BehaviourSettingsCard(settings, scope)
+                BehaviourSettingsCard(settings, scope, onOpenNetwork)
                 GestureSettingsCard(settings, scope, onOpenGestureCustomization)
                 PlayerAdvancedSettingsCard(settings, scope)
                 }
@@ -475,13 +428,8 @@ fun SettingsScreen(
                         }
                     }
                 }
-                if (settings.enableNetworkBrowsing) {
-                    SettingsCard(icon = Icons.Filled.Folder, title = "Network libraries (beta)") {
-                        NetworkToolsPanel(onOpenNetwork)
-                    }
-                }
 
-                SettingsCard(icon = Icons.Filled.Storage, title = "Storage & backups") {
+                SettingsCard(icon = Icons.Filled.Storage, title = "Storage") {
                     Text(
                         "Manage space, cached files and backups.",
                         style = MaterialTheme.typography.bodySmall,
@@ -493,13 +441,6 @@ fun SettingsScreen(
                         shape = RoundedCornerShape(16.dp),
                     ) {
                         Text("Open storage dashboard")
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
-                        onClick = onOpenStorageAnalyzer,
-                        shape = RoundedCornerShape(16.dp),
-                    ) {
-                        Text("Analyze storage usage")
                     }
                     Spacer(Modifier.height(8.dp))
                     OutlinedButton(
@@ -517,27 +458,12 @@ fun SettingsScreen(
                     ) {
                         Text("Clear all saved metadata")
                     }
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
-                        onClick = onOpenQueue,
-                        shape = RoundedCornerShape(16.dp),
-                    ) {
-                        Text("Play queue")
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
-                        onClick = onOpenOrganizeAssistant,
-                        shape = RoundedCornerShape(16.dp),
-                    ) {
-                        Text("File organizer")
-                    }
                 }
                 }
             }
             item(key = "Media Settings") {
                 SettingsGroup("Media Settings") {
                 TrackSettingsCard(settings, scope)
-                SubtitleFontSettingsCard(scope)
                 LanguageDropdownCard(settings = settings, scope = scope)
                 SettingsCard(icon = Icons.Filled.Subtitles, title = "Auto subtitles") {
                     Row(
@@ -571,29 +497,19 @@ fun SettingsScreen(
                 SettingsGroup("Advanced & About") {
                 CollapsibleSettingsCard(
                     icon = Icons.Filled.Tune,
-                    title = "Data & performance",
-                    subtitle = "Save mobile data \u00b7 Performance mode",
+                    title = "Data usage",
+                    subtitle = "Artwork quality",
                     expanded = tweaksExpanded,
                     onToggle = { tweaksExpanded = !tweaksExpanded },
                 ) {
                     Spacer(Modifier.height(14.dp))
                     PrefToggle(
                         label = "Save mobile data",
-                        description = "Smaller artwork; bulk artwork downloads only on Wi-Fi.",
+                        description = "Use smaller artwork and download HD images only on Wi-Fi.",
                         checked = settings.dataSaverArtwork,
                     ) { enabled ->
                         scope.launch { AppContainer.settings.setDataSaverArtwork(enabled) }
                     }
-                    Spacer(Modifier.height(14.dp))
-                    PrefToggle(
-                        label = "Performance mode",
-                        description = "Uses the standard refresh rate, usually 60 Hz. Restart to apply.",
-                        checked = settings.performanceMode,
-                    ) { enabled ->
-                        scope.launch { AppContainer.settings.setPerformanceMode(enabled) }
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    com.opticast.player.player.MemorySnapshotPanel()
                 }
                 ApiKeysCard(settings = settings, scope = scope)
                 SettingsCard(icon = Icons.Filled.SystemUpdate, title = "Check for updates") {
@@ -816,7 +732,7 @@ private fun ApiKeysCard(settings: AppSettings, scope: CoroutineScope) {
                 Column(Modifier.weight(1f)) {
                     Text(settingsHeaderTitle("API keys"), style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "TMDB · OpenSubtitles · SubDL - lightweight, 2 keys only",
+                        "TMDB, OpenSubtitles and SubDL",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -1015,7 +931,7 @@ private fun CollapsibleSettingsCard(
 }
 
 @Composable
-internal fun SettingsCard(
+private fun SettingsCard(
     icon: ImageVector,
     title: String,
     content: @Composable () -> Unit,
@@ -1062,7 +978,7 @@ private fun ApiKeyField(
 
 /** Toggle row used inside the Playback & control card. */
 @Composable
-internal fun PrefToggle(
+private fun PrefToggle(
     label: String,
     description: String,
     checked: Boolean,
@@ -1087,11 +1003,41 @@ internal fun PrefToggle(
     }
 }
 
+/** Playback settings applied immediately. */
+@Composable
+private fun EngineSettingsCard(settings: AppSettings, scope: CoroutineScope) {
+    val playbackContext = LocalContext.current
+    SettingsCard(icon = Icons.Filled.PlayArrow, title = "Playback") {
+        Text("To set as default, open a video from your file manager, select OptiCast and choose Always. You can also share videos to OptiCast.", style = MaterialTheme.typography.bodySmall)
+        TextButton(onClick = {
+            runCatching { playbackContext.startActivity(android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                android.net.Uri.parse("package:${playbackContext.packageName}"))) }
+        }) { Text("System default settings") }
+        PrefToggle(
+            label = "Use external player",
+            description = "Open videos in another installed player.",
+            checked = settings.useExternalPlayer,
+        ) { enabled -> scope.launch { AppContainer.settings.setUseExternalPlayer(enabled) } }
+
+        Spacer(Modifier.height(10.dp))
+        Text(settingsHeaderTitle("Engine selection"), style = MaterialTheme.typography.titleMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("mpv" to "MPV (Default)", "media3" to "Media3").forEach { (id, name) ->
+                FilterChip(selected = if (id == "media3") settings.playbackEngine != "mpv" else settings.playbackEngine == id,
+                    onClick = { scope.launch { AppContainer.settings.setPlaybackEngine(id) } },
+                    label = { Text(name) }, enabled = !settings.useExternalPlayer)
+            }
+        }
+        Text("MPV handles local files with automatic fallback. Network sources and audio enhancements use Media3. Changes apply to the next video.",
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
 @Composable
 private fun TrackSettingsCard(settings: AppSettings, scope: CoroutineScope) {
     SettingsCard(icon = Icons.Filled.Subtitles, title = "Audio & subtitle tracks") {
         Text("For tracks already in your video. Manual choices take priority.", style = MaterialTheme.typography.bodySmall)
-        val trackLanguages = listOf("" to "Any / default", "en" to "English", "ny" to "Chichewa", "fr" to "French", "es" to "Spanish", "pt" to "Portuguese", "de" to "German", "it" to "Italian", "ja" to "Japanese", "ko" to "Korean", "zh" to "Chinese", "ar" to "Arabic", "hi" to "Hindi", "ru" to "Russian")
+        val trackLanguages = listOf("" to "Any / default", "en" to "English", "fr" to "French", "es" to "Spanish", "zh" to "Chinese")
         TrackLanguagePicker("Preferred audio language", settings.preferredAudioLanguage, trackLanguages) { code ->
             scope.launch { AppContainer.settings.setPreferredAudioLanguage(code) }
         }
@@ -1110,61 +1056,6 @@ private fun TrackSettingsCard(settings: AppSettings, scope: CoroutineScope) {
         }
         Text("No matching forced/full track? Subtitles stay off. Download languages are set separately.", style = MaterialTheme.typography.bodySmall)
         Spacer(Modifier.height(10.dp))
-    }
-}
-
-@Composable
-private fun SubtitleFontSettingsCard(scope: CoroutineScope) {
-    val context = LocalContext.current
-    val fontManager = remember { AppContainer.subtitleFonts }
-    var fonts by remember { mutableStateOf(fontManager.fontNames()) }
-    var selectedFont by remember { mutableStateOf("System Default") }
-    val fontPicker = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument()) { uri ->
-        uri?.let {
-            try {
-                val input = context.contentResolver.openInputStream(it)
-                val fileName = it.lastPathSegment?.substringAfterLast("/") ?: "custom.ttf"
-                val tempFile = java.io.File(context.cacheDir, fileName)
-                input?.use { inp -> tempFile.outputStream().use { out -> inp.copyTo(out) } }
-                if (fontManager.importFont(tempFile)) {
-                    fonts = fontManager.fontNames()
-                }
-                tempFile.delete()
-            } catch (_: Exception) {}
-        }
-    }
-    
-    SettingsCard(icon = Icons.Filled.Subtitles, title = "Subtitle fonts - custom") {
-        Text("Add your own subtitle fonts - offline, no internet needed. Supports .ttf and .otf. Falls back to system font.", style = MaterialTheme.typography.bodySmall)
-        Spacer(Modifier.height(8.dp))
-        Text("Available fonts: ${fonts.size}", style = MaterialTheme.typography.labelLarge)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            fonts.forEach { fontName ->
-                FilterChip(
-                    selected = selectedFont == fontName,
-                    onClick = { selectedFont = fontName },
-                    label = { Text(fontName, maxLines = 1) }
-                )
-            }
-        }
-        Spacer(Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = { fontPicker.launch(arrayOf("font/*", "application/octet-stream")) }) {
-                Text("Import font")
-            }
-            if (selectedFont != "System Default") {
-                OutlinedButton(onClick = {
-                    if (fontManager.deleteFont(selectedFont)) {
-                        fonts = fontManager.fontNames()
-                        selectedFont = "System Default"
-                    }
-                }) {
-                    Text("Delete")
-                }
-            }
-        }
-        Spacer(Modifier.height(4.dp))
-        Text("Fonts saved to: ${fontManager.fontDirPath()} - 10MB max per font, offline-first, private, stays on device", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -1203,65 +1094,55 @@ private fun PlayerLayoutSettingsCard(settings: AppSettings, scope: CoroutineScop
         }
 
         Text(
-            settingsHeaderTitle("Buttons on the playing screen"),
+            settingsHeaderTitle("Player controls"),
             style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(top = 16.dp, bottom = 2.dp),
+            modifier = Modifier.padding(top = 16.dp, bottom = 6.dp),
         )
-        listOf(
-            "back" to "Back",
-            "speed" to "Playback speed",
-            "subtitles" to "Subtitles and Audio",
-            "library" to "Library",
-            "chapters" to "Chapters",
-            "info" to "Playback info",
-            "lock" to "Lock controls",
-            "aspect" to "Aspect ratio",
-            "sleep" to "Sleep timer",
-        ).forEach { (id, label) ->
-            PrefToggle(
-                label = label,
-                description = "",
-                checked = settings.playerControls.contains(id),
-            ) { enabled ->
-                scope.launch { AppContainer.settings.setPlayerControl(id, enabled) }
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            listOf(
+                "back" to "Back",
+                "speed" to "Speed",
+                "subtitles" to "Audio & Subtitles",
+                "library" to "Library",
+                "chapters" to "Chapters",
+                "info" to "Info",
+                "lock" to "Lock",
+                "aspect" to "Aspect",
+                "sleep" to "Sleep",
+            ).forEach { (id, label) ->
+                val selected = settings.playerControls.contains(id)
+                FilterChip(
+                    selected = selected,
+                    onClick = { scope.launch { AppContainer.settings.setPlayerControl(id, !selected) } },
+                    label = { Text(label) },
+                    leadingIcon = if (selected) {
+                        { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                    } else null
+                )
             }
         }
-
     }
 }
 
 @Composable
 private fun GestureSettingsCard(settings: AppSettings, scope: CoroutineScope, onOpenGestureCustomization: () -> Unit = {}) {
     SettingsCard(icon = Icons.Filled.TouchApp, title = "Gestures") {
+        Text(
+            "Configure swipe and double-tap actions for the player.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(10.dp))
         OutlinedButton(onClick = onOpenGestureCustomization, shape = RoundedCornerShape(16.dp)) {
             Text("Customize gestures")
         }
-        Spacer(Modifier.height(10.dp))
-
-        Text(
-            "Double-tap seek distance",
-            style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(top = 8.dp),
-        )
-        Spacer(Modifier.height(6.dp))
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            listOf(5, 10, 15, 30).forEach { seconds ->
-                FilterChip(
-                    selected = settings.doubleTapSeekSec == seconds,
-                    onClick = {
-                        scope.launch { AppContainer.settings.setDoubleTapSeekSec(seconds) }
-                    },
-                    label = { Text("${seconds}s") },
-                )
-            }
-        }
-
+        Spacer(Modifier.height(12.dp))
         PrefToggle(
             label = "Hold to fast-forward",
-            description = "Press & hold the video to temporarily speed up, release to return.",
+            description = "Press and hold to speed up temporarily.",
             checked = settings.holdToSpeed,
         ) { enabled -> scope.launch { AppContainer.settings.setHoldToSpeed(enabled) } }
         if (settings.holdToSpeed) {
@@ -1280,73 +1161,63 @@ private fun GestureSettingsCard(settings: AppSettings, scope: CoroutineScope, on
                 }
             }
         }
-
-        PrefToggle(
-            label = "Swipe to seek",
-            description = "Horizontal swipe scrubs through the video.",
-            checked = settings.gestureSeek,
-        ) { enabled -> scope.launch { AppContainer.settings.setGestureSeek(enabled) } }
-        PrefToggle(
-            label = "Swipe for volume & brightness",
-            description = "Vertical swipe: volume on the right side, screen brightness on the left.",
-            checked = settings.gestureVolumeBrightness,
-        ) { enabled -> scope.launch { AppContainer.settings.setGestureVolumeBrightness(enabled) } }
-
-        Spacer(Modifier.height(10.dp))
     }
 }
 
 @Composable
-private fun BehaviourSettingsCard(settings: AppSettings, scope: CoroutineScope) {
+private fun BehaviourSettingsCard(settings: AppSettings, scope: CoroutineScope, onOpenNetwork: () -> Unit = {}) {
     SettingsCard(icon = Icons.Filled.PlayArrow, title = "Playback behaviour") {
         PrefToggle(
             label = "Start in landscape",
-            description = "Pressing play rotates straight to landscape fullscreen - no waiting, no taps.",
+            description = "Automatically switch to landscape when playback starts.",
             checked = settings.autoLandscape,
         ) { enabled -> scope.launch { AppContainer.settings.setAutoLandscape(enabled) } }
         PrefToggle(
             label = "Keep screen on",
-            description = "Prevents the display from sleeping while a video is open.",
+            description = "Prevent display sleep during playback.",
             checked = settings.keepScreenOn,
         ) { enabled -> scope.launch { AppContainer.settings.setKeepScreenOn(enabled) } }
         PrefToggle(
             label = "Preserve voice pitch at speed",
-            description = "Keeps voices natural at 1.25×+ instead of sounding chipmunk-like.",
+            description = "Maintain natural voice pitch at higher speeds.",
             checked = settings.preservePitch,
         ) { enabled -> scope.launch { AppContainer.settings.setPreservePitch(enabled) } }
         Text(
-            "Resume playback is always on. To start over, use Restart from beginning on the video's information page.",
+            "Resume is always enabled. To restart, use Restart from beginning on the detail page.",
             style = MaterialTheme.typography.bodySmall,
         )
         PrefToggle(
             label = "Auto-play next episode",
-            description = "Counts down 5 seconds after an episode ends, then plays the next one.",
+            description = "Automatically play the next episode when current ends.",
             checked = settings.autoNextEpisode,
         ) { enabled -> scope.launch { AppContainer.settings.setAutoNextEpisode(enabled) } }
 
         PrefToggle(
-            label = "Enable network browsing (beta)",
-            description = "Show SMB/NFS network libraries - experimental, off by default for lightness. Requires local network.",
+            label = "Enable network browsing",
+            description = "Show network libraries.",
             checked = settings.enableNetworkBrowsing,
         ) { enabled -> scope.launch { AppContainer.settings.setEnableNetworkBrowsing(enabled) } }
-
+        if (settings.enableNetworkBrowsing) {
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(onClick = onOpenNetwork, shape = RoundedCornerShape(16.dp)) {
+                Text("Open network libraries")
+            }
+        }
     }
 }
 
 @Composable
 private fun PlayerAdvancedSettingsCard(settings: AppSettings, scope: CoroutineScope) {
     SettingsCard(icon = Icons.Filled.Tune, title = "Advanced player") {
-        PrefToggle(
-            label = "Show battery and clock",
-            description = "Display battery percentage and time in player top bar.",
-            checked = settings.showBatteryClock,
-        ) { enabled -> scope.launch { AppContainer.settings.setShowBatteryClock(enabled) } }
-
         Text("Orientation mode", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 12.dp))
         Spacer(Modifier.height(6.dp))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("auto" to "Auto", "portrait" to "Portrait", "landscape" to "Landscape", "sensor" to "Sensor", "locked" to "Locked").forEach { (id, label) ->
-                FilterChip(selected = settings.orientationMode == id, onClick = { scope.launch { AppContainer.settings.setOrientationMode(id) } }, label = { Text(label) })
+            listOf("auto" to "Auto", "portrait" to "Portrait").forEach { (id, label) ->
+                val isSelected = when (id) {
+                    "auto" -> settings.orientationMode == "auto" || settings.orientationMode == "sensor"
+                    else -> settings.orientationMode == id
+                }
+                FilterChip(selected = isSelected, onClick = { scope.launch { AppContainer.settings.setOrientationMode(id) } }, label = { Text(label) })
             }
         }
 
@@ -1358,25 +1229,9 @@ private fun PlayerAdvancedSettingsCard(settings: AppSettings, scope: CoroutineSc
 
         PrefToggle(
             label = "Volume normalization",
-            description = "Normalize volume across videos for consistent loudness.",
+            description = "Normalize volume across videos.",
             checked = settings.volumeNormalization,
         ) { enabled -> scope.launch { AppContainer.settings.setVolumeNormalization(enabled) } }
-
-        Spacer(Modifier.height(8.dp))
-        Text("File organizer", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 8.dp))
-        PrefToggle(
-            label = "Enable organizer assistant",
-            description = "Allow file organization suggestions. Default suggest-only, safe mode.",
-            checked = settings.organizeAssistantEnabled,
-        ) { enabled -> scope.launch { AppContainer.settings.setOrganizeAssistantEnabled(enabled) } }
-        if (settings.organizeAssistantEnabled) {
-            Text("Organizer level", style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 8.dp))
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(1 to "Suggest only", 2 to "Rename only", 3 to "Allow moves").forEach { (lvl, label) ->
-                    FilterChip(selected = settings.organizeLevel == lvl, onClick = { scope.launch { AppContainer.settings.setOrganizeLevel(lvl) } }, label = { Text(label) })
-                }
-            }
-        }
     }
 }
 

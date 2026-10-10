@@ -1105,13 +1105,13 @@ private fun EngineSettingsCard(settings: AppSettings, scope: CoroutineScope) {
         Spacer(Modifier.height(10.dp))
         Text(settingsHeaderTitle("Engine selection"), style = MaterialTheme.typography.titleMedium)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("mpv" to "Default", "media3" to "Compatibility").forEach { (id, name) ->
+            listOf("mpv" to "MPV (Default)", "media3" to "Media3").forEach { (id, name) ->
                 FilterChip(selected = if (id == "media3") settings.playbackEngine != "mpv" else settings.playbackEngine == id,
                     onClick = { scope.launch { AppContainer.settings.setPlaybackEngine(id) } },
                     label = { Text(name) }, enabled = !settings.useExternalPlayer)
             }
         }
-        Text("Default handles local files with automatic fallback. Network sources and audio enhancements use compatibility mode. Changes apply to the next video.",
+        Text("MPV handles local files with automatic fallback. Network sources and audio enhancements use Media3. Changes apply to the next video.",
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         Spacer(Modifier.height(10.dp))

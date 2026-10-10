@@ -33,7 +33,7 @@ data class AppSettings(
     val gestureVolumeBrightness: Boolean = true,
     val keepScreenOn: Boolean = true,
     val autoLandscape: Boolean = true,
-    val orientationMode: String = "auto", // auto, portrait, landscape, sensor, locked
+    val orientationMode: String = "sensor", // auto, portrait, landscape, sensor, locked - default sensor per user request
     val preservePitch: Boolean = true,
     val audioBoostPct: Int = 100,
     val playbackEngine: String = "mpv", // mpv first with Media3 fallback | media3 only
@@ -157,7 +157,7 @@ class SettingsRepository(private val context: Context) {
             gestureVolumeBrightness = prefs[gestureVolKey] ?: true,
             keepScreenOn = prefs[keepScreenOnKey] ?: true,
             autoLandscape = prefs[autoLandscapeKey] ?: true,
-            orientationMode = prefs[orientationModeKey] ?: "auto",
+            orientationMode = prefs[orientationModeKey] ?: "sensor",
             preservePitch = prefs[preservePitchKey] ?: true,
             audioBoostPct = prefs[audioBoostKey] ?: 100,
             // New preference generation intentionally adopts the requested mpv-first default

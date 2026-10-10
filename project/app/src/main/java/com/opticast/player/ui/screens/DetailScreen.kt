@@ -421,6 +421,7 @@ fun DetailScreen(
         ) {
             item(key = "header") {
                 Box(Modifier.fillMaxWidth().height(heroHeight)) {
+                    val isShow = video.isEpisode || metadata?.type == "tv"
                     if (backdropUrl != null) {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
@@ -432,56 +433,59 @@ fun DetailScreen(
                             modifier = Modifier.fillMaxSize(),
                         )
                     } else {
-                        // No backdrop: try frame, then blurred poster fallback (fix black background)
-                        // User reported black background for Afterburn (2025) - offline-first needs fallback
-                        val frame = rememberFrameArtwork(video.id)
-                        if (frame != null) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(frame)
-                                    .crossfade(true)
-                                    .build(),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize(),
-                            )
-                        } else if (posterUrl != null) {
-                            // Poster as background when no backdrop and no frame - never black
-                            // Offline-first: poster is cached, backdrop may not be (new movie, slow internet 30KB/s)
-                            // Fix black background reported for Afterburn (2025) - use poster with dark overlay
-                            // Blur not available in this Compose version, use alpha + scale for background effect
-                            Box(Modifier.fillMaxSize()) {
-                                AsyncImage(
-                                    model = ImageRequest.Builder(LocalContext.current)
-                                        .data(posterUrl)
-                                        .crossfade(true)
-                                        .build(),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .graphicsLayer {
-                                            // Slightly increased size for media info background poster - user request
+                        if (isShow) {
+                            if (posterUrl != null) {
+                                Box(Modifier.fillMaxSize()) {
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(LocalContext.current)
+                                            .data(posterUrl)
+                                            .crossfade(true)
+                                            .build(),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize().graphicsLayer {
                                             scaleX = 1.35f
                                             scaleY = 1.35f
                                             alpha = 0.7f
                                         },
-                                )
-                                // Dark overlay to ensure text readability + blur effect simulation
-                                Box(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .background(
-                                            Brush.verticalGradient(
-                                                0f to Color.Black.copy(alpha = 0.3f),
-                                                0.5f to Color.Black.copy(alpha = 0.6f),
-                                                1f to MaterialTheme.colorScheme.background.copy(alpha = 0.9f)
-                                            )
-                                        )
-                                )
+                                    )
+                                    Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0f to Color.Black.copy(alpha = 0.3f), 0.5f to Color.Black.copy(alpha = 0.6f), 1f to MaterialTheme.colorScheme.background.copy(alpha = 0.9f))))
+                                }
+                            } else {
+                                FallbackPoster(metadata?.displayTitle ?: video.parsed.title)
                             }
                         } else {
-                            FallbackPoster(metadata?.displayTitle ?: video.parsed.title)
+                            val frame = rememberFrameArtwork(video.id)
+                            if (frame != null) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(frame)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            } else if (posterUrl != null) {
+                                Box(Modifier.fillMaxSize()) {
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(LocalContext.current)
+                                            .data(posterUrl)
+                                            .crossfade(true)
+                                            .build(),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize().graphicsLayer {
+                                            scaleX = 1.35f
+                                            scaleY = 1.35f
+                                            alpha = 0.7f
+                                        },
+                                    )
+                                    Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0f to Color.Black.copy(alpha = 0.3f), 0.5f to Color.Black.copy(alpha = 0.6f), 1f to MaterialTheme.colorScheme.background.copy(alpha = 0.9f))))
+                                }
+                            } else {
+                                FallbackPoster(metadata?.displayTitle ?: video.parsed.title)
+                            }
                         }
                     }
                     Box(

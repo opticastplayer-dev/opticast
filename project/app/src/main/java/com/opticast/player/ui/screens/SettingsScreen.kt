@@ -1086,16 +1086,16 @@ private fun PrefToggle(
     }
 }
 
-/** MX-style playback & gesture settings, all applied live by the built-in player. */
+/** Playback settings applied immediately. */
 @Composable
 private fun EngineSettingsCard(settings: AppSettings, scope: CoroutineScope) {
     val playbackContext = LocalContext.current
-    SettingsCard(icon = Icons.Filled.PlayArrow, title = "Playback engine") {
-        Text("To make OptiCast your default, open a video from a file manager, choose OptiCast and select Always if Android offers it. You can also share a video to OptiCast.", style = MaterialTheme.typography.bodySmall)
+    SettingsCard(icon = Icons.Filled.PlayArrow, title = "Playback") {
+        Text("To set as default, open a video from your file manager, select OptiCast and choose Always. You can also share videos to OptiCast.", style = MaterialTheme.typography.bodySmall)
         TextButton(onClick = {
             runCatching { playbackContext.startActivity(android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                 android.net.Uri.parse("package:${playbackContext.packageName}"))) }
-        }) { Text("Android app / default settings") }
+        }) { Text("System default settings") }
         PrefToggle(
             label = "Use external player",
             description = "Open videos in another installed player.",
@@ -1103,15 +1103,15 @@ private fun EngineSettingsCard(settings: AppSettings, scope: CoroutineScope) {
         ) { enabled -> scope.launch { AppContainer.settings.setUseExternalPlayer(enabled) } }
 
         Spacer(Modifier.height(10.dp))
-        Text(settingsHeaderTitle("Built-in playback engine"), style = MaterialTheme.typography.titleMedium)
+        Text(settingsHeaderTitle("Engine selection"), style = MaterialTheme.typography.titleMedium)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("mpv" to "mpv · default", "media3" to "Media3").forEach { (id, name) ->
+            listOf("mpv" to "Default", "media3" to "Compatibility").forEach { (id, name) ->
                 FilterChip(selected = if (id == "media3") settings.playbackEngine != "mpv" else settings.playbackEngine == id,
                     onClick = { scope.launch { AppContainer.settings.setPlaybackEngine(id) } },
                     label = { Text(name) }, enabled = !settings.useExternalPlayer)
             }
         }
-        Text("mpv plays local files with one Media3 fallback. Network playback and EQ/boost use Media3. Engine changes apply to the next video opened.",
+        Text("Default handles local files with automatic fallback. Network sources and audio enhancements use compatibility mode. Changes apply to the next video.",
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         Spacer(Modifier.height(10.dp))

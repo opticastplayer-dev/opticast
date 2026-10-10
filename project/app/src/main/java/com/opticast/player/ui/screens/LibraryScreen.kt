@@ -323,7 +323,6 @@ fun LibraryScreen(
     var sortBy by rememberSaveable { mutableStateOf("recent") } // recent | title | rating | year
     var selectedGenre by rememberSaveable { mutableStateOf("") }
     var showGenrePicker by rememberSaveable { mutableStateOf(false) }
-    var selectedSmartCollectionId by rememberSaveable { mutableStateOf<String?>(null) }
     var showMissingFiles by rememberSaveable { mutableStateOf(false) }
     var showRenameSuggestions by rememberSaveable { mutableStateOf(false) }
     val renameVersion by AppContainer.renameSuggestions.version.collectAsStateWithLifecycle()
@@ -464,13 +463,7 @@ fun LibraryScreen(
     val searched = remember(searchedUnscoped, searchOpen, searchScope) {
         if (!searchOpen) searchedUnscoped else searchedUnscoped.filter { searchTypeMatches(searchScope, it.video.isEpisode || it.metadata?.type == "tv") }
     }
-    val autoSmartCollections = remember(state.entries) { SmartCollections.getAll() + SmartCollections.getByGenre(state.entries) + SmartCollections.getByYear(state.entries) }
-    val filteredBySmart = remember(searched, selectedSmartCollectionId, autoSmartCollections) {
-        val id = selectedSmartCollectionId
-        if (id == null) searched else {
-            autoSmartCollections.firstOrNull { it.id == id }?.let { coll -> searched.filter { coll.filter(it) } } ?: searched
-        }
-    }
+    val filteredBySmart = searched
     fun isWatched(entry: LibraryEntry): Boolean =
         AppContainer.playbackState.state(entry.video.id)?.isWatched == true
 
@@ -631,13 +624,6 @@ fun LibraryScreen(
             if (state.entries.isNotEmpty()) {
                 if (showLibraryStatistics(design.style, design.stats, searching)) item(span = { GridItemSpan(maxLineSpan) }) {
                     StatsCard(stats)
-                }
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    com.opticast.player.ui.components.SmartCollectionsRow(
-                        collections = autoSmartCollections,
-                        selectedId = selectedSmartCollectionId,
-                        onSelect = { id -> selectedSmartCollectionId = if (selectedSmartCollectionId == id) null else id }
-                    )
                 }
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     FilterChipsRow(

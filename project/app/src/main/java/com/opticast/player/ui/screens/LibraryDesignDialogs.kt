@@ -99,9 +99,7 @@ internal fun LibraryCustomizeDialog(tab: String, design: LibraryDesign, onChange
                     }
                     if (design.style == "classic") {
                         item(key = LibraryCustomizeControl.STATISTICS.lazyKey) {
-                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(design.stats, { onChange(design.copy(stats = it)) })
-                                Text("Library statistics", style = MaterialTheme.typography.bodyMedium)
+                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {                                Text("Library statistics", style = MaterialTheme.typography.bodyMedium)
                             }
                             Text("Hold a handle to drag. Use ⋮ for move buttons.", Modifier.padding(bottom = 8.dp), style = MaterialTheme.typography.bodySmall)
                         }

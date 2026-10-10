@@ -170,6 +170,8 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     var confirmClear by remember { mutableStateOf(false) }
     var appearanceExpanded by rememberSaveable { mutableStateOf(false) }
+    var playbackExpanded by rememberSaveable { mutableStateOf(false) }
+    var subtitlesExpanded by rememberSaveable { mutableStateOf(false) }
     var tweaksExpanded by rememberSaveable { mutableStateOf(false) }
     var developerExpanded by rememberSaveable { mutableStateOf(false) }
     var customFolder by remember { mutableStateOf("") }
@@ -322,10 +324,8 @@ fun SettingsScreen(
             }
             item(key = "Playback & Controls") {
                 SettingsGroup("Playback & Controls") {
-                EngineSettingsCard(settings, scope)
-                BehaviourSettingsCard(settings, scope, onOpenNetwork)
+                CombinedPlaybackCard(settings, scope, onOpenNetwork, playbackExpanded, { playbackExpanded = !playbackExpanded })
                 GestureSettingsCard(settings, scope, onOpenGestureCustomization)
-                PlayerAdvancedSettingsCard(settings, scope)
                 }
             }
             item(key = "File Management") {
@@ -463,33 +463,7 @@ fun SettingsScreen(
             }
             item(key = "Media Settings") {
                 SettingsGroup("Media Settings") {
-                TrackSettingsCard(settings, scope)
-                LanguageDropdownCard(settings = settings, scope = scope)
-                SettingsCard(icon = Icons.Filled.Subtitles, title = "Auto subtitles") {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                "Download subtitles during scan",
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                            Text(
-                                "When a file is matched, OptiCast fetches the most-downloaded subtitle in your languages. Uses your OpenSubtitles quota.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Spacer(Modifier.width(12.dp))
-                        Switch(
-                            checked = settings.autoSubtitles,
-                            onCheckedChange = { enabled ->
-                                scope.launch { AppContainer.settings.setAutoSubtitles(enabled) }
-                            },
-                        )
-                    }
-                }
+                CombinedSubtitlesCard(settings, scope, subtitlesExpanded, { subtitlesExpanded = !subtitlesExpanded })
                 SoundSettingsCard(settings, scope)
                 }
             }
@@ -1269,6 +1243,218 @@ private fun SoundSettingsCard(settings: AppSettings, scope: CoroutineScope) {
             description = "Adds presence to speech so quiet dialogue stays clear at low volume. Stacks with audio boost.",
             checked = settings.dialogueBoost,
         ) { enabled -> scope.launch { AppContainer.settings.setDialogueBoost(enabled) } }
+
+@Composable
+private fun CombinedPlaybackCard(
+    settings: AppSettings,
+    scope: CoroutineScope,
+    onOpenNetwork: () -> Unit,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
+    CollapsibleSettingsCard(
+        icon = Icons.Filled.PlayArrow,
+        title = "Playback",
+        subtitle = "Engine, behaviour and orientation",
+        expanded = expanded,
+        onToggle = onToggle
+    ) {
+        val playbackContext = LocalContext.current
+        // Engine selection
+        Text("To set as default, open a video from your file manager, select OptiCast and choose Always. You can also share videos to OptiCast.", style = MaterialTheme.typography.bodySmall)
+        TextButton(onClick = {
+            runCatching { playbackContext.startActivity(android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                android.net.Uri.parse("package:${playbackContext.packageName}"))) }
+        }) { Text("System default settings") }
+        PrefToggle(
+            label = "Use external player",
+            description = "Open videos in another installed player.",
+            checked = settings.useExternalPlayer,
+        ) { enabled -> scope.launch { AppContainer.settings.setUseExternalPlayer(enabled) } }
+
+        Spacer(Modifier.height(10.dp))
+        Text(settingsHeaderTitle("Engine selection"), style = MaterialTheme.typography.titleMedium)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("mpv" to "MPV (Default)", "media3" to "Media3").forEach { (id, name) ->
+                FilterChip(selected = if (id == "media3") settings.playbackEngine != "mpv" else settings.playbackEngine == id,
+                    onClick = { scope.launch { AppContainer.settings.setPlaybackEngine(id) } },
+                    label = { Text(name) }, enabled = !settings.useExternalPlayer)
+            }
+        }
+        Text("MPV handles local files with automatic fallback. Network sources and audio enhancements use Media3. Changes apply to the next video.",
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        // Behaviour
+        PrefToggle(
+            label = "Start in landscape",
+            description = "Automatically switch to landscape when playback starts.",
+            checked = settings.autoLandscape,
+        ) { enabled -> scope.launch { AppContainer.settings.setAutoLandscape(enabled) } }
+        PrefToggle(
+            label = "Keep screen on",
+            description = "Prevent display sleep during playback.",
+            checked = settings.keepScreenOn,
+        ) { enabled -> scope.launch { AppContainer.settings.setKeepScreenOn(enabled) } }
+        PrefToggle(
+            label = "Preserve voice pitch at speed",
+            description = "Maintain natural voice pitch at higher speeds.",
+            checked = settings.preservePitch,
+        ) { enabled -> scope.launch { AppContainer.settings.setPreservePitch(enabled) } }
+        Text(
+            "Resume is always enabled. To restart, use Restart from beginning on the detail page.",
+            style = MaterialTheme.typography.bodySmall,
+        )
+        PrefToggle(
+            label = "Auto-play next episode",
+            description = "Automatically play the next episode when current ends.",
+            checked = settings.autoNextEpisode,
+        ) { enabled -> scope.launch { AppContainer.settings.setAutoNextEpisode(enabled) } }
+
+        PrefToggle(
+            label = "Enable network browsing",
+            description = "Show network libraries.",
+            checked = settings.enableNetworkBrowsing,
+        ) { enabled -> scope.launch { AppContainer.settings.setEnableNetworkBrowsing(enabled) } }
+        if (settings.enableNetworkBrowsing) {
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(onClick = onOpenNetwork, shape = RoundedCornerShape(16.dp)) {
+                Text("Open network libraries")
+            }
+        }
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        // Advanced - orientation and audio
+        Text("Orientation mode", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 2.dp))
+        Spacer(Modifier.height(6.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("auto" to "Auto", "portrait" to "Portrait").forEach { (id, label) ->
+                val isSelected = when (id) {
+                    "auto" -> settings.orientationMode == "auto" || settings.orientationMode == "sensor"
+                    else -> settings.orientationMode == id
+                }
+                FilterChip(selected = isSelected, onClick = { scope.launch { AppContainer.settings.setOrientationMode(id) } }, label = { Text(label) })
+            }
+        }
+
+        PrefToggle(
+            label = "Auto crop black bars",
+            description = "Automatically remove black bars from videos.",
+            checked = settings.autoCrop,
+        ) { enabled -> scope.launch { AppContainer.settings.setAutoCrop(enabled) } }
+
+        PrefToggle(
+            label = "Volume normalization",
+            description = "Normalize volume across videos.",
+            checked = settings.volumeNormalization,
+        ) { enabled -> scope.launch { AppContainer.settings.setVolumeNormalization(enabled) } }
+    }
+}
+
+@Composable
+private fun CombinedSubtitlesCard(
+    settings: AppSettings,
+    scope: CoroutineScope,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
+    CollapsibleSettingsCard(
+        icon = Icons.Filled.Subtitles,
+        title = "Subtitles",
+        subtitle = "Audio, tracks and languages",
+        expanded = expanded,
+        onToggle = onToggle
+    ) {
+        // Audio & subtitle tracks
+        Text("For tracks already in your video. Manual choices take priority.", style = MaterialTheme.typography.bodySmall)
+        val trackLanguages = listOf("" to "Any / default", "en" to "English", "fr" to "French", "es" to "Spanish", "zh" to "Chinese")
+        TrackLanguagePicker("Preferred audio language", settings.preferredAudioLanguage, trackLanguages) { code ->
+            scope.launch { AppContainer.settings.setPreferredAudioLanguage(code) }
+        }
+        PrefToggle("Avoid commentary", "Prefer main audio when available in your chosen language.", settings.avoidCommentary) {
+            scope.launch { AppContainer.settings.setAvoidCommentary(it) }
+        }
+        Text("Subtitle rule", style = MaterialTheme.typography.labelLarge)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("default" to "Container default", "forced" to "Forced only", "full" to "Full subtitles", "off" to "Off").forEach { (mode, label) ->
+                FilterChip(selected = settings.embeddedSubtitleMode == mode,
+                    onClick = { scope.launch { AppContainer.settings.setEmbeddedSubtitleMode(mode) } }, label = { Text(label) })
+            }
+        }
+        TrackLanguagePicker("Embedded subtitle language", settings.embeddedSubtitleLanguage, trackLanguages) { code ->
+            scope.launch { AppContainer.settings.setEmbeddedSubtitleLanguage(code) }
+        }
+        Text("No matching forced/full track? Subtitles stay off. Download languages are set separately.", style = MaterialTheme.typography.bodySmall)
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        // Subtitle languages - inline version of LanguageDropdownCard
+        val selectedLangs = settings.subtitleLanguages
+        val summary = if (selectedLangs.isEmpty()) {
+            "Choose languages…"
+        } else {
+            val names = LANGUAGE_OPTIONS.filter { it.first in selectedLangs }.map { it.second }
+            when {
+                names.isEmpty() -> "${selectedLangs.size} selected"
+                names.size <= 2 -> names.joinToString(", ")
+                else -> "${names.take(2).joinToString(", ")} +${names.size - 2} more"
+            }
+        }
+        Text(settingsHeaderTitle("Subtitle languages"), style = MaterialTheme.typography.titleSmall)
+        Text(summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Subtitle searches (detail page & in-player) look for these languages.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(8.dp))
+        LANGUAGE_OPTIONS.forEach { (code, name) ->
+            val checked = code in selectedLangs
+            Surface(
+                shape = RoundedCornerShape(14.dp),
+                color = if (checked) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f) else Color.Transparent,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 1.dp).clickable {
+                    val next = if (checked) selectedLangs - code else selectedLangs + code
+                    if (next.isNotEmpty()) {
+                        scope.launch { AppContainer.settings.setSubtitleLanguages(next) }
+                    }
+                },
+            ) {
+                Row(
+                    Modifier.heightIn(min = 48.dp).padding(horizontal = 14.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(checked = checked, onCheckedChange = null)
+                    Spacer(Modifier.width(12.dp))
+                    Text(name, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        // Auto subtitles
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text("Download subtitles during scan", style = MaterialTheme.typography.labelLarge)
+                Text(
+                    "When a file is matched, OptiCast fetches the most-downloaded subtitle in your languages. Uses your OpenSubtitles quota.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            Switch(
+                checked = settings.autoSubtitles,
+                onCheckedChange = { enabled -> scope.launch { AppContainer.settings.setAutoSubtitles(enabled) } },
+            )
+        }
     }
 }
 

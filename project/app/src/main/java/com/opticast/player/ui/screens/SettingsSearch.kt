@@ -24,12 +24,41 @@ internal val settingsSearchIndex = linkedMapOf(
 )
 
 internal fun settingsSearchMatches(title: String, query: String): Boolean {
-    val words = query.lowercase(Locale.ROOT).trim().split(Regex("[^\\p{L}\\p{N}]+")).filter { it.isNotEmpty() }
+    if (query.isBlank()) return true
+    val q = query.lowercase(Locale.ROOT).trim()
+    val words = q.split(Regex("[^\\p{L}\\p{N}]+")).filter { it.isNotEmpty() }
+    if (words.isEmpty()) return true
     val group = settingsGroups.entries.firstOrNull { title in it.value }?.key.orEmpty()
-    val searchable = (title + " " + settingsSearchIndex[title].orEmpty() + " " + group).lowercase(Locale.ROOT)
+    val subtitle = settingsCategorySubtitle(title)
+    val searchable = (title + " " + settingsSearchIndex[title].orEmpty() + " " + subtitle + " " + group).lowercase(Locale.ROOT)
     return words.all { searchable.contains(it) }
 }
-internal fun matchingSettingsSections(query: String): List<String> = settingsSearchIndex.keys.filter { settingsSearchMatches(it, query) }
+
+internal fun matchingSettingsSections(query: String): List<String> {
+    if (query.isBlank()) return settingsSearchIndex.keys.toList()
+    val q = query.lowercase(Locale.ROOT).trim()
+    return settingsSearchIndex.keys
+        .map { title ->
+            val group = settingsGroups.entries.firstOrNull { title in it.value }?.key.orEmpty()
+            val subtitle = settingsCategorySubtitle(title)
+            val searchable = (title + " " + settingsSearchIndex[title].orEmpty() + " " + subtitle + " " + group).lowercase(Locale.ROOT)
+            val titleLower = title.lowercase(Locale.ROOT)
+            val score = when {
+                titleLower == q -> 0
+                titleLower.startsWith(q) -> 1
+                titleLower.contains(q) -> 2
+                searchable.contains(q) -> 3
+                else -> {
+                    val words = q.split(Regex("[^\\p{L}\\p{N}]+")).filter { it.isNotEmpty() }
+                    if (words.all { searchable.contains(it) }) 4 else 10
+                }
+            }
+            title to score
+        }
+        .filter { it.second < 10 }
+        .sortedBy { it.second }
+        .map { it.first }
+}
 
 /** Display-only title casing keeps search identifiers and provider acronyms intact. */
 internal fun settingsHeaderTitle(value: String): String = buildString {

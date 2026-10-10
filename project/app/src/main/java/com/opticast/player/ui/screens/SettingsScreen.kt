@@ -516,8 +516,7 @@ fun SettingsScreen(
                     UpdateCheckOption(installedVersionLabel(LocalContext.current))
                 }
                 SettingsCard(icon = Icons.Filled.Description, title = "About") {
-                    com.opticast.player.ui.components.LegalNoticesButton()
-                    Spacer(Modifier.height(14.dp))
+                    val ctx = LocalContext.current
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
                             painter = painterResource(R.drawable.ic_opticast_mark),
@@ -528,11 +527,7 @@ fun SettingsScreen(
                         Column {
                             Text(settingsHeaderTitle("OptiCast"), style = MaterialTheme.typography.headlineSmall)
                             Text(
-                                // Read from the installed package, never a
-                                // literal: the old hardcoded string claimed
-                                // "2.0.0 (build 34)" no matter which build was
-                                // actually running.
-                                installedVersionLabel(LocalContext.current),
+                                installedVersionLabel(ctx),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -545,12 +540,16 @@ fun SettingsScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(16.dp))
-                    Spacer(Modifier.height(16.dp))
-                    Image(painterResource(R.drawable.tmdb_attribution), contentDescription = "TMDB",
-                        modifier = Modifier.width(88.dp))
-                    Text("This product uses the TMDB API but is not endorsed or certified by TMDB.",
-                        style = MaterialTheme.typography.bodySmall)
-                    ProviderCredits()
+                    OutlinedButton(
+                        onClick = {
+                            runCatching {
+                                ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://opticastplayer.dev/legal")))
+                            }
+                        },
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Text("Legal notices and credits")
+                    }
                     Spacer(Modifier.height(16.dp))
                     DeviceInfo()
                 }

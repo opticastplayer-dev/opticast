@@ -61,6 +61,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -378,6 +379,10 @@ fun PosterCard(
     val remotePosterUrl = remember(entry.metadata?.posterPath) { posterRemoteUrlFor(entry) }
     val fallbackTitle = remember(entry.video.name, entry.video.parsed.title) { entry.video.parsed.title.ifBlank { entry.video.name } }
     val playback = remember(entry.video.id) { AppContainer.playbackState.progressOf(entry.video.id) }
+    val queue by AppContainer.queueStore.queue.collectAsState()
+    val queueItem = remember(entry.video.id, queue) { queue.firstOrNull { it.videoId == entry.video.id } }
+    val isNext = queueItem?.order == 0
+    val isQueued = queueItem != null
 
     // Keep fast for grid
     // SharedElement only for detail header, not for grid cards (prevents messed up empty boxes)
@@ -441,6 +446,8 @@ fun PosterCard(
             verticalArrangement = Arrangement.spacedBy(5.dp)) {
             badge?.let { StatusBadge(it) }
             episodeTag?.let { PosterPill(it, Color.Black.copy(alpha = 0.8f), Color.White) }
+            if (isNext) PosterPill("Next", Color(0xFF7C4DFF).copy(alpha = 0.9f), Color.White)
+            else if (isQueued) PosterPill("Queue", Color(0xFF455A64).copy(alpha = 0.9f), Color.White)
         }
 
 

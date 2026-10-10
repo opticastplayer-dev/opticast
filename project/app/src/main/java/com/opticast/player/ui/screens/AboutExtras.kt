@@ -207,29 +207,17 @@ internal fun UpdateCheckOption(version: String) {
 
 @Composable
 internal fun ProviderCredits() {
-    var expanded by remember { mutableStateOf(false) }
-    val uri = LocalUriHandler.current
-    TextButton(onClick = { expanded = !expanded }) {
-        Text(if (expanded) "Hide provider credits and legal notices" else "Provider credits and legal notices")
-    }
-    if (expanded) {
-        Text("Independent app; no provider endorsement. Names, artwork and subtitles remain subject to their owners' rights. These notices do not grant rights to redistribute movies or provider content.",
-            style = MaterialTheme.typography.bodySmall)
-        ProviderNotices.entries.forEach { provider ->
-            Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.surfaceContainer,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text(provider.name, style = MaterialTheme.typography.titleSmall)
-                    Text(provider.description, style = MaterialTheme.typography.bodyMedium)
-                    Text(provider.notice, style = MaterialTheme.typography.bodySmall)
-                    provider.links.forEach { (label, url) ->
-                        TextButton(onClick = { runCatching { uri.openUri(url) } }) { Text(label) }
-                    }
-                }
+    // Provider credits and legal notices moved to website per user request.
+    // Keep composable for compatibility but show only website link.
+    val ctx = LocalContext.current
+    OutlinedButton(
+        onClick = {
+            runCatching {
+                ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://opticastplayer.dev/legal")))
             }
         }
-        Text("Notices are stored offline. Opening provider/licence links uses the internet. Optional provider queries are sent directly to their services. Library and playback data are stored locally; Android backup and user exports may copy app data.",
-            style = MaterialTheme.typography.bodySmall)
+    ) {
+        Text("View legal notices and credits on website")
     }
 }
 

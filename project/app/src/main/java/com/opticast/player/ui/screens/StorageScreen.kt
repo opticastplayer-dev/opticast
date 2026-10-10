@@ -284,37 +284,31 @@ fun StorageScreen(onBack: () -> Unit, onOpenMatch: (Long) -> Unit) {
                 }
             }
 
-            // ---------------- caches ----------------
+            // ---------------- caches - simplified brief ----------------
             item {
                 StorageCard("Caches", Icons.Filled.CleaningServices) {
-                    cacheSizes.forEach { (label, size) ->
-                        StatRow(label, formatSize(size))
-                    }
-                    Spacer(Modifier.height(6.dp))
+                    val totalCache = cacheSizes.firstOrNull { it.first == "App total" }?.second ?: 0L
+                    Text(
+                        if (totalCache > 0) "Cached files: ${formatSize(totalCache)}"
+                        else "No cached files",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(Modifier.height(10.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = {
                             scope.launch {
                                 withContext(Dispatchers.IO) {
                                     AppContainer.frameArtwork.deleteAll()
                                     AppContainer.thumbnails.deleteAll()
-                                    runCatching {
-                                        File(context.filesDir, "chapters").deleteRecursively()
-                                    }
+                                    runCatching { File(context.filesDir, "chapters").deleteRecursively() }
                                     runCatching { File(context.filesDir, "posters").deleteRecursively() }
                                 }
-                                message = "Caches cleared \u00b7 they rebuild as you browse"
+                                message = "Caches cleared"
                                 refresh++
                             }
                         }) { Text("Clear caches") }
                         OutlinedButton(onClick = { backupTick++; refresh++ }) { Text("Refresh") }
                     }
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        "Caches rebuild themselves when needed. Clearing them frees " +
-                            "space at the cost of one slower first open per title.",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                 }
             }
 

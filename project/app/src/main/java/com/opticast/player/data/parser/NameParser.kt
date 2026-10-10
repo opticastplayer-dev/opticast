@@ -59,12 +59,20 @@ object NameParser {
     }
 
     private fun clean(raw: String): String {
-        val noBrackets = raw.replace(Regex("\\[[^\\]]*]|\\([^)]*\\)"), " ")
+        var noBrackets = raw.replace(Regex("\\[[^\\]]*]|\\([^)]*\\)"), " ")
+        // Remove any stray bracket chars left from unmatched brackets like "Movie ("
+        noBrackets = noBrackets.replace(Regex("[\\[\\]()]+"), " ")
         val spaced = noBrackets.replace('.', ' ').replace('_', ' ')
         val tokens = spaced.split(Regex("\\s+"))
             .filter { it.isNotBlank() }
             .filterNot { it.lowercase() in junkTokens }
             .filterNot { it.startsWith("-") }
-        return tokens.joinToString(" ").trim()
+        var title = tokens.joinToString(" ").trim()
+        // Final safety: trim trailing '(' or ')' that survived tokenization
+        title = title.trimEnd('(', ')', '[', ']', ' ', '-', '_', '.')
+            .trim()
+        // Collapse multiple spaces
+        title = title.replace(Regex("\\s{2,}"), " ")
+        return title
     }
 }

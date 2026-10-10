@@ -213,7 +213,7 @@ internal fun ProviderCredits() {
     OutlinedButton(
         onClick = {
             runCatching {
-                ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://opticastplayer.dev/legal")))
+                ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://opticastplayer-dev.github.io/opticast/")))
             }
         }
     ) {

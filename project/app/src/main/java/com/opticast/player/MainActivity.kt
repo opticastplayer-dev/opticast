@@ -229,6 +229,11 @@ private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0
                     onBack = { navController.popBackStack() },
                     onOpenStorage = { navController.navigate(ROUTE_STORAGE) },
                     onOpenNetwork = { navController.navigate(ROUTE_NETWORK) },
+                    onOpenStorageAnalyzer = { navController.navigate(ROUTE_STORAGE_ANALYZER) },
+                    onOpenTrash = { navController.navigate(ROUTE_TRASH) },
+                    onOpenQueue = { navController.navigate(ROUTE_QUEUE) },
+                    onOpenOrganizeAssistant = { navController.navigate(ROUTE_ORGANIZE) },
+                    onOpenGestureCustomization = { navController.navigate(ROUTE_GESTURE) },
                 )
             }
 
@@ -241,6 +246,27 @@ private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0
                     onBack = { navController.popBackStack() },
                     onPlayRemote = playRemote,
                 )
+            }
+            composable(ROUTE_STORAGE_ANALYZER) {
+                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList())
+                StorageAnalyzerScreen(entries = entries, onBack = { navController.popBackStack() })
+            }
+            composable(ROUTE_TRASH) {
+                TrashScreen(onBack = { navController.popBackStack() })
+            }
+            composable(ROUTE_QUEUE) {
+                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList())
+                QueueScreen(entries = entries, onBack = { navController.popBackStack() }, onPlay = { id ->
+                    val intent = playerIntent(context, id)
+                    context.startActivity(intent)
+                })
+            }
+            composable(ROUTE_ORGANIZE) {
+                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList())
+                OrganizeAssistantScreen(entries = entries, onBack = { navController.popBackStack() })
+            }
+            composable(ROUTE_GESTURE) {
+                GestureCustomizationScreen(onBack = { navController.popBackStack() })
             }
             composable("show/{showName}") { entry ->
                 val name = entry.arguments?.getString("showName")
@@ -294,3 +320,8 @@ private const val ROUTE_LIBRARY = "library"
 private const val ROUTE_NETWORK = "network"
 private const val ROUTE_STORAGE = "storage"
 private const val ROUTE_SETTINGS = "settings"
+private const val ROUTE_STORAGE_ANALYZER = "storage_analyzer"
+private const val ROUTE_TRASH = "trash"
+private const val ROUTE_QUEUE = "queue"
+private const val ROUTE_ORGANIZE = "organize"
+private const val ROUTE_GESTURE = "gesture_customization"

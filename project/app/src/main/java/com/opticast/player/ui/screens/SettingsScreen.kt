@@ -205,6 +205,11 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onOpenStorage: () -> Unit = {},
     onOpenNetwork: () -> Unit = {},
+    onOpenStorageAnalyzer: () -> Unit = {},
+    onOpenTrash: () -> Unit = {},
+    onOpenQueue: () -> Unit = {},
+    onOpenOrganizeAssistant: () -> Unit = {},
+    onOpenGestureCustomization: () -> Unit = {},
 ) {
     val settings by AppContainer.settings.settings
         .collectAsStateWithLifecycle(initialValue = AppSettings())
@@ -365,7 +370,8 @@ fun SettingsScreen(
                 SettingsGroup("Playback & Controls") {
                 EngineSettingsCard(settings, scope)
                 BehaviourSettingsCard(settings, scope)
-                GestureSettingsCard(settings, scope)
+                GestureSettingsCard(settings, scope, onOpenGestureCustomization)
+                PlayerAdvancedSettingsCard(settings, scope)
                 }
             }
             item(key = "File Management") {
@@ -487,6 +493,20 @@ fun SettingsScreen(
                     ) {
                         Text("Open storage dashboard")
                     }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = onOpenStorageAnalyzer,
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Text("Analyze storage usage")
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = onOpenTrash,
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Text("Trash / Recently deleted")
+                    }
                 }
 
                 SettingsCard(icon = Icons.Filled.Movie, title = "Library maintenance") {
@@ -495,6 +515,20 @@ fun SettingsScreen(
                         shape = RoundedCornerShape(16.dp),
                     ) {
                         Text("Clear all saved metadata")
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = onOpenQueue,
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Text("Play queue")
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = onOpenOrganizeAssistant,
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Text("File organizer")
                     }
                 }
                 }
@@ -1235,8 +1269,12 @@ private fun PlayerLayoutSettingsCard(settings: AppSettings, scope: CoroutineScop
 }
 
 @Composable
-private fun GestureSettingsCard(settings: AppSettings, scope: CoroutineScope) {
+private fun GestureSettingsCard(settings: AppSettings, scope: CoroutineScope, onOpenGestureCustomization: () -> Unit = {}) {
     SettingsCard(icon = Icons.Filled.TouchApp, title = "Gestures") {
+        OutlinedButton(onClick = onOpenGestureCustomization, shape = RoundedCornerShape(16.dp)) {
+            Text("Customize gestures")
+        }
+        Spacer(Modifier.height(10.dp))
 
         Text(
             "Double-tap seek distance",
@@ -1330,6 +1368,53 @@ private fun BehaviourSettingsCard(settings: AppSettings, scope: CoroutineScope) 
             checked = settings.enableNetworkBrowsing,
         ) { enabled -> scope.launch { AppContainer.settings.setEnableNetworkBrowsing(enabled) } }
 
+    }
+}
+
+@Composable
+private fun PlayerAdvancedSettingsCard(settings: AppSettings, scope: CoroutineScope) {
+    SettingsCard(icon = Icons.Filled.Tune, title = "Advanced player") {
+        PrefToggle(
+            label = "Show battery and clock",
+            description = "Display battery percentage and time in player top bar.",
+            checked = settings.showBatteryClock,
+        ) { enabled -> scope.launch { AppContainer.settings.setShowBatteryClock(enabled) } }
+
+        Text("Orientation mode", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 12.dp))
+        Spacer(Modifier.height(6.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("auto" to "Auto", "portrait" to "Portrait", "landscape" to "Landscape", "sensor" to "Sensor", "locked" to "Locked").forEach { (id, label) ->
+                FilterChip(selected = settings.orientationMode == id, onClick = { scope.launch { AppContainer.settings.setOrientationMode(id) } }, label = { Text(label) })
+            }
+        }
+
+        PrefToggle(
+            label = "Auto crop black bars",
+            description = "Automatically remove black bars from videos.",
+            checked = settings.autoCrop,
+        ) { enabled -> scope.launch { AppContainer.settings.setAutoCrop(enabled) } }
+
+        PrefToggle(
+            label = "Volume normalization",
+            description = "Normalize volume across videos for consistent loudness.",
+            checked = settings.volumeNormalization,
+        ) { enabled -> scope.launch { AppContainer.settings.setVolumeNormalization(enabled) } }
+
+        Spacer(Modifier.height(8.dp))
+        Text("File organizer", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 8.dp))
+        PrefToggle(
+            label = "Enable organizer assistant",
+            description = "Allow file organization suggestions. Default suggest-only, safe mode.",
+            checked = settings.organizeAssistantEnabled,
+        ) { enabled -> scope.launch { AppContainer.settings.setOrganizeAssistantEnabled(enabled) } }
+        if (settings.organizeAssistantEnabled) {
+            Text("Organizer level", style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 8.dp))
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf(1 to "Suggest only", 2 to "Rename only", 3 to "Allow moves").forEach { (lvl, label) ->
+                    FilterChip(selected = settings.organizeLevel == lvl, onClick = { scope.launch { AppContainer.settings.setOrganizeLevel(lvl) } }, label = { Text(label) })
+                }
+            }
+        }
     }
 }
 

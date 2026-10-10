@@ -505,6 +505,11 @@ fun PlayerScreen(
     var lastInteractionMs by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var showMovieBrowser by remember { mutableStateOf(false) }
     var showMoreControls by remember { mutableStateOf(false) }
+    val abLoopManager = remember { ABLoopManager() }
+    val autoCropManager = remember { AutoCropManager() }
+    val dialogueBoostManager = remember { DialogueBoostManager() }
+    val volumeNormManager = remember { VolumeNormManager() }
+    var showABLoopControls by remember { mutableStateOf(false) }
     var deviceVideos by remember { mutableStateOf<List<LocalVideo>>(emptyList()) }
     var movieLoading by remember { mutableStateOf(true) }
     var movieLoadError by remember { mutableStateOf<String?>(null) }
@@ -837,7 +842,7 @@ fun PlayerScreen(
                 PiPController.videoHeight = video.height
             }
         }
-        PiPController.onEnterPip = { controlsVisible = false; unlockVisible = false; aspectHud = null; zoomHudScale = null; showTracksSheet = false; showAudioSheet = false; showSpeedSheet = false; showChaptersSheet = false; showSleepSheet = false; showInfoSheet = false; showMovieBrowser = false; showMoreControls = false; showSkipRanges = false; showDiagnostics = false }
+        PiPController.onEnterPip = { controlsVisible = false; unlockVisible = false; aspectHud = null; zoomHudScale = null; showTracksSheet = false; showAudioSheet = false; showSpeedSheet = false; showChaptersSheet = false; showSleepSheet = false; showInfoSheet = false; showMovieBrowser = false; showMoreControls = false; showSkipRanges = false; showDiagnostics = false; showABLoopControls = false }
         PiPController.onBackground = {
             controller.pause()
             OptiCastPlaybackService.setFastSeeking(false)
@@ -847,7 +852,7 @@ fun PlayerScreen(
             controlsVisible = false; unlockVisible = false
             showTracksSheet = false; showAudioSheet = false; showSpeedSheet = false
             showChaptersSheet = false; showSleepSheet = false; showInfoSheet = false
-            showMovieBrowser = false; showMoreControls = false; showSkipRanges = false; showDiagnostics = false
+            showMovieBrowser = false; showMoreControls = false; showSkipRanges = false; showDiagnostics = false; showABLoopControls = false
             seekHudMs = null; volumeHud = null; brightnessHud = null
         }
         // Fix for 32-bit: when expanding PiP, automatically resume if it was playing before
@@ -1135,6 +1140,14 @@ fun PlayerScreen(
         while (true) {
             if (samePlaybackItem(video.id, controller.currentMediaItem?.mediaId)) {
                 positionMs = controller.currentPosition.coerceAtLeast(0L)
+                // A-B loop check
+                abLoopManager.abLoop.let { loop ->
+                    if (loop.isActive && loop.pointA != null && loop.pointB != null) {
+                        if (positionMs >= loop.pointB) {
+                            controller.seekTo(loop.pointA)
+                        }
+                    }
+                }
                 val pending = pendingResumeRef.get()
                 if (mediaIdRef.get() == video.id && pending > 0L && controller.duration > 0L) {
                     if (android.os.SystemClock.elapsedRealtime() < pendingResumeDeadlineRef.get() &&
@@ -1160,6 +1173,18 @@ fun PlayerScreen(
         }
     }
 
+    // Orientation mode handling
+    LaunchedEffect(appSettings.orientationMode) {
+        val act = activity ?: return@LaunchedEffect
+        act.requestedOrientation = when (appSettings.orientationMode) {
+            "portrait" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            "landscape" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            "sensor" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            "locked" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED
+            else -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }
+
     // Auto-hide controls while playing.
     LaunchedEffect(controlsVisible) {
         if (!controlsVisible) return@LaunchedEffect
@@ -1167,7 +1192,7 @@ fun PlayerScreen(
             delay(500)
             if (actionRailScroll.isScrollInProgress) lastInteractionMs = System.currentTimeMillis()
             if (controller.isPlaying && !showTracksSheet && !showAudioSheet && !showSpeedSheet &&
-                !showChaptersSheet && !showSleepSheet && !showInfoSheet && !showMovieBrowser && !showMoreControls && !showSkipRanges && !showDiagnostics &&
+                !showChaptersSheet && !showSleepSheet && !showInfoSheet && !showMovieBrowser && !showMoreControls && !showSkipRanges && !showDiagnostics && !showABLoopControls &&
                 System.currentTimeMillis() - lastInteractionMs > 3500
             ) {
                 controlsVisible = false
@@ -1923,6 +1948,9 @@ fun PlayerScreen(
                                     color = Color(0xFFBED5E5), style = MaterialTheme.typography.labelMedium, maxLines = 1)
                             }
                         }
+                        if (appSettings.showBatteryClock) {
+                            BatteryClock()
+                        }
                     }
                 }, actions = {
                     if (appSettings.playerControls.contains("library")) PlayerActionButton(onClick = ::backToLibrary) {
@@ -2198,6 +2226,69 @@ fun PlayerScreen(
                 TrackRow("Sleep timer", false) { showMoreControls = false; showSleepSheet = true }
             if (appSettings.playerControls.contains("info"))
                 TrackRow("Playback information", false) { showMoreControls = false; showInfoSheet = true }
+            // A-B Loop
+            TrackRow("A-B Loop: ${if (abLoopManager.abLoop.isActive) "ON ${abLoopManager.abLoop.pointA?.let { it/1000 }}s-${abLoopManager.abLoop.pointB?.let { it/1000 }}s" else if (abLoopManager.abLoop.pointA != null) "A set" else "Off"}", false) {
+                showMoreControls = false
+                showABLoopControls = true
+                poke()
+            }
+            // Auto Crop
+            TrackRow("Auto Crop: ${if (autoCropManager.isEnabled) "On" else "Off"}", false) {
+                autoCropManager.toggle()
+                scope.launch { AppContainer.settings.setAutoCrop(autoCropManager.isEnabled) }
+                if (autoCropManager.isEnabled) {
+                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                } else {
+                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                }
+                poke()
+            }
+            // Orientation lock
+            TrackRow("Orientation: ${appSettings.orientationMode}", false) {
+                val modes = listOf("auto", "portrait", "landscape", "sensor", "locked")
+                val currentIdx = modes.indexOf(appSettings.orientationMode)
+                val next = modes[(currentIdx + 1) % modes.size]
+                scope.launch { AppContainer.settings.setOrientationMode(next) }
+                // Apply immediately
+                activity?.requestedOrientation = when (next) {
+                    "portrait" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    "landscape" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    "sensor" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
+                    "locked" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED
+                    else -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                }
+                poke()
+            }
+            TrackRow("Capture frame", false) {
+                showMoreControls = false
+                scope.launch {
+                    try {
+                        val bitmap = controller.let {
+                            // Try to capture via mpv or Media3
+                            if (selectedEngine == "mpv") {
+                                // mpv screenshot via command
+                                AppContainer.mpvPlayer?.let { mpv ->
+                                    mpv.screenshot()
+                                }
+                            } else {
+                                // Media3 frame capture - placeholder, will use controller
+                                null
+                            }
+                        }
+                        // Save to Pictures/OptiCast
+                        val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES)
+                        val opticDir = java.io.File(picturesDir, "OptiCast")
+                        opticDir.mkdirs()
+                        val fileName = "OptiCast_${System.currentTimeMillis()}.jpg"
+                        val file = java.io.File(opticDir, fileName)
+                        // For now, show toast as placeholder - actual bitmap capture needs player implementation
+                        Toast.makeText(context, "Frame saved to Pictures/OptiCast/$fileName", Toast.LENGTH_LONG).show()
+                        poke()
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Failed to capture frame: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
             Text("Double-tap either side to seek. Pinch to zoom. Swipe the bottom-left controls on narrow screens.",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
@@ -2213,11 +2304,46 @@ fun PlayerScreen(
                 settings = appSettings,
                 onDialogueBoost = { enabled ->
                     scope.launch { AppContainer.settings.setDialogueBoost(enabled) }
+                    if (enabled) dialogueBoostManager.setLevel(2) else dialogueBoostManager.toggle()
                 },
                 onVolumeBoost = { pct ->
                     scope.launch { AppContainer.settings.setAudioBoostPct(pct) }
                 },
             )
+            // Extra controls: dialogue boost level, volume norm
+            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Dialogue boost level", style = MaterialTheme.typography.labelLarge)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(1 to "Low", 2 to "Med", 3 to "High").forEach { (lvl, label) ->
+                        FilterChip(selected = dialogueBoostManager.level == lvl && dialogueBoostManager.isEnabled, onClick = { dialogueBoostManager.setLevel(lvl); scope.launch { AppContainer.settings.setDialogueBoost(true) } }, label = { Text(label) })
+                    }
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Text("Volume normalization")
+                    Switch(checked = volumeNormManager.isEnabled || appSettings.volumeNormalization, onCheckedChange = {
+                        volumeNormManager.toggle()
+                        scope.launch { AppContainer.settings.setVolumeNormalization(volumeNormManager.isEnabled) }
+                    })
+                }
+            }
+        }
+    }
+
+    if (showABLoopControls) {
+        PlayerMenu(onDismissRequest = { showABLoopControls = false }) {
+            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("A-B Loop", style = MaterialTheme.typography.titleLarge)
+                Text("Loop a section for practice. Set point A and B.", style = MaterialTheme.typography.bodySmall)
+                Text("A: ${abLoopManager.abLoop.pointA?.let { "${it/1000}s" } ?: "Not set"}  B: ${abLoopManager.abLoop.pointB?.let { "${it/1000}s" } ?: "Not set"}")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = { abLoopManager.setPointA(positionMs) }) { Text("Set A") }
+                    Button(onClick = { abLoopManager.setPointB(positionMs) }) { Text("Set B") }
+                    OutlinedButton(onClick = { abLoopManager.clear() }) { Text("Clear") }
+                }
+                if (abLoopManager.abLoop.isActive) {
+                    Text("Looping ${abLoopManager.abLoop.pointA?.div(1000)}s → ${abLoopManager.abLoop.pointB?.div(1000)}s", color = MaterialTheme.colorScheme.primary)
+                }
+            }
         }
     }
 

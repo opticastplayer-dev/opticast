@@ -13,6 +13,7 @@ import com.opticast.player.ui.components.toggledDiscoverySections
 import com.opticast.player.ui.components.matchesLibraryGenre
 import com.opticast.player.ui.components.libraryGenres
 import com.opticast.player.ui.components.completedLibrarySeries
+import com.opticast.player.data.SmartCollections
 import com.opticast.player.ui.screens.library.libraryFileAvailability
 import com.opticast.player.ui.screens.library.libraryMatching
 import androidx.compose.foundation.combinedClickable
@@ -322,6 +323,7 @@ fun LibraryScreen(
     var sortBy by rememberSaveable { mutableStateOf("recent") } // recent | title | rating | year
     var selectedGenre by rememberSaveable { mutableStateOf("") }
     var showGenrePicker by rememberSaveable { mutableStateOf(false) }
+    var selectedSmartCollectionId by rememberSaveable { mutableStateOf<String?>(null) }
     var showMissingFiles by rememberSaveable { mutableStateOf(false) }
     var showRenameSuggestions by rememberSaveable { mutableStateOf(false) }
     val renameVersion by AppContainer.renameSuggestions.version.collectAsStateWithLifecycle()
@@ -462,17 +464,24 @@ fun LibraryScreen(
     val searched = remember(searchedUnscoped, searchOpen, searchScope) {
         if (!searchOpen) searchedUnscoped else searchedUnscoped.filter { searchTypeMatches(searchScope, it.video.isEpisode || it.metadata?.type == "tv") }
     }
+    val autoSmartCollections = remember(state.entries) { SmartCollections.getAll() + SmartCollections.getByGenre(state.entries) + SmartCollections.getByYear(state.entries) }
+    val filteredBySmart = remember(searched, selectedSmartCollectionId, autoSmartCollections) {
+        val id = selectedSmartCollectionId
+        if (id == null) searched else {
+            autoSmartCollections.firstOrNull { it.id == id }?.let { coll -> searched.filter { coll.filter(it) } } ?: searched
+        }
+    }
     fun isWatched(entry: LibraryEntry): Boolean =
         AppContainer.playbackState.state(entry.video.id)?.isWatched == true
 
     val genres = remember(state.entries) { libraryGenres(state.entries.flatMap { it.metadata?.genres.orEmpty() }) }
-    val allMovies = remember(searched, selectedGenre, sortBy) {
-        searched.filter { !it.video.isEpisode && it.metadata?.type != "tv" }
+    val allMovies = remember(filteredBySmart, selectedGenre, sortBy) {
+        filteredBySmart.filter { !it.video.isEpisode && it.metadata?.type != "tv" }
             .filter { matchesLibraryGenre(it.metadata?.genres.orEmpty(), selectedGenre) }
             .sortedWith(comparatorFor(sortBy))
     }
-    val allShows = remember(searched, selectedGenre, sortBy) {
-        searched.filter { it.video.isEpisode || it.metadata?.type == "tv" }
+    val allShows = remember(filteredBySmart, selectedGenre, sortBy) {
+        filteredBySmart.filter { it.video.isEpisode || it.metadata?.type == "tv" }
             .groupBy { it.metadata?.showTitle ?: it.video.parsed.title.ifBlank { it.video.name } }
             .filterValues { episodes -> episodes.any { matchesLibraryGenre(it.metadata?.genres.orEmpty(), selectedGenre) } }
             .entries.sortedWith { a, b -> comparatorFor(sortBy).compare(a.value.first(), b.value.first()) }
@@ -622,6 +631,13 @@ fun LibraryScreen(
             if (state.entries.isNotEmpty()) {
                 if (showLibraryStatistics(design.style, design.stats, searching)) item(span = { GridItemSpan(maxLineSpan) }) {
                     StatsCard(stats)
+                }
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    com.opticast.player.ui.components.SmartCollectionsRow(
+                        collections = autoSmartCollections,
+                        selectedId = selectedSmartCollectionId,
+                        onSelect = { id -> selectedSmartCollectionId = if (selectedSmartCollectionId == id) null else id }
+                    )
                 }
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     FilterChipsRow(

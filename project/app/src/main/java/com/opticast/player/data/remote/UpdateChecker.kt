@@ -125,7 +125,7 @@ object UpdateChecker {
             val isNewer = isVersionNewer(tag, installed.first)
             val apk = release.assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains("OptiCast", true) } ?: release.assets.firstOrNull { it.name.endsWith(".apk") }
             val info = UpdateInfo(tag, parseVersionCode(tag), release.body, apk?.browser_download_url ?: release.html_url, release.html_url.ifBlank { GITHUB_RELEASES_URL }, apk?.size ?: 0L, isNewer)
-            prefs(context).edit().putString(KEY_AVAILABLE_UPDATE_JSON, json.encodeToString(info)).apply()
+            prefs(context).edit().putString(KEY_AVAILABLE_UPDATE_JSON, json.encodeToString<UpdateInfo>(info)).apply()
             if (isNewer) {
                 prefs(context).edit().putString(KEY_LAST_VERSION, tag).putString(KEY_WHATS_NEW_VERSION, tag).putString(KEY_WHATS_NEW_CHANGELOG, release.body).putBoolean(KEY_WHATS_NEW_SHOWN, true).apply()
             } else {

@@ -377,7 +377,6 @@ class SettingsRepository(private val context: Context) {
         context.settingsDataStore.edit { it[gridKey] = grid }
     }
 
-    }
 
     suspend fun setOrientationMode(mode: String) {
         context.settingsDataStore.edit { it[orientationModeKey] = mode }
@@ -407,7 +406,5 @@ class SettingsRepository(private val context: Context) {
         context.settingsDataStore.edit { it[gestureCustomKey] = value }
     }
 
-    }
 
-    }
 }

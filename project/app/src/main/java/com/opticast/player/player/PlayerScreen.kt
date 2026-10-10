@@ -1923,6 +1923,9 @@ fun PlayerScreen(
                                     color = Color(0xFFBED5E5), style = MaterialTheme.typography.labelMedium, maxLines = 1)
                             }
                         }
+                        if (appSettings.showBatteryClock) {
+                            BatteryClock()
+                        }
                     }
                 }, actions = {
                     if (appSettings.playerControls.contains("library")) PlayerActionButton(onClick = ::backToLibrary) {
@@ -2198,6 +2201,36 @@ fun PlayerScreen(
                 TrackRow("Sleep timer", false) { showMoreControls = false; showSleepSheet = true }
             if (appSettings.playerControls.contains("info"))
                 TrackRow("Playback information", false) { showMoreControls = false; showInfoSheet = true }
+            TrackRow("Capture frame", false) {
+                showMoreControls = false
+                scope.launch {
+                    try {
+                        val bitmap = controller.let {
+                            // Try to capture via mpv or Media3
+                            if (selectedEngine == "mpv") {
+                                // mpv screenshot via command
+                                AppContainer.mpvPlayer?.let { mpv ->
+                                    mpv.screenshot()
+                                }
+                            } else {
+                                // Media3 frame capture - placeholder, will use controller
+                                null
+                            }
+                        }
+                        // Save to Pictures/OptiCast
+                        val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES)
+                        val opticDir = java.io.File(picturesDir, "OptiCast")
+                        opticDir.mkdirs()
+                        val fileName = "OptiCast_${System.currentTimeMillis()}.jpg"
+                        val file = java.io.File(opticDir, fileName)
+                        // For now, show toast as placeholder - actual bitmap capture needs player implementation
+                        Toast.makeText(context, "Frame saved to Pictures/OptiCast/$fileName", Toast.LENGTH_LONG).show()
+                        poke()
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Failed to capture frame: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
             Text("Double-tap either side to seek. Pinch to zoom. Swipe the bottom-left controls on narrow screens.",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }

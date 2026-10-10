@@ -33,6 +33,7 @@ data class AppSettings(
     val gestureVolumeBrightness: Boolean = true,
     val keepScreenOn: Boolean = true,
     val autoLandscape: Boolean = true,
+    val orientationMode: String = "auto", // auto, portrait, landscape, sensor, locked
     val preservePitch: Boolean = true,
     val audioBoostPct: Int = 100,
     val playbackEngine: String = "mpv", // mpv first with Media3 fallback | media3 only
@@ -41,6 +42,9 @@ data class AppSettings(
     val embeddedSubtitleMode: String = "default",
     val avoidCommentary: Boolean = true,
     val dialogueBoost: Boolean = false,
+    val autoCrop: Boolean = false,
+    val volumeNormalization: Boolean = false,
+    val showBatteryClock: Boolean = true,
     val autoNextEpisode: Boolean = true,
     val resumePlayback: Boolean = true,
     val enableNetworkBrowsing: Boolean = false, // Advanced: SMB/NFS browsing, off by default for lightness
@@ -67,6 +71,12 @@ data class AppSettings(
      * On by default, because artwork should never quietly burn someone's data.
      */
     val dataSaverArtwork: Boolean = true,
+    // New features
+    val trashEnabled: Boolean = true,
+    val trashRetentionDays: Int = 30,
+    val gestureCustomization: String = "default", // default, custom
+    val organizeAssistantEnabled: Boolean = false,
+    val organizeLevel: Int = 1, // 1 suggest only, 2 rename only, 3 allow moves
 )
 
 private val Context.settingsDataStore: DataStore<Preferences> by
@@ -100,6 +110,7 @@ class SettingsRepository(private val context: Context) {
     private val gestureVolKey = booleanPreferencesKey("gesture_volume_brightness")
     private val keepScreenOnKey = booleanPreferencesKey("keep_screen_on")
     private val autoLandscapeKey = booleanPreferencesKey("auto_landscape")
+    private val orientationModeKey = stringPreferencesKey("orientation_mode")
     private val preservePitchKey = booleanPreferencesKey("preserve_pitch")
     private val audioBoostKey = intPreferencesKey("audio_boost_pct")
     private val autoNextKey = booleanPreferencesKey("auto_next_episode")
@@ -109,6 +120,14 @@ class SettingsRepository(private val context: Context) {
     private val playerControlsKey = stringSetPreferencesKey("player_controls")
     private val themeKey = stringPreferencesKey("app_theme")
     private val gridKey = stringPreferencesKey("library_grid")
+    private val autoCropKey = booleanPreferencesKey("auto_crop")
+    private val volumeNormKey = booleanPreferencesKey("volume_normalization")
+    private val batteryClockKey = booleanPreferencesKey("show_battery_clock")
+    private val trashEnabledKey = booleanPreferencesKey("trash_enabled")
+    private val trashRetentionKey = intPreferencesKey("trash_retention_days")
+    private val gestureCustomKey = stringPreferencesKey("gesture_customization")
+    private val organizeEnabledKey = booleanPreferencesKey("organize_assistant_enabled")
+    private val organizeLevelKey = intPreferencesKey("organize_level")
 
     val settings: Flow<AppSettings> = context.settingsDataStore.data.map { prefs ->
         AppSettings(
@@ -138,6 +157,7 @@ class SettingsRepository(private val context: Context) {
             gestureVolumeBrightness = prefs[gestureVolKey] ?: true,
             keepScreenOn = prefs[keepScreenOnKey] ?: true,
             autoLandscape = prefs[autoLandscapeKey] ?: true,
+            orientationMode = prefs[orientationModeKey] ?: "auto",
             preservePitch = prefs[preservePitchKey] ?: true,
             audioBoostPct = prefs[audioBoostKey] ?: 100,
             // New preference generation intentionally adopts the requested mpv-first default
@@ -148,6 +168,9 @@ class SettingsRepository(private val context: Context) {
             embeddedSubtitleMode = prefs[embeddedModeKey]?.takeIf { it in listOf("default", "forced", "full", "off") } ?: "default",
             avoidCommentary = prefs[avoidCommentaryKey] ?: true,
             dialogueBoost = prefs[dialogueBoostKey] ?: false,
+            autoCrop = prefs[autoCropKey] ?: false,
+            volumeNormalization = prefs[volumeNormKey] ?: false,
+            showBatteryClock = prefs[batteryClockKey] ?: true,
             autoNextEpisode = prefs[autoNextKey] ?: true,
             resumePlayback = prefs[resumeKey] ?: true,
             enableNetworkBrowsing = prefs[networkBrowsingKey] ?: false,
@@ -162,6 +185,11 @@ class SettingsRepository(private val context: Context) {
                 ),
             appTheme = resolvedAppTheme(prefs[themeKey]),
             libraryGrid = resolvedLibraryGrid(prefs[gridKey]),
+            trashEnabled = prefs[trashEnabledKey] ?: true,
+            trashRetentionDays = prefs[trashRetentionKey] ?: 30,
+            gestureCustomization = prefs[gestureCustomKey] ?: "default",
+            organizeAssistantEnabled = prefs[organizeEnabledKey] ?: false,
+            organizeLevel = prefs[organizeLevelKey] ?: 1,
         )
     }
 
@@ -360,5 +388,41 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setEnableNetworkBrowsing(enabled: Boolean) {
         context.settingsDataStore.edit { it[networkBrowsingKey] = enabled }
+    }
+
+    suspend fun setOrientationMode(mode: String) {
+        context.settingsDataStore.edit { it[orientationModeKey] = mode }
+    }
+
+    suspend fun setAutoCrop(enabled: Boolean) {
+        context.settingsDataStore.edit { it[autoCropKey] = enabled }
+    }
+
+    suspend fun setVolumeNormalization(enabled: Boolean) {
+        context.settingsDataStore.edit { it[volumeNormKey] = enabled }
+    }
+
+    suspend fun setShowBatteryClock(enabled: Boolean) {
+        context.settingsDataStore.edit { it[batteryClockKey] = enabled }
+    }
+
+    suspend fun setTrashEnabled(enabled: Boolean) {
+        context.settingsDataStore.edit { it[trashEnabledKey] = enabled }
+    }
+
+    suspend fun setTrashRetentionDays(days: Int) {
+        context.settingsDataStore.edit { it[trashRetentionKey] = days }
+    }
+
+    suspend fun setGestureCustomization(value: String) {
+        context.settingsDataStore.edit { it[gestureCustomKey] = value }
+    }
+
+    suspend fun setOrganizeAssistantEnabled(enabled: Boolean) {
+        context.settingsDataStore.edit { it[organizeEnabledKey] = enabled }
+    }
+
+    suspend fun setOrganizeLevel(level: Int) {
+        context.settingsDataStore.edit { it[organizeLevelKey] = level }
     }
 }

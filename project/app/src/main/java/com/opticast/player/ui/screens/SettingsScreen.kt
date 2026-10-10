@@ -854,14 +854,9 @@ private fun BehaviourSettingsCard(settings: AppSettings, scope: CoroutineScope, 
             description = "Automatically play the next episode when current ends.",
             checked = settings.autoNextEpisode,
         ) { enabled -> scope.launch { AppContainer.settings.setAutoNextEpisode(enabled) } }
-
-        PrefToggle(
-            label = "Enable network browsing",
-            description = "Show network libraries.",
-            Spacer(Modifier.height(8.dp))
-            OutlinedButton(onClick = onOpenNetwork, shape = RoundedCornerShape(16.dp)) {
-                Text("Open network libraries")
-            }
+        Spacer(Modifier.height(8.dp))
+        OutlinedButton(onClick = onOpenNetwork, shape = RoundedCornerShape(16.dp)) {
+            Text("Open network libraries")
         }
     }
 }

@@ -162,7 +162,6 @@ fun SettingsScreen(
     onOpenNetwork: () -> Unit = {},
     onOpenStorageAnalyzer: () -> Unit = {},
     onOpenTrash: () -> Unit = {},
-    onOpenQueue: () -> Unit = {},
     onOpenOrganizeAssistant: () -> Unit = {},
     onOpenGestureCustomization: () -> Unit = {},
 ) {
@@ -817,35 +816,13 @@ private fun PlayerLayoutSettingsCard(settings: AppSettings, scope: CoroutineScop
 private fun GestureSettingsCard(settings: AppSettings, scope: CoroutineScope, onOpenGestureCustomization: () -> Unit = {}) {
     SettingsCard(icon = Icons.Filled.TouchApp, title = "Gestures") {
         Text(
-            "Configure swipe and double-tap actions for the player.",
+            "Configure swipe and hold actions for the player.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(10.dp))
         OutlinedButton(onClick = onOpenGestureCustomization, shape = RoundedCornerShape(16.dp)) {
             Text("Customize gestures")
-        }
-        Spacer(Modifier.height(12.dp))
-        PrefToggle(
-            label = "Hold to fast-forward",
-            description = "Press and hold to speed up temporarily.",
-            checked = settings.holdToSpeed,
-        ) { enabled -> scope.launch { AppContainer.settings.setHoldToSpeed(enabled) } }
-        if (settings.holdToSpeed) {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                listOf(2f, 3f, 4f).forEach { factor ->
-                    FilterChip(
-                        selected = settings.holdSpeedFactor == factor,
-                        onClick = {
-                            scope.launch { AppContainer.settings.setHoldSpeedFactor(factor) }
-                        },
-                        label = { Text("${factor.toInt()}× while held") },
-                    )
-                }
-            }
         }
     }
 }
@@ -959,6 +936,7 @@ private fun SoundSettingsCard(settings: AppSettings, scope: CoroutineScope) {
     }
 }
 
+
 @Composable
 private fun CombinedPlaybackCard(
     settings: AppSettings,
@@ -970,115 +948,67 @@ private fun CombinedPlaybackCard(
     CollapsibleSettingsCard(
         icon = Icons.Filled.PlayArrow,
         title = "Playback",
-        subtitle = "Engine, behaviour and orientation",
+        subtitle = "Player and audio",
         expanded = expanded,
         onToggle = onToggle
     ) {
-        val playbackContext = LocalContext.current
-        // Engine selection
-        Text("To set as default, open a video from your file manager, select OptiCast and choose Always. You can also share videos to OptiCast.", style = MaterialTheme.typography.bodySmall)
-        TextButton(onClick = {
-            runCatching { playbackContext.startActivity(android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                android.net.Uri.parse("package:${playbackContext.packageName}"))) }
-        }) { Text("System default settings") }
+        val ctx = LocalContext.current
+        // Set as default app - direct option in settings
+        Text(settingsHeaderTitle("Default app"), style = MaterialTheme.typography.titleSmall)
+        Text("Set OptiCast as default video player for your device.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick = {
+                runCatching {
+                    ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("package:${ctx.packageName}")).apply {
+                        setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        data = Uri.parse("package:${ctx.packageName}")
+                    })
+                }
+            }, shape = RoundedCornerShape(16.dp)) {
+                Text("Set as default")
+            }
+            TextButton(onClick = {
+                runCatching {
+                    ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://opticastplayer-dev.github.io/opticast/")).apply {
+                        // Fallback to system default settings
+                    })
+                    ctx.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${ctx.packageName}")))
+                }
+            }) { Text("System settings") }
+        }
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
         PrefToggle(
             label = "Use external player",
             description = "Open videos in another installed player.",
             checked = settings.useExternalPlayer,
         ) { enabled -> scope.launch { AppContainer.settings.setUseExternalPlayer(enabled) } }
 
-        Spacer(Modifier.height(10.dp))
-        Text(settingsHeaderTitle("Engine selection"), style = MaterialTheme.typography.titleMedium)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("mpv" to "MPV (Default)", "media3" to "Media3").forEach { (id, name) ->
-                FilterChip(selected = if (id == "media3") settings.playbackEngine != "mpv" else settings.playbackEngine == id,
-                    onClick = { scope.launch { AppContainer.settings.setPlaybackEngine(id) } },
-                    label = { Text(name) }, enabled = !settings.useExternalPlayer)
-            }
-        }
-        Text("MPV handles local files with automatic fallback. Network sources and audio enhancements use Media3. Changes apply to the next video.",
-            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-
         HorizontalDivider(Modifier.padding(vertical = 14.dp))
 
-        // Behaviour
-        PrefToggle(
-            label = "Start in landscape",
-            description = "Automatically switch to landscape when playback starts.",
-            checked = settings.autoLandscape,
-        ) { enabled -> scope.launch { AppContainer.settings.setAutoLandscape(enabled) } }
         PrefToggle(
             label = "Keep screen on",
             description = "Prevent display sleep during playback.",
             checked = settings.keepScreenOn,
         ) { enabled -> scope.launch { AppContainer.settings.setKeepScreenOn(enabled) } }
-        PrefToggle(
-            label = "Preserve voice pitch at speed",
-            description = "Maintain natural voice pitch at higher speeds.",
-            checked = settings.preservePitch,
-        ) { enabled -> scope.launch { AppContainer.settings.setPreservePitch(enabled) } }
-        Text(
-            "Resume is always enabled. To restart, use Restart from beginning on the detail page.",
-            style = MaterialTheme.typography.bodySmall,
-        )
+
         PrefToggle(
             label = "Auto-play next episode",
             description = "Automatically play the next episode when current ends.",
             checked = settings.autoNextEpisode,
         ) { enabled -> scope.launch { AppContainer.settings.setAutoNextEpisode(enabled) } }
 
-        PrefToggle(
-            label = "Enable network browsing",
-            description = "Show network libraries.",
-            checked = settings.enableNetworkBrowsing,
-        ) { enabled -> scope.launch { AppContainer.settings.setEnableNetworkBrowsing(enabled) } }
-        if (settings.enableNetworkBrowsing) {
-            Spacer(Modifier.height(8.dp))
-            OutlinedButton(onClick = onOpenNetwork, shape = RoundedCornerShape(16.dp)) {
-                Text("Open network libraries")
-            }
-        }
-
         HorizontalDivider(Modifier.padding(vertical = 14.dp))
 
-        // Advanced - orientation and audio
-        Text("Orientation mode", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 2.dp))
-        Spacer(Modifier.height(6.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("auto" to "Auto", "portrait" to "Portrait").forEach { (id, label) ->
-                val isSelected = when (id) {
-                    "auto" -> settings.orientationMode == "auto" || settings.orientationMode == "sensor"
-                    else -> settings.orientationMode == id
-                }
-                FilterChip(selected = isSelected, onClick = { scope.launch { AppContainer.settings.setOrientationMode(id) } }, label = { Text(label) })
-            }
-        }
-
+        Text("Audio", style = MaterialTheme.typography.titleSmall)
         PrefToggle(
-            label = "Auto crop black bars",
-            description = "Automatically remove black bars from videos.",
-            checked = settings.autoCrop,
-        ) { enabled -> scope.launch { AppContainer.settings.setAutoCrop(enabled) } }
-
-        PrefToggle(
-            label = "Volume normalization",
-            description = "Normalize volume across videos.",
-            checked = settings.volumeNormalization,
-        ) { enabled -> scope.launch { AppContainer.settings.setVolumeNormalization(enabled) } }
-
-        HorizontalDivider(Modifier.padding(vertical = 14.dp))
-
-        Text("Audio boost", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 2.dp))
-        Spacer(Modifier.height(6.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(100 to "Off", 125 to "125%", 150 to "150%", 200 to "200%").forEach { (pct, label) ->
-                FilterChip(selected = settings.audioBoostPct == pct, onClick = { scope.launch { AppContainer.settings.setAudioBoostPct(pct) } }, label = { Text(label) })
-            }
-        }
-        Text("Amplifies quiet recordings above 100%. May clip very loud sources.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(6.dp))
-        PrefToggle(label = "Dialogue boost", description = "Adds presence to speech so quiet dialogue stays clear at low volume. Stacks with audio boost.", checked = settings.dialogueBoost) { enabled ->
-            scope.launch { AppContainer.settings.setDialogueBoost(enabled) }
+            label = "Boost quiet audio",
+            description = "Amplifies quiet recordings (150%). May clip loud sources.",
+            checked = settings.audioBoostPct > 100,
+        ) { enabled ->
+            scope.launch { AppContainer.settings.setAudioBoostPct(if (enabled) 150 else 100) }
         }
     }
 }
@@ -1093,34 +1023,17 @@ private fun CombinedSubtitlesCard(
     CollapsibleSettingsCard(
         icon = Icons.Filled.Subtitles,
         title = "Subtitles",
-        subtitle = "Audio, tracks and languages",
+        subtitle = "Audio and languages",
         expanded = expanded,
         onToggle = onToggle
     ) {
-        // Audio & subtitle tracks
-        Text("For tracks already in your video. Manual choices take priority.", style = MaterialTheme.typography.bodySmall)
         val trackLanguages = listOf("" to "Any / default", "en" to "English", "fr" to "French", "es" to "Spanish", "zh" to "Chinese")
         TrackLanguagePicker("Preferred audio language", settings.preferredAudioLanguage, trackLanguages) { code ->
             scope.launch { AppContainer.settings.setPreferredAudioLanguage(code) }
         }
-        PrefToggle("Avoid commentary", "Prefer main audio when available in your chosen language.", settings.avoidCommentary) {
-            scope.launch { AppContainer.settings.setAvoidCommentary(it) }
-        }
-        Text("Subtitle rule", style = MaterialTheme.typography.labelLarge)
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("default" to "Container default", "forced" to "Forced only", "full" to "Full subtitles", "off" to "Off").forEach { (mode, label) ->
-                FilterChip(selected = settings.embeddedSubtitleMode == mode,
-                    onClick = { scope.launch { AppContainer.settings.setEmbeddedSubtitleMode(mode) } }, label = { Text(label) })
-            }
-        }
-        TrackLanguagePicker("Embedded subtitle language", settings.embeddedSubtitleLanguage, trackLanguages) { code ->
-            scope.launch { AppContainer.settings.setEmbeddedSubtitleLanguage(code) }
-        }
-        Text("No matching forced/full track? Subtitles stay off. Download languages are set separately.", style = MaterialTheme.typography.bodySmall)
 
         HorizontalDivider(Modifier.padding(vertical = 14.dp))
 
-        // Subtitle languages - inline version of LanguageDropdownCard
         val selectedLangs = settings.subtitleLanguages
         val summary = if (selectedLangs.isEmpty()) {
             "Choose languages…"
@@ -1134,12 +1047,6 @@ private fun CombinedSubtitlesCard(
         }
         Text(settingsHeaderTitle("Subtitle languages"), style = MaterialTheme.typography.titleSmall)
         Text(summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(8.dp))
-        Text(
-            "Subtitle searches (detail page & in-player) look for these languages.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
         Spacer(Modifier.height(8.dp))
         LANGUAGE_OPTIONS.forEach { (code, name) ->
             val checked = code in selectedLangs
@@ -1163,31 +1070,8 @@ private fun CombinedSubtitlesCard(
                 }
             }
         }
-
-        HorizontalDivider(Modifier.padding(vertical = 14.dp))
-
-        // Auto subtitles
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text("Download subtitles during scan", style = MaterialTheme.typography.labelLarge)
-                Text(
-                    "When a file is matched, OptiCast fetches the most-downloaded subtitle in your languages. Uses your OpenSubtitles quota.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Spacer(Modifier.width(12.dp))
-            Switch(
-                checked = settings.autoSubtitles,
-                onCheckedChange = { enabled -> scope.launch { AppContainer.settings.setAutoSubtitles(enabled) } },
-            )
-        }
     }
 }
-
 
 @Composable
 private fun CombinedAppearanceCard(
@@ -1199,7 +1083,7 @@ private fun CombinedAppearanceCard(
     CollapsibleSettingsCard(
         icon = Icons.Filled.Palette,
         title = "Appearance",
-        subtitle = "Theme, grid and player layout",
+        subtitle = "Theme and grid",
         expanded = expanded,
         onToggle = onToggle
     ) {
@@ -1233,41 +1117,6 @@ private fun CombinedAppearanceCard(
                 FilterChip(selected = settings.libraryGrid == id, onClick = { scope.launch { AppContainer.settings.setLibraryGrid(id) } }, label = { Text(name) })
             }
         }
-        Spacer(Modifier.height(14.dp))
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text("Adapt colors to your wallpaper", style = MaterialTheme.typography.labelLarge)
-                Text("Use wallpaper colours on Android 12+. Keeps the dark background.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Spacer(Modifier.width(12.dp))
-            Switch(checked = settings.useDeviceColors, onCheckedChange = { enabled -> scope.launch { AppContainer.settings.setUseDeviceColors(enabled) } })
-        }
-
-        HorizontalDivider(Modifier.padding(vertical = 14.dp))
-
-        Text(settingsHeaderTitle("Progress bar"), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 2.dp))
-        Spacer(Modifier.height(6.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("thick" to "Thick · default", "gradient" to "Gradient", "hidden" to "Hidden").forEach { (id, label) ->
-                FilterChip(selected = settings.progressBarStyle == id, onClick = { scope.launch { AppContainer.settings.setProgressBarStyle(id) } }, label = { Text(label) })
-            }
-        }
-        if (settings.progressBarStyle == "hidden") {
-            Text("The bar is hidden; the elapsed and total times stay on screen.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
-        }
-
-        Text(settingsHeaderTitle("Player controls"), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 16.dp, bottom = 6.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf("back" to "Back", "speed" to "Speed", "subtitles" to "Audio & Subtitles", "library" to "Library", "chapters" to "Chapters", "info" to "Info", "lock" to "Lock", "aspect" to "Aspect", "sleep" to "Sleep").forEach { (id, label) ->
-                val selected = settings.playerControls.contains(id)
-                FilterChip(
-                    selected = selected,
-                    onClick = { scope.launch { AppContainer.settings.setPlayerControl(id, !selected) } },
-                    label = { Text(label) },
-                    leadingIcon = if (selected) { { Icon(Icons.Filled.Check, null, Modifier.size(16.dp)) } } else null
-                )
-            }
-        }
     }
 }
 
@@ -1286,25 +1135,11 @@ private fun CombinedFilesCard(
     CollapsibleSettingsCard(
         icon = Icons.Filled.FolderOff,
         title = "Files & Storage",
-        subtitle = "Excluded folders, storage and maintenance",
+        subtitle = "Excluded folders and storage",
         expanded = expanded,
         onToggle = onToggle
     ) {
-        Text("Videos inside these folders are skipped when scanning - handy for camera clips, screen recordings and messenger videos.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(12.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            PRESET_FOLDERS.forEach { (path, label) ->
-                val selected = settings.excludedFolders.contains(path)
-                FilterChip(selected = selected, onClick = {
-                    val next = if (selected) settings.excludedFolders - path else settings.excludedFolders + path
-                    scope.launch {
-                        AppContainer.settings.setExcludedFolders(next)
-                        FolderExclusions.hydrate(next)
-                        AppContainer.metadataStore.touch()
-                    }
-                }, label = { Text(label) })
-            }
-        }
+        Text("Videos inside these folders are skipped when scanning.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(
@@ -1329,7 +1164,7 @@ private fun CombinedFilesCard(
                 }
             }) { Icon(Icons.Filled.Add, "Add folder", tint = MaterialTheme.colorScheme.primary) }
         }
-        val customFolders = settings.excludedFolders.filter { folder -> PRESET_FOLDERS.none { it.first == folder } }
+        val customFolders = settings.excludedFolders
         customFolders.forEach { folder ->
             Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(folder, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
@@ -1348,12 +1183,7 @@ private fun CombinedFilesCard(
 
         Text("Manage space, cached files and backups.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = onOpenStorage, shape = RoundedCornerShape(16.dp)) { Text("Storage dashboard") }
-            OutlinedButton(onClick = onOpenTrash, shape = RoundedCornerShape(16.dp)) { Text("Trash") }
-        }
-        Spacer(Modifier.height(12.dp))
-        OutlinedButton(onClick = { confirmClear() }, shape = RoundedCornerShape(16.dp)) { Text("Clear all saved metadata") }
+        OutlinedButton(onClick = onOpenStorage, shape = RoundedCornerShape(16.dp)) { Text("Open storage dashboard") }
     }
 }
 
@@ -1433,14 +1263,8 @@ private fun CombinedAboutCard(
         Text(settingsHeaderTitle("Contact & support"), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
         DeveloperRow("Email", "opticastproject@gmail.com", "mailto:opticastproject@gmail.com")
-
-        HorizontalDivider(Modifier.padding(vertical = 14.dp))
-
-        DeviceInfo()
     }
 }
-
-
 
 @Composable
 private fun TrackLanguagePicker(label: String, selected: String, options: List<Pair<String, String>>, onSelect: (String) -> Unit) {

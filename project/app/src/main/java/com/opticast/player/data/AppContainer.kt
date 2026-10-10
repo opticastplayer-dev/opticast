@@ -141,11 +141,11 @@ object AppContainer {
 
     // New features
     val trashStore: com.opticast.player.data.local.TrashStore by lazy { com.opticast.player.data.local.TrashStore(application) }
-    val queueStore: com.opticast.player.data.local.QueueStore by lazy { com.opticast.player.data.local.QueueStore(application) }
     val organizeAssistant: com.opticast.player.data.local.OrganizeAssistant by lazy { com.opticast.player.data.local.OrganizeAssistant(application) }
 
     // Clean - removed placeholder cloud/cast that didn't benefit end user (0 benefit)
     // Cloud Drive/SMB/WebDAV + Cast will be added later when real implementation ready, offline-first #1
+    // Queue removed per user request - play next / add to queue deleted
     val breadcrumb: com.opticast.player.data.local.BreadcrumbTracker by lazy { com.opticast.player.data.local.BreadcrumbTracker(application) }
     val subtitleFonts: com.opticast.player.data.local.SubtitleFontManager by lazy { com.opticast.player.data.local.SubtitleFontManager(application) }
     val gaplessQueue: com.opticast.player.player.GaplessQueue by lazy { com.opticast.player.player.GaplessQueue() }

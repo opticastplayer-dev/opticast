@@ -8,9 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
-import com.opticast.player.data.ProviderNotices
 import com.opticast.player.data.remote.UpdateChecker
 import kotlinx.coroutines.launch
 

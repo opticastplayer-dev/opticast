@@ -73,6 +73,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FolderOff
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import com.opticast.player.data.local.FolderExclusions
+import com.opticast.player.data.AppSettings
+
 /**
  * Storage dashboard, file organiser and backup.
  *
@@ -99,6 +107,8 @@ fun StorageScreen(onBack: () -> Unit, onOpenMatch: (Long) -> Unit) {
     var backupTick by remember { mutableIntStateOf(0) }
     var includeSearchHistory by rememberSaveable { mutableStateOf(false) }
     var duplicateReview by remember { mutableStateOf<List<LocalVideo>?>(null) }
+    val appSettings by AppContainer.settings.settings.collectAsStateWithLifecycle(initialValue = AppSettings())
+    var customFolder by rememberSaveable { mutableStateOf("") }
 
     // ---- data ----
     LaunchedEffect(refresh) {
@@ -203,6 +213,54 @@ fun StorageScreen(onBack: () -> Unit, onOpenMatch: (Long) -> Unit) {
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
+            // ---------------- excluded folders (moved from Files & Storage) ----------------
+            item {
+                StorageCard("Excluded folders", Icons.Filled.FolderOff) {
+                    Text("Videos inside these folders are skipped when scanning.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(12.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            value = customFolder,
+                            onValueChange = { customFolder = it },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(18.dp),
+                            placeholder = { Text("Custom path, e.g. Movies/Clips") },
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer, unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer)
+                        )
+                        IconButton(onClick = {
+                            val path = customFolder.trim().trim('/')
+                            if (path.isNotBlank() && !appSettings.excludedFolders.contains(path)) {
+                                val next = appSettings.excludedFolders + path
+                                scope.launch {
+                                    AppContainer.settings.setExcludedFolders(next)
+                                    FolderExclusions.hydrate(next)
+                                    AppContainer.metadataStore.touch()
+                                }
+                                customFolder = ""
+                            }
+                        }) { Icon(Icons.Filled.Add, "Add folder", tint = MaterialTheme.colorScheme.primary) }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    appSettings.excludedFolders.forEach { folder ->
+                        Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(folder, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                            IconButton(onClick = {
+                                val next = appSettings.excludedFolders - folder
+                                scope.launch {
+                                    AppContainer.settings.setExcludedFolders(next)
+                                    FolderExclusions.hydrate(next)
+                                    AppContainer.metadataStore.touch()
+                                }
+                            }) { Icon(Icons.Filled.Close, "Remove", tint = MaterialTheme.colorScheme.error) }
+                        }
+                    }
+                    if (appSettings.excludedFolders.isEmpty()) {
+                        Text("No excluded folders", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+
             // ---------------- overview ----------------
             item {
                 StorageCard("Library", Icons.Filled.Storage) {

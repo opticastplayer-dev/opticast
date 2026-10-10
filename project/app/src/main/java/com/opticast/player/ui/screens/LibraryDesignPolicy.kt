@@ -25,12 +25,15 @@ internal fun searchTypeMatches(filter: String, isShow: Boolean): Boolean = when 
     "tv" -> isShow
     else -> true
 }
-internal data class LibraryDesign(val style: String = "classic", val order: List<String> = classicSectionOrder, val hidden: Set<String> = emptySet(), val stats: Boolean = true)
+internal data class LibraryDesign(val style: String = "classic", val order: List<String> = classicSectionOrder, val hidden: Set<String> = emptySet())
 internal data class PersonalCollection(val id: String, val name: String, val videoIds: List<Long>)
 
 internal val classicSectionOrder = listOf("continue", "featured", "recent", "titles", "watched", "collections")
 internal fun supportedLibraryStyle(saved: String?): String = if (saved == "minimal") "minimal" else "classic"
-internal internal fun featuredTap(selectionMode: Boolean, watchButton: Boolean): FeaturedTap = when {
+internal fun showLibraryStatistics(style: String, enabled: Boolean, searching: Boolean) = !searching && style == "classic" && enabled
+internal fun includeCompletedTitles(style: String, hidden: Set<String>, searching: Boolean) = searching || style == "minimal" || "watched" in hidden
+internal enum class FeaturedTap { SELECT, PLAY, DETAILS }
+internal fun featuredTap(selectionMode: Boolean, watchButton: Boolean): FeaturedTap = when {
     selectionMode -> FeaturedTap.SELECT
     watchButton -> FeaturedTap.PLAY
     else -> FeaturedTap.DETAILS

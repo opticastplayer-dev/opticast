@@ -957,26 +957,13 @@ private fun CombinedPlaybackCard(
         Text(settingsHeaderTitle("Default app"), style = MaterialTheme.typography.titleSmall)
         Text("Set OptiCast as default video player for your device.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedButton(onClick = {
+        OutlinedButton(onClick = {
                 runCatching {
-                    ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("package:${ctx.packageName}")).apply {
-                        setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                        data = Uri.parse("package:${ctx.packageName}")
-                    })
+                    ctx.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${ctx.packageName}")))
                 }
             }, shape = RoundedCornerShape(16.dp)) {
                 Text("Set as default")
             }
-            TextButton(onClick = {
-                runCatching {
-                    ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://opticastplayer-dev.github.io/opticast/")).apply {
-                        // Fallback to system default settings
-                    })
-                    ctx.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${ctx.packageName}")))
-                }
-            }) { Text("System settings") }
-        }
 
         HorizontalDivider(Modifier.padding(vertical = 14.dp))
 
@@ -1135,55 +1122,19 @@ private fun CombinedFilesCard(
     CollapsibleSettingsCard(
         icon = Icons.Filled.FolderOff,
         title = "Files & Storage",
-        subtitle = "Excluded folders and storage",
+        subtitle = "Storage dashboard",
         expanded = expanded,
         onToggle = onToggle
     ) {
-        Text("Videos inside these folders are skipped when scanning.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            "Manage storage, cached files, backups and excluded folders.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Spacer(Modifier.height(12.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(
-                value = customFolder,
-                onValueChange = onCustomFolderChange,
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(18.dp),
-                placeholder = { Text("Custom path, e.g. Movies/Clips") },
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer, unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer)
-            )
-            IconButton(onClick = {
-                val path = customFolder.trim().trim('/')
-                if (path.isNotBlank() && !settings.excludedFolders.contains(path)) {
-                    val next = settings.excludedFolders + path
-                    scope.launch {
-                        AppContainer.settings.setExcludedFolders(next)
-                        FolderExclusions.hydrate(next)
-                        AppContainer.metadataStore.touch()
-                    }
-                    onCustomFolderChange("")
-                }
-            }) { Icon(Icons.Filled.Add, "Add folder", tint = MaterialTheme.colorScheme.primary) }
+        OutlinedButton(onClick = onOpenStorage, shape = RoundedCornerShape(16.dp)) {
+            Text("Open storage dashboard")
         }
-        val customFolders = settings.excludedFolders
-        customFolders.forEach { folder ->
-            Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(folder, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                IconButton(onClick = {
-                    val next = settings.excludedFolders - folder
-                    scope.launch {
-                        AppContainer.settings.setExcludedFolders(next)
-                        FolderExclusions.hydrate(next)
-                        AppContainer.metadataStore.touch()
-                    }
-                }) { Icon(Icons.Filled.Close, "Remove", tint = MaterialTheme.colorScheme.error) }
-            }
-        }
-
-        HorizontalDivider(Modifier.padding(vertical = 14.dp))
-
-        Text("Manage space, cached files and backups.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(10.dp))
-        OutlinedButton(onClick = onOpenStorage, shape = RoundedCornerShape(16.dp)) { Text("Open storage dashboard") }
     }
 }
 

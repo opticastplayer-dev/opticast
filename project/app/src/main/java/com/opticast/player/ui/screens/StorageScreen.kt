@@ -216,34 +216,7 @@ fun StorageScreen(onBack: () -> Unit, onOpenMatch: (Long) -> Unit) {
             // ---------------- excluded folders (moved from Files & Storage) ----------------
             item {
                 StorageCard("Excluded folders", Icons.Filled.FolderOff) {
-                    val excludedCount = appSettings.excludedFolders.size
-                    Text(
-                        if (excludedCount == 0) "Videos inside these folders are skipped when scanning. No folders excluded yet."
-                        else "Videos inside these $excludedCount folder${if (excludedCount == 1) "" else "s"} are skipped when scanning:",
-                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    if (excludedCount > 0) {
-                        Spacer(Modifier.height(8.dp))
-                        // List folders to compliment the description
-                        appSettings.excludedFolders.forEach { folder ->
-                            Row(
-                                Modifier.fillMaxWidth().padding(vertical = 4.dp).background(MaterialTheme.colorScheme.surfaceContainerHighest, RoundedCornerShape(12.dp)).padding(horizontal = 12.dp, vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(Icons.Filled.FolderOff, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Spacer(Modifier.width(8.dp))
-                                Text(folder, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                                IconButton(onClick = {
-                                    val next = appSettings.excludedFolders - folder
-                                    scope.launch {
-                                        AppContainer.settings.setExcludedFolders(next)
-                                        FolderExclusions.hydrate(next)
-                                        AppContainer.metadataStore.touch()
-                                    }
-                                }) { Icon(Icons.Filled.Close, "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp)) }
-                            }
-                        }
-                    }
+                    Text("Videos inside these folders are skipped when scanning.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(12.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         OutlinedTextField(
@@ -268,6 +241,23 @@ fun StorageScreen(onBack: () -> Unit, onOpenMatch: (Long) -> Unit) {
                             }
                         }) { Icon(Icons.Filled.Add, "Add folder", tint = MaterialTheme.colorScheme.primary) }
                     }
+                    Spacer(Modifier.height(8.dp))
+                    appSettings.excludedFolders.forEach { folder ->
+                        Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(folder, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                            IconButton(onClick = {
+                                val next = appSettings.excludedFolders - folder
+                                scope.launch {
+                                    AppContainer.settings.setExcludedFolders(next)
+                                    FolderExclusions.hydrate(next)
+                                    AppContainer.metadataStore.touch()
+                                }
+                            }) { Icon(Icons.Filled.Close, "Remove", tint = MaterialTheme.colorScheme.error) }
+                        }
+                    }
+                    if (appSettings.excludedFolders.isEmpty()) {
+                        Text("No excluded folders", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
 
@@ -284,31 +274,37 @@ fun StorageScreen(onBack: () -> Unit, onOpenMatch: (Long) -> Unit) {
                 }
             }
 
-            // ---------------- caches - simplified brief ----------------
+            // ---------------- caches ----------------
             item {
                 StorageCard("Caches", Icons.Filled.CleaningServices) {
-                    val totalCache = cacheSizes.firstOrNull { it.first == "App total" }?.second ?: 0L
-                    Text(
-                        if (totalCache > 0) "Cached files: ${formatSize(totalCache)}"
-                        else "No cached files",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(Modifier.height(10.dp))
+                    cacheSizes.forEach { (label, size) ->
+                        StatRow(label, formatSize(size))
+                    }
+                    Spacer(Modifier.height(6.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = {
                             scope.launch {
                                 withContext(Dispatchers.IO) {
                                     AppContainer.frameArtwork.deleteAll()
                                     AppContainer.thumbnails.deleteAll()
-                                    runCatching { File(context.filesDir, "chapters").deleteRecursively() }
+                                    runCatching {
+                                        File(context.filesDir, "chapters").deleteRecursively()
+                                    }
                                     runCatching { File(context.filesDir, "posters").deleteRecursively() }
                                 }
-                                message = "Caches cleared"
+                                message = "Caches cleared \u00b7 they rebuild as you browse"
                                 refresh++
                             }
                         }) { Text("Clear caches") }
                         OutlinedButton(onClick = { backupTick++; refresh++ }) { Text("Refresh") }
                     }
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Caches rebuild themselves when needed. Clearing them frees " +
+                            "space at the cost of one slower first open per title.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
 
@@ -586,10 +582,21 @@ private fun StatRow(label: String, value: String) {
 // ============================ helpers ============================
 
 private fun measureCaches(context: Context): List<Pair<String, Long>> {
-    val total = runCatching {
-        context.filesDir.walkTopDown().filter { it.isFile }.sumOf { it.length() }
+    fun size(name: String) = runCatching {
+        File(context.filesDir, name).walkTopDown().filter { it.isFile }.sumOf { it.length() }
     }.getOrDefault(0L)
-    return listOf("App total" to total)
+
+    return listOf(
+        "Poster artwork" to size("posters"),
+        "Video frame thumbnails" to size("frames"),
+        "Scrub previews" to size("thumbs"),
+        "Chapter indexes" to size("chapters"),
+        "Downloaded from network" to size("network"),
+        "Subtitles & metadata" to (size("subtitles") + size("metadata")),
+        "App total" to runCatching {
+            context.filesDir.walkTopDown().filter { it.isFile }.sumOf { it.length() }
+        }.getOrDefault(0L),
+    )
 }
 
 /** Same byte size and a near-identical name: the same file, twice. */

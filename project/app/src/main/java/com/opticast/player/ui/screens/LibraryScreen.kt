@@ -230,7 +230,12 @@ internal data class ContinueItem(
     val playback: PlaybackState
                         )
 
-internal data class LibraryStats(val movies: Int, val shows: Int)
+internal data class LibraryStats(
+    val movies: Int,
+    val shows: Int,
+    val watched: Int,
+    val totalHours: Double
+                        )
 
 internal fun comparatorFor(sortBy: String): Comparator<LibraryEntry> = when (sortBy) {
     "title" -> compareBy { (it.metadata?.displayTitle ?: it.video.parsed.title).lowercase() }
@@ -490,7 +495,11 @@ fun LibraryScreen(
             .filter { it.video.isEpisode || it.metadata?.type == "tv" }
             .groupBy { it.metadata?.showTitle ?: it.video.parsed.title.ifBlank { it.video.name } }
             .size
-        LibraryStats(movieCount, showCount)
+        val watchedCount = state.entries.count {
+            AppContainer.playbackState.state(it.video.id)?.isWatched == true
+        }
+        val hours = state.entries.sumOf { it.video.durationMs } / 3_600_000.0
+        LibraryStats(movieCount, showCount, watchedCount, hours)
     }
 
     val favoriteTitleCount = remember(state.entries, favVersion) {
@@ -615,6 +624,9 @@ fun LibraryScreen(
                 onRecheck = { viewModel.recheckFiles() }
             )
             if (state.entries.isNotEmpty()) {
+                if (showLibraryStatistics(design.style, design.stats, searching)) item(span = { GridItemSpan(maxLineSpan) }) {
+                    StatsCard(stats)
+                }
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     FilterChipsRow(
                         sortBy = sortBy,

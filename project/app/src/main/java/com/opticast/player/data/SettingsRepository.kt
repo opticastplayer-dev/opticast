@@ -46,13 +46,14 @@ data class AppSettings(
     val volumeNormalization: Boolean = false,
     val showBatteryClock: Boolean = true,
     val autoNextEpisode: Boolean = true,
-    val resumePlayback: Boolean = true,    // Progress bar look, and which buttons the playing screen shows.
+    val resumePlayback: Boolean = true,
+    // Progress bar look, and which buttons the playing screen shows.
     val showChapterStamps: Boolean = false,
     val progressBarStyle: String = "thick", // thick | gradient | hidden
     val playerControls: List<String> = listOf(
         "back", "speed", "subtitles", "library", "chapters", "info", "lock", "aspect",
-        "sleep", "audioonly",
-    ),
+        "sleep", "audioonly"
+),
     /** Start every video with the picture off: saves data and battery. */
     // Appearance / library
     val appTheme: String = "cast", // cast | midnight | ocean
@@ -72,7 +73,8 @@ data class AppSettings(
     // New features
     val trashEnabled: Boolean = true,
     val trashRetentionDays: Int = 30,
-    val gestureCustomization: String = "default", // default, custom)
+    val gestureCustomization: String = "default", // default, custom
+)
 
 private val Context.settingsDataStore: DataStore<Preferences> by
     preferencesDataStore(name = "opticast_settings")
@@ -97,7 +99,8 @@ class SettingsRepository(private val context: Context) {
     private val embeddedLanguageKey = stringPreferencesKey("embedded_subtitle_language")
     private val embeddedModeKey = stringPreferencesKey("embedded_subtitle_mode")
     private val avoidCommentaryKey = booleanPreferencesKey("avoid_commentary")
-    private val dialogueBoostKey = booleanPreferencesKey("dialogue_boost")    private val holdToSpeedKey = booleanPreferencesKey("hold_to_speed")
+    private val dialogueBoostKey = booleanPreferencesKey("dialogue_boost")
+    private val holdToSpeedKey = booleanPreferencesKey("hold_to_speed")
     private val holdSpeedFactorKey = floatPreferencesKey("hold_speed_factor")
     private val gestureSeekKey = booleanPreferencesKey("gesture_seek")
     private val gestureVolKey = booleanPreferencesKey("gesture_volume_brightness")
@@ -119,6 +122,7 @@ class SettingsRepository(private val context: Context) {
     private val trashEnabledKey = booleanPreferencesKey("trash_enabled")
     private val trashRetentionKey = intPreferencesKey("trash_retention_days")
     private val gestureCustomKey = stringPreferencesKey("gesture_customization")
+
     val settings: Flow<AppSettings> = context.settingsDataStore.data.map { prefs ->
         AppSettings(
             tmdbApiKey = prefs[tmdbKey].orEmpty(),
@@ -162,20 +166,22 @@ class SettingsRepository(private val context: Context) {
             volumeNormalization = prefs[volumeNormKey] ?: false,
             showBatteryClock = prefs[batteryClockKey] ?: true,
             autoNextEpisode = prefs[autoNextKey] ?: true,
-            resumePlayback = prefs[resumeKey] ?: true,            showChapterStamps = prefs[chapterStampsKey] ?: false,
+            resumePlayback = prefs[resumeKey] ?: true,
+            showChapterStamps = prefs[chapterStampsKey] ?: false,
             progressBarStyle = resolvedProgressStyle(prefs[progressBarStyleKey]),
             playerControls = resolvedPlayerControls(
                 prefs[playerControlsKey]
                     ?: setOf(
                         "back", "speed", "subtitles", "library", "chapters", "info",
-                        "lock", "aspect", "sleep", "audioonly",
-                    )
+                        "lock", "aspect", "sleep", "audioonly"
+)
                 ),
             appTheme = resolvedAppTheme(prefs[themeKey]),
             libraryGrid = resolvedLibraryGrid(prefs[gridKey]),
             trashEnabled = prefs[trashEnabledKey] ?: true,
             trashRetentionDays = prefs[trashRetentionKey] ?: 30,
-            gestureCustomization = prefs[gestureCustomKey] ?: "default",        )
+            gestureCustomization = prefs[gestureCustomKey] ?: "default"
+)
     }
 
     suspend fun setPreferredAudioLanguage(value: String) { context.settingsDataStore.edit { it[audioLanguageKey] = value } }
@@ -351,8 +357,8 @@ class SettingsRepository(private val context: Context) {
             val current: MutableSet<String> = prefs[playerControlsKey]?.let { resolvedPlayerControls(it).toMutableSet() }
                 ?: mutableSetOf(
                     "back", "speed", "subtitles", "library", "chapters", "info",
-                    "lock", "aspect", "sleep", "audioonly",
-                )
+                    "lock", "aspect", "sleep", "audioonly"
+)
             val resolvedId = if (id == "audio") "library" else id
             if (enabled) current.add(resolvedId) else current.remove(resolvedId)
             prefs[playerControlsKey] = current
@@ -371,8 +377,6 @@ class SettingsRepository(private val context: Context) {
         context.settingsDataStore.edit { it[gridKey] = grid }
     }
 
-    suspend fun setEnableNetworkBrowsing(enabled: Boolean) {
-        context.settingsDataStore.edit { it[networkBrowsingKey] = enabled }
     }
 
     suspend fun setOrientationMode(mode: String) {
@@ -403,11 +407,7 @@ class SettingsRepository(private val context: Context) {
         context.settingsDataStore.edit { it[gestureCustomKey] = value }
     }
 
-    suspend fun setOrganizeAssistantEnabled(enabled: Boolean) {
-        context.settingsDataStore.edit { it[organizeEnabledKey] = enabled }
     }
 
-    suspend fun setOrganizeLevel(level: Int) {
-        context.settingsDataStore.edit { it[organizeLevelKey] = level }
     }
 }

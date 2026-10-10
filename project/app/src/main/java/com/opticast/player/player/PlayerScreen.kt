@@ -235,14 +235,7 @@ fun PlayerScreen(
     val storeVersion by AppContainer.metadataStore.version.collectAsState()
     val appSettings by AppContainer.settings.settings.collectAsState(initial = AppContainer.initialSettings)
 
-    // Instant landscape: rotate immediately on entry when toggle is on.
-    // Uses SENSOR_LANDSCAPE to start in landscape but still allow sensor rotation.
-    LaunchedEffect(Unit) {
-        if (AppContainer.initialSettings.autoLandscape) {
-            activity?.requestedOrientation =
-                android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        }
-    }
+    HandlePlayerOrientation(activity = activity, appSettings = appSettings)
 
     // Internal id so "Up next" can switch episodes without re-navigating.
     var activeVideoId by remember(videoId, remoteUri) { mutableLongStateOf(videoId) }
@@ -1172,19 +1165,6 @@ fun PlayerScreen(
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
-    }
-
-    // Orientation mode handling - respects autoLandscape toggle
-    LaunchedEffect(appSettings.orientationMode, appSettings.autoLandscape) {
-        val act = activity ?: return@LaunchedEffect
-        val autoLand = appSettings.autoLandscape
-        act.requestedOrientation = when (appSettings.orientationMode) {
-            "portrait" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            "landscape" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            "sensor" -> if (autoLand) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
-            "locked" -> android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED
-            else -> if (autoLand) android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE else android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         }
     }
 

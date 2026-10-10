@@ -47,6 +47,7 @@ import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -172,6 +173,9 @@ fun SettingsScreen(
     var appearanceExpanded by rememberSaveable { mutableStateOf(false) }
     var playbackExpanded by rememberSaveable { mutableStateOf(false) }
     var subtitlesExpanded by rememberSaveable { mutableStateOf(false) }
+    var filesExpanded by rememberSaveable { mutableStateOf(false) }
+    var advancedExpanded by rememberSaveable { mutableStateOf(false) }
+    var aboutExpanded by rememberSaveable { mutableStateOf(false) }
     var tweaksExpanded by rememberSaveable { mutableStateOf(false) }
     var developerExpanded by rememberSaveable { mutableStateOf(false) }
     var customFolder by remember { mutableStateOf("") }
@@ -222,104 +226,7 @@ fun SettingsScreen(
         ) {
             item(key = "UI & Appearance") {
                 SettingsGroup("UI & Appearance") {
-                CollapsibleSettingsCard(
-                    icon = Icons.Filled.Palette,
-                    title = "Appearance",
-                    subtitle = "Theme \u00b7 wallpaper colours \u00b7 grid size",
-                    expanded = appearanceExpanded,
-                    onToggle = { appearanceExpanded = !appearanceExpanded },
-                ) {
-                    Text("Theme", style = MaterialTheme.typography.labelLarge)
-                    Spacer(Modifier.height(8.dp))
-                    THEME_OPTIONS.forEach { (id, name, blurb) ->
-                        val selected = settings.appTheme == id
-                        Surface(
-                            shape = RoundedCornerShape(18.dp),
-                            color = if (selected) {
-                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-                            } else {
-                                MaterialTheme.colorScheme.surfaceContainer
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 3.dp)
-                                .clip(RoundedCornerShape(18.dp))
-                                .clickable {
-                                    scope.launch { AppContainer.settings.setAppTheme(id) }
-                                },
-                        ) {
-                            Row(
-                                Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Box(
-                                    Modifier
-                                        .size(22.dp)
-                                        .clip(RoundedCornerShape(50))
-                                        .background(themePreviewColor(id)),
-                                )
-                                Spacer(Modifier.width(12.dp))
-                                Column(Modifier.weight(1f)) {
-                                    Text(name, style = MaterialTheme.typography.labelLarge)
-                                    Text(
-                                        blurb,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                                if (selected) {
-                                    Icon(
-                                        Icons.Filled.Check,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    Spacer(Modifier.height(14.dp))
-                    Text("Library grid", style = MaterialTheme.typography.labelLarge)
-                    Spacer(Modifier.height(8.dp))
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        GRID_OPTIONS.forEach { (id, name, _) ->
-                            FilterChip(
-                                selected = settings.libraryGrid == id,
-                                onClick = {
-                                    scope.launch { AppContainer.settings.setLibraryGrid(id) }
-                                },
-                                label = { Text(name) },
-                            )
-                        }
-                    }
-                    Spacer(Modifier.height(14.dp))
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                "Adapt colors to your wallpaper",
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                            Text(
-                                "Use wallpaper colours on Android 12+. Keeps the dark background.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Spacer(Modifier.width(12.dp))
-                        Switch(
-                            checked = settings.useDeviceColors,
-                            onCheckedChange = { enabled ->
-                                scope.launch { AppContainer.settings.setUseDeviceColors(enabled) }
-                            },
-                        )
-                    }
-                }
-                PlayerLayoutSettingsCard(settings, scope)
+                CombinedAppearanceCard(settings, scope, appearanceExpanded, { appearanceExpanded = !appearanceExpanded })
                 }
             }
             item(key = "Playback & Controls") {
@@ -330,212 +237,18 @@ fun SettingsScreen(
             }
             item(key = "File Management") {
                 SettingsGroup("File Management") {
-                SettingsCard(icon = Icons.Filled.FolderOff, title = "Excluded folders") {
-                    Text(
-                        "Videos inside these folders are skipped when scanning - handy for camera clips, screen recordings and messenger videos.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        PRESET_FOLDERS.forEach { (path, label) ->
-                            val selected = settings.excludedFolders.contains(path)
-                            FilterChip(
-                                selected = selected,
-                                onClick = {
-                                    val next = if (selected) {
-                                        settings.excludedFolders - path
-                                    } else {
-                                        settings.excludedFolders + path
-                                    }
-                                    scope.launch {
-                                        AppContainer.settings.setExcludedFolders(next)
-                                        FolderExclusions.hydrate(next)
-                                        AppContainer.metadataStore.touch()
-                                    }
-                                },
-                                label = { Text(label) },
-                            )
-                        }
-                    }
-                    Spacer(Modifier.height(12.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
-                            value = customFolder,
-                            onValueChange = { customFolder = it },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(18.dp),
-                            placeholder = { Text("Custom path, e.g. Movies/Clips") },
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            ),
-                        )
-                        IconButton(
-                            onClick = {
-                                val path = customFolder.trim().trim('/')
-                                if (path.isNotBlank() && !settings.excludedFolders.contains(path)) {
-                                    val next = settings.excludedFolders + path
-                                    scope.launch {
-                                        AppContainer.settings.setExcludedFolders(next)
-                                        FolderExclusions.hydrate(next)
-                                        AppContainer.metadataStore.touch()
-                                    }
-                                    customFolder = ""
-                                }
-                            },
-                        ) {
-                            Icon(
-                                Icons.Filled.Add,
-                                contentDescription = "Add folder",
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                    }
-                    val customFolders = settings.excludedFolders.filter { folder ->
-                        PRESET_FOLDERS.none { it.first == folder }
-                    }
-                    customFolders.forEach { folder ->
-                        Row(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                folder,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f),
-                            )
-                            IconButton(onClick = {
-                                val next = settings.excludedFolders - folder
-                                scope.launch {
-                                    AppContainer.settings.setExcludedFolders(next)
-                                    FolderExclusions.hydrate(next)
-                                    AppContainer.metadataStore.touch()
-                                }
-                            }) {
-                                Icon(
-                                    Icons.Filled.Close,
-                                    contentDescription = "Remove",
-                                    tint = MaterialTheme.colorScheme.error,
-                                )
-                            }
-                        }
-                    }
-                }
-
-                SettingsCard(icon = Icons.Filled.Storage, title = "Storage") {
-                    Text(
-                        "Manage space, cached files and backups.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    OutlinedButton(
-                        onClick = onOpenStorage,
-                        shape = RoundedCornerShape(16.dp),
-                    ) {
-                        Text("Open storage dashboard")
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
-                        onClick = onOpenTrash,
-                        shape = RoundedCornerShape(16.dp),
-                    ) {
-                        Text("Trash / Recently deleted")
-                    }
-                }
-
-                SettingsCard(icon = Icons.Filled.Movie, title = "Library maintenance") {
-                    OutlinedButton(
-                        onClick = { confirmClear = true },
-                        shape = RoundedCornerShape(16.dp),
-                    ) {
-                        Text("Clear all saved metadata")
-                    }
-                }
+                CombinedFilesCard(settings, scope, customFolder, { customFolder = it }, onOpenStorage, onOpenTrash, { confirmClear = true }, filesExpanded, { filesExpanded = !filesExpanded })
                 }
             }
             item(key = "Media Settings") {
                 SettingsGroup("Media Settings") {
                 CombinedSubtitlesCard(settings, scope, subtitlesExpanded, { subtitlesExpanded = !subtitlesExpanded })
-                SoundSettingsCard(settings, scope)
                 }
             }
             item(key = "Advanced & About") {
                 SettingsGroup("Advanced & About") {
-                CollapsibleSettingsCard(
-                    icon = Icons.Filled.Tune,
-                    title = "Data usage",
-                    subtitle = "Artwork quality",
-                    expanded = tweaksExpanded,
-                    onToggle = { tweaksExpanded = !tweaksExpanded },
-                ) {
-                    Spacer(Modifier.height(14.dp))
-                    PrefToggle(
-                        label = "Save mobile data",
-                        description = "Use smaller artwork and download HD images only on Wi-Fi.",
-                        checked = settings.dataSaverArtwork,
-                    ) { enabled ->
-                        scope.launch { AppContainer.settings.setDataSaverArtwork(enabled) }
-                    }
-                }
-                ApiKeysCard(settings = settings, scope = scope)
-                SettingsCard(icon = Icons.Filled.SystemUpdate, title = "Check for updates") {
-                    UpdateCheckOption(installedVersionLabel(LocalContext.current))
-                }
-                SettingsCard(icon = Icons.Filled.Description, title = "About") {
-                    val ctx = LocalContext.current
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Image(
-                            painter = painterResource(R.drawable.ic_opticast_mark),
-                            contentDescription = null,
-                            modifier = Modifier.size(56.dp),
-                        )
-                        Spacer(Modifier.width(14.dp))
-                        Column {
-                            Text(settingsHeaderTitle("OptiCast"), style = MaterialTheme.typography.headlineSmall)
-                            Text(
-                                installedVersionLabel(ctx),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                    Spacer(Modifier.height(14.dp))
-                    Text(
-                        "OptiCast plays your own media. No movies or streaming accounts are supplied. Only access content you have permission to use.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(Modifier.height(16.dp))
-                    OutlinedButton(
-                        onClick = {
-                            runCatching {
-                                ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://opticastplayer-dev.github.io/opticast/")))
-                            }
-                        },
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Text("Legal notices and credits")
-                    }
-                    Spacer(Modifier.height(16.dp))
-                    DeviceInfo()
-                }
-                CollapsibleSettingsCard(
-                    icon = Icons.Filled.Code,
-                    title = "Contact & support",
-                    subtitle = "Contact and support",
-                    expanded = developerExpanded,
-                    onToggle = { developerExpanded = !developerExpanded },
-                ) {
-                    DeveloperRow("Email", "opticastproject@gmail.com", "mailto:opticastproject@gmail.com")
-                }
+                CombinedAdvancedCard(settings, scope, advancedExpanded, { advancedExpanded = !advancedExpanded })
+                CombinedAboutCard(settings, scope, aboutExpanded, { aboutExpanded = !aboutExpanded })
                 }
             }
         }
@@ -1350,6 +1063,21 @@ private fun CombinedPlaybackCard(
             description = "Normalize volume across videos.",
             checked = settings.volumeNormalization,
         ) { enabled -> scope.launch { AppContainer.settings.setVolumeNormalization(enabled) } }
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        Text("Audio boost", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 2.dp))
+        Spacer(Modifier.height(6.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(100 to "Off", 125 to "125%", 150 to "150%", 200 to "200%").forEach { (pct, label) ->
+                FilterChip(selected = settings.audioBoostPct == pct, onClick = { scope.launch { AppContainer.settings.setAudioBoostPct(pct) } }, label = { Text(label) })
+            }
+        }
+        Text("Amplifies quiet recordings above 100%. May clip very loud sources.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(6.dp))
+        PrefToggle(label = "Dialogue boost", description = "Adds presence to speech so quiet dialogue stays clear at low volume. Stacks with audio boost.", checked = settings.dialogueBoost) { enabled ->
+            scope.launch { AppContainer.settings.setDialogueBoost(enabled) }
+        }
     }
 }
 
@@ -1457,6 +1185,260 @@ private fun CombinedSubtitlesCard(
         }
     }
 }
+
+
+@Composable
+private fun CombinedAppearanceCard(
+    settings: AppSettings,
+    scope: CoroutineScope,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
+    CollapsibleSettingsCard(
+        icon = Icons.Filled.Palette,
+        title = "Appearance",
+        subtitle = "Theme, grid and player layout",
+        expanded = expanded,
+        onToggle = onToggle
+    ) {
+        Text("Theme", style = MaterialTheme.typography.labelLarge)
+        Spacer(Modifier.height(8.dp))
+        THEME_OPTIONS.forEach { (id, name, blurb) ->
+            val selected = settings.appTheme == id
+            Surface(
+                shape = RoundedCornerShape(18.dp),
+                color = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f) else MaterialTheme.colorScheme.surfaceContainer,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp).clip(RoundedCornerShape(18.dp)).clickable {
+                    scope.launch { AppContainer.settings.setAppTheme(id) }
+                },
+            ) {
+                Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(22.dp).clip(RoundedCornerShape(50)).background(themePreviewColor(id)))
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(name, style = MaterialTheme.typography.labelLarge)
+                        Text(blurb, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    if (selected) Icon(Icons.Filled.Check, null, tint = MaterialTheme.colorScheme.primary)
+                }
+            }
+        }
+        Spacer(Modifier.height(14.dp))
+        Text("Library grid", style = MaterialTheme.typography.labelLarge)
+        Spacer(Modifier.height(8.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            GRID_OPTIONS.forEach { (id, name, _) ->
+                FilterChip(selected = settings.libraryGrid == id, onClick = { scope.launch { AppContainer.settings.setLibraryGrid(id) } }, label = { Text(name) })
+            }
+        }
+        Spacer(Modifier.height(14.dp))
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("Adapt colors to your wallpaper", style = MaterialTheme.typography.labelLarge)
+                Text("Use wallpaper colours on Android 12+. Keeps the dark background.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Spacer(Modifier.width(12.dp))
+            Switch(checked = settings.useDeviceColors, onCheckedChange = { enabled -> scope.launch { AppContainer.settings.setUseDeviceColors(enabled) } })
+        }
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        Text(settingsHeaderTitle("Progress bar"), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 2.dp))
+        Spacer(Modifier.height(6.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("thick" to "Thick · default", "gradient" to "Gradient", "hidden" to "Hidden").forEach { (id, label) ->
+                FilterChip(selected = settings.progressBarStyle == id, onClick = { scope.launch { AppContainer.settings.setProgressBarStyle(id) } }, label = { Text(label) })
+            }
+        }
+        if (settings.progressBarStyle == "hidden") {
+            Text("The bar is hidden; the elapsed and total times stay on screen.", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 4.dp))
+        }
+
+        Text(settingsHeaderTitle("Player controls"), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(top = 16.dp, bottom = 6.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf("back" to "Back", "speed" to "Speed", "subtitles" to "Audio & Subtitles", "library" to "Library", "chapters" to "Chapters", "info" to "Info", "lock" to "Lock", "aspect" to "Aspect", "sleep" to "Sleep").forEach { (id, label) ->
+                val selected = settings.playerControls.contains(id)
+                FilterChip(
+                    selected = selected,
+                    onClick = { scope.launch { AppContainer.settings.setPlayerControl(id, !selected) } },
+                    label = { Text(label) },
+                    leadingIcon = if (selected) { { Icon(Icons.Filled.Check, null, Modifier.size(16.dp)) } } else null
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CombinedFilesCard(
+    settings: AppSettings,
+    scope: CoroutineScope,
+    customFolder: String,
+    onCustomFolderChange: (String) -> Unit,
+    onOpenStorage: () -> Unit,
+    onOpenTrash: () -> Unit,
+    confirmClear: () -> Unit,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
+    CollapsibleSettingsCard(
+        icon = Icons.Filled.FolderOff,
+        title = "Files & Storage",
+        subtitle = "Excluded folders, storage and maintenance",
+        expanded = expanded,
+        onToggle = onToggle
+    ) {
+        Text("Videos inside these folders are skipped when scanning - handy for camera clips, screen recordings and messenger videos.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(12.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            PRESET_FOLDERS.forEach { (path, label) ->
+                val selected = settings.excludedFolders.contains(path)
+                FilterChip(selected = selected, onClick = {
+                    val next = if (selected) settings.excludedFolders - path else settings.excludedFolders + path
+                    scope.launch {
+                        AppContainer.settings.setExcludedFolders(next)
+                        FolderExclusions.hydrate(next)
+                        AppContainer.metadataStore.touch()
+                    }
+                }, label = { Text(label) })
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = customFolder,
+                onValueChange = onCustomFolderChange,
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(18.dp),
+                placeholder = { Text("Custom path, e.g. Movies/Clips") },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer, unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer)
+            )
+            IconButton(onClick = {
+                val path = customFolder.trim().trim('/')
+                if (path.isNotBlank() && !settings.excludedFolders.contains(path)) {
+                    val next = settings.excludedFolders + path
+                    scope.launch {
+                        AppContainer.settings.setExcludedFolders(next)
+                        FolderExclusions.hydrate(next)
+                        AppContainer.metadataStore.touch()
+                    }
+                    onCustomFolderChange("")
+                }
+            }) { Icon(Icons.Filled.Add, "Add folder", tint = MaterialTheme.colorScheme.primary) }
+        }
+        val customFolders = settings.excludedFolders.filter { folder -> PRESET_FOLDERS.none { it.first == folder } }
+        customFolders.forEach { folder ->
+            Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(folder, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                IconButton(onClick = {
+                    val next = settings.excludedFolders - folder
+                    scope.launch {
+                        AppContainer.settings.setExcludedFolders(next)
+                        FolderExclusions.hydrate(next)
+                        AppContainer.metadataStore.touch()
+                    }
+                }) { Icon(Icons.Filled.Close, "Remove", tint = MaterialTheme.colorScheme.error) }
+            }
+        }
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        Text("Manage space, cached files and backups.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick = onOpenStorage, shape = RoundedCornerShape(16.dp)) { Text("Storage dashboard") }
+            OutlinedButton(onClick = onOpenTrash, shape = RoundedCornerShape(16.dp)) { Text("Trash") }
+        }
+        Spacer(Modifier.height(12.dp))
+        OutlinedButton(onClick = { confirmClear() }, shape = RoundedCornerShape(16.dp)) { Text("Clear all saved metadata") }
+    }
+}
+
+@Composable
+private fun CombinedAdvancedCard(
+    settings: AppSettings,
+    scope: CoroutineScope,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
+    CollapsibleSettingsCard(
+        icon = Icons.Filled.Tune,
+        title = "Advanced",
+        subtitle = "Data usage and API keys",
+        expanded = expanded,
+        onToggle = onToggle
+    ) {
+        PrefToggle(label = "Save mobile data", description = "Use smaller artwork and download HD images only on Wi-Fi.", checked = settings.dataSaverArtwork) { enabled ->
+            scope.launch { AppContainer.settings.setDataSaverArtwork(enabled) }
+        }
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        Text(settingsHeaderTitle("API keys"), style = MaterialTheme.typography.titleMedium)
+        Text("TMDB, OpenSubtitles and SubDL", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(12.dp))
+        ApiKeySection(provider = API_PROVIDERS[0], description = "Movie & TV artwork and info from themoviedb.org. Free v3 key: sign up, then open Settings → API.") {
+            ApiKeyField(value = settings.tmdbApiKey, placeholder = "TMDB API key", onSave = { key -> scope.launch { AppContainer.settings.setTmdbApiKey(key) } })
+        }
+        ApiKeySection(provider = API_PROVIDERS[1], description = "Subtitles from opensubtitles.com. Free key: create an account, then add a consumer app under Settings → API keys.") {
+            ApiKeyField(value = settings.openSubtitlesApiKey, placeholder = "OpenSubtitles API key", onSave = { key -> scope.launch { AppContainer.settings.setOpenSubtitlesApiKey(key) } })
+        }
+        ApiKeySection(provider = API_PROVIDERS[2], description = "Backup subtitle provider - great for anime. Free key from your SubDL account panel.") {
+            ApiKeyField(value = settings.subdlApiKey, placeholder = "SubDL API key", onSave = { key -> scope.launch { AppContainer.settings.setSubdlApiKey(key) } })
+        }
+    }
+}
+
+@Composable
+private fun CombinedAboutCard(
+    settings: AppSettings,
+    scope: CoroutineScope,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
+    CollapsibleSettingsCard(
+        icon = Icons.Filled.Description,
+        title = "About",
+        subtitle = "Version, updates and support",
+        expanded = expanded,
+        onToggle = onToggle
+    ) {
+        val ctx = LocalContext.current
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(painter = painterResource(R.drawable.ic_opticast_mark), contentDescription = null, modifier = Modifier.size(56.dp))
+            Spacer(Modifier.width(14.dp))
+            Column {
+                Text(settingsHeaderTitle("OptiCast"), style = MaterialTheme.typography.headlineSmall)
+                Text(installedVersionLabel(ctx), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        Spacer(Modifier.height(14.dp))
+        Text("OptiCast plays your own media. No movies or streaming accounts are supplied. Only access content you have permission to use.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(16.dp))
+        OutlinedButton(onClick = { runCatching { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://opticastplayer-dev.github.io/opticast/"))) } }, shape = RoundedCornerShape(16.dp)) {
+            Text("Legal notices and credits")
+        }
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        Text(settingsHeaderTitle("Check for updates"), style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        UpdateCheckOption(installedVersionLabel(ctx))
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        Text(settingsHeaderTitle("Contact & support"), style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        DeveloperRow("Email", "opticastproject@gmail.com", "mailto:opticastproject@gmail.com")
+
+        HorizontalDivider(Modifier.padding(vertical = 14.dp))
+
+        DeviceInfo()
+    }
+}
+
+
 
 @Composable
 private fun TrackLanguagePicker(label: String, selected: String, options: List<Pair<String, String>>, onSelect: (String) -> Unit) {

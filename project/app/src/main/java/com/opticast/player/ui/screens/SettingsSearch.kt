@@ -4,20 +4,13 @@ import java.util.Locale
 
 /** Public labels only: never index saved credentials, file paths or account values. */
 internal val settingsSearchIndex = linkedMapOf(
-    "Appearance" to "theme cast midnight ocean wallpaper material you device colors colours library grid compact medium comfortable posters",
-    "Playback" to "mpv ffmpeg media3 default open with share external player fallback engine orientation auto crop volume normalization landscape rotation screen on sleep preserve voice pitch speed resume restart auto play next episode autoplay audio only sound picture network browsing",
-    "Player layout" to "player controls customize progress bar thick gradient hidden buttons library home return chapters sleep timer aspect ratio lock audio only subtitles playback info speed",
+    "Appearance" to "theme cast midnight ocean wallpaper material you device colors colours library grid compact medium comfortable posters progress bar thick gradient hidden buttons library home return chapters sleep timer aspect ratio lock audio only subtitles playback info speed",
+    "Playback" to "mpv ffmpeg media3 default open with share external player fallback engine orientation auto crop volume normalization audio boost dialogue speech landscape rotation screen on sleep preserve voice pitch speed resume restart auto play next episode autoplay audio only sound picture network browsing",
     "Gestures" to "player controls swipe double tap hold fast forward speed customize",
+    "Files & Storage" to "scan exclude folders path camera screen recordings screenshots downloads telegram videos storage cache free space trash deleted library clear all saved metadata matches reset delete",
     "Subtitles" to "automatic preferred audio language embedded subtitle forced full off container default commentary english french spanish chinese download languages auto subtitles during scan opensubtitles quota",
-    "Sound" to "audio boost volume dialogue speech",
-    "Data usage" to "save mobile data artwork posters wifi hd quality",
-    "API keys" to "providers metadata tmdb opensubtitles subdl key account",
-    "Excluded folders" to "scan exclude folders path camera screen recordings screenshots downloads telegram videos",
-    "Storage" to "storage cache free space trash deleted",
-    "Library maintenance" to "library clear all saved metadata matches reset delete",
-    "Check for updates" to "update installed version release manual check whats new changelog",
-    "About" to "about version legal licences licenses notices credits attribution tmdb providers device android model ram memory support",
-    "Contact & support" to "developer email contact support help",
+    "Advanced" to "save mobile data artwork posters wifi hd quality providers metadata tmdb opensubtitles subdl key account",
+    "About" to "about version legal licences licenses notices credits attribution tmdb providers device android model ram memory support update installed version release manual check whats new changelog developer email contact support help",
 )
 
 internal fun settingsSearchMatches(title: String, query: String): Boolean {
@@ -67,26 +60,23 @@ internal fun settingsHeaderTitle(value: String): String = buildString {
 }
 
 internal val settingsGroups = linkedMapOf(
-    "UI & Appearance" to listOf("Appearance", "Player layout"),
+    "UI & Appearance" to listOf("Appearance"),
     "Playback & Controls" to listOf("Playback", "Gestures"),
-    "File Management" to listOf("Excluded folders", "Storage", "Library maintenance"),
-    "Media Settings" to listOf("Subtitles", "Sound"),
-    "Advanced & About" to listOf("Data usage", "API keys", "Check for updates", "About", "Contact & support"),
+    "File Management" to listOf("Files & Storage"),
+    "Media Settings" to listOf("Subtitles"),
+    "Advanced & About" to listOf("Advanced", "About"),
 )
 internal fun visibleSettingsGroups(query: String): List<String> = settingsGroups.filterValues { titles ->
     titles.any { settingsSearchMatches(it, query) }
 }.keys.toList()
 
 internal fun settingsCategorySubtitle(title: String): String = when (title) {
-    "Player layout" -> "Progress bar and player controls"
+    "Appearance" -> "Theme, grid and player layout"
     "Gestures" -> "Swipe and hold controls"
-    "Playback" -> "Engine, behaviour and orientation"
+    "Playback" -> "Engine, behaviour, orientation and audio"
+    "Files & Storage" -> "Excluded folders, storage and maintenance"
     "Subtitles" -> "Audio, tracks and languages"
-    "Excluded folders" -> "Folders excluded from scans"
-    "Storage" -> "Cached files and trash"
-    "Library maintenance" -> "Saved metadata"
-    "Sound" -> "Audio enhancements"
-    "Data usage" -> "Artwork quality"
-    "About" -> "Version and device information"
+    "Advanced" -> "Data usage and API keys"
+    "About" -> "Version, updates and support"
     else -> ""
 }

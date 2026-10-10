@@ -218,7 +218,14 @@ class OrganizeAssistant(private val context: Context) {
     fun getIgnoreList(): Set<String> {
         return try {
             if (!ignoreFile.exists()) return emptySet()
-            json.decodeFromString<Set<String>>(ignoreFile.readText())
+            val text = ignoreFile.readText().trim()
+            if (text.isEmpty()) return emptySet()
+            // Support both old JSON format and new line-separated format
+            if (text.startsWith("[")) {
+                json.decodeFromString<Set<String>>(text)
+            } else {
+                text.lines().filter { it.isNotBlank() }.toSet()
+            }
         } catch (_: Exception) {
             emptySet()
         }
@@ -228,7 +235,8 @@ class OrganizeAssistant(private val context: Context) {
         try {
             val current = getIgnoreList().toMutableSet()
             current.add(path)
-            ignoreFile.writeText(json.encodeToString<Set<String>>(current.toSet()))
+            // Write as newline-separated to avoid generic serialization issues
+            ignoreFile.writeText(current.joinToString("\n"))
         } catch (_: Exception) {
         }
     }

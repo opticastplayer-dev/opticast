@@ -40,8 +40,8 @@ fun StorageAnalyzerScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Storage Overview", style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(8.dp))
-                        Text("Movies: ${entries.count { !it.isShow }} files, ${StorageAnalyzer.formatSize(stats.totalMoviesSize)}")
-                        Text("TV Shows: ${entries.count { it.isShow }} files, ${StorageAnalyzer.formatSize(stats.totalShowsSize)}")
+                        Text("Movies: ${entries.count { !it.video.isEpisode }} files, ${StorageAnalyzer.formatSize(stats.totalMoviesSize)}")
+                        Text("TV Shows: ${entries.count { it.video.isEpisode }} files, ${StorageAnalyzer.formatSize(stats.totalShowsSize)}")
                         Text("Total: ${StorageAnalyzer.formatSize(stats.totalSize)}")
                         if (stats.totalSpace > 0) {
                             Spacer(Modifier.height(8.dp))
@@ -61,10 +61,10 @@ fun StorageAnalyzerScreen(
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Row(modifier = Modifier.padding(12.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(entry.name, maxLines = 1, style = MaterialTheme.typography.bodyMedium)
-                            Text(entry.path, maxLines = 1, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(entry.video.name, maxLines = 1, style = MaterialTheme.typography.bodyMedium)
+                            Text(entry.video.uri, maxLines = 1, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        Text(StorageAnalyzer.formatSize(try { java.io.File(entry.path).length() } catch (_: Exception) { 0L }), style = MaterialTheme.typography.labelMedium)
+                        Text(StorageAnalyzer.formatSize(try { java.io.File(entry.video.uri).length() } catch (_: Exception) { 0L }), style = MaterialTheme.typography.labelMedium)
                     }
                 }
             }

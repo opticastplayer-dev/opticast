@@ -43,6 +43,11 @@ import com.opticast.player.ui.screens.NetworkScreen
 import com.opticast.player.ui.screens.SettingsScreen
 import com.opticast.player.ui.screens.StorageScreen
 import com.opticast.player.ui.screens.ShowScreen
+import com.opticast.player.ui.screens.StorageAnalyzerScreen
+import com.opticast.player.ui.screens.TrashScreen
+import com.opticast.player.ui.screens.QueueScreen
+import com.opticast.player.ui.screens.OrganizeAssistantScreen
+import com.opticast.player.ui.screens.GestureCustomizationScreen
 import com.opticast.player.ui.theme.OptiCastTheme
 
 class MainActivity : ComponentActivity() {
@@ -248,21 +253,21 @@ private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0
                 )
             }
             composable(ROUTE_STORAGE_ANALYZER) {
-                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList())
+                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList<com.opticast.player.data.model.LibraryEntry>())
                 StorageAnalyzerScreen(entries = entries, onBack = { navController.popBackStack() })
             }
             composable(ROUTE_TRASH) {
                 TrashScreen(onBack = { navController.popBackStack() })
             }
             composable(ROUTE_QUEUE) {
-                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList())
+                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList<com.opticast.player.data.model.LibraryEntry>())
                 QueueScreen(entries = entries, onBack = { navController.popBackStack() }, onPlay = { id ->
                     val intent = playerIntent(context, id)
                     context.startActivity(intent)
                 })
             }
             composable(ROUTE_ORGANIZE) {
-                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList())
+                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList<com.opticast.player.data.model.LibraryEntry>())
                 OrganizeAssistantScreen(entries = entries, onBack = { navController.popBackStack() })
             }
             composable(ROUTE_GESTURE) {

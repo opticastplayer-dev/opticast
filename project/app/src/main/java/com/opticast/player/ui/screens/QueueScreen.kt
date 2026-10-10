@@ -24,7 +24,7 @@ fun QueueScreen(
 ) {
     val queue by AppContainer.queueStore.queue.collectAsState()
     val queueEntries = remember(queue, entries) {
-        queue.mapNotNull { q -> entries.find { it.id == q.videoId }?.let { q to it } }
+        queue.mapNotNull { q -> entries.find { it.video.id == q.videoId }?.let { q to it } }
     }
 
     Scaffold(
@@ -69,15 +69,15 @@ fun QueueScreen(
                             Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                                 Text("${index + 1}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(entry.name, maxLines = 1, style = MaterialTheme.typography.bodyMedium)
-                                    Text(entry.path, maxLines = 1, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(entry.video.name, maxLines = 1, style = MaterialTheme.typography.bodyMedium)
+                                    Text(entry.video.uri, maxLines = 1, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                             Row {
-                                IconButton(onClick = { onPlay(entry.id) }) {
+                                IconButton(onClick = { onPlay(entry.video.id) }) {
                                     Icon(Icons.Filled.PlayArrow, "Play")
                                 }
-                                IconButton(onClick = { AppContainer.queueStore.removeFromQueue(entry.id) }) {
+                                IconButton(onClick = { AppContainer.queueStore.removeFromQueue(entry.video.id) }) {
                                     Icon(Icons.Filled.Delete, "Remove")
                                 }
                             }

@@ -659,14 +659,14 @@ internal fun EntryMenuSheet(
                 overflow = TextOverflow.Ellipsis
             )
             MenuActionRow(Icons.Filled.PlayArrow, "Play now", onPlay)
-            MenuActionRow(Icons.Filled.Queue, "Play next") {
+            MenuActionRow(Icons.Filled.Queue, "Play next", onClick = {
                 targets.forEach { AppContainer.queueStore.addNext(it.video.id) }
                 onDismiss()
-            }
-            MenuActionRow(Icons.Filled.Queue, "Add to queue") {
+            })
+            MenuActionRow(Icons.Filled.Queue, "Add to queue", onClick = {
                 targets.forEach { AppContainer.queueStore.addToQueue(it.video.id) }
                 onDismiss()
-            }
+            })
             MenuActionRow(Icons.Filled.Info, "Details", onDetails)
             MenuActionRow(
                 Icons.Filled.Check,

@@ -67,56 +67,60 @@ class OrganizeAssistant(private val context: Context) {
         val ignoreList = getIgnoreList()
 
         entries.forEach { entry ->
-            if (entry.path in ignoreList) return@forEach
+            val entryPath = entry.video.uri
+            val entryName = entry.video.name
+            val entryId = entry.video.id
+            val isShow = entry.video.isEpisode
+            if (entryPath in ignoreList) return@forEach
 
             // Check messy names
-            if (isMessyName(entry.name)) {
-                val cleanName = cleanFileName(entry.name)
-                if (cleanName != entry.name) {
+            if (isMessyName(entryName)) {
+                val cleanName = cleanFileName(entryName)
+                if (cleanName != entryName) {
                     messyNames.add(
                         FileSuggestion(
-                            id = "${entry.id}_rename",
-                            beforePath = entry.path,
-                            afterPath = File(File(entry.path).parent, cleanName).absolutePath,
+                            id = "${entryId}_rename",
+                            beforePath = entryPath,
+                            afterPath = File(File(entryPath).parent ?: "", cleanName).absolutePath,
                             reason = "Clean filename",
                             type = "rename",
-                            size = File(entry.path).length()
+                            size = try { File(entryPath).length() } catch (_: Exception) { 0L }
                         )
                     )
                 }
             }
 
             // Check misplaced movies (in Download but looks like movie)
-            if (entry.path.contains("/Download/", ignoreCase = true) && !entry.isShow) {
-                if (isMovieFile(entry.name)) {
-                    val afterPath = "/Movies/${getMovieFolderName(entry.name)}/${cleanFileName(entry.name)}"
+            if (entryPath.contains("/Download/", ignoreCase = true) && !isShow) {
+                if (isMovieFile(entryName)) {
+                    val afterPath = "/Movies/${getMovieFolderName(entryName)}/${cleanFileName(entryName)}"
                     misplacedMovies.add(
                         FileSuggestion(
-                            id = "${entry.id}_move_movie",
-                            beforePath = entry.path,
+                            id = "${entryId}_move_movie",
+                            beforePath = entryPath,
                             afterPath = afterPath,
                             reason = "Movie in Download, move to Movies",
                             type = "move_movie",
-                            size = File(entry.path).length()
+                            size = try { File(entryPath).length() } catch (_: Exception) { 0L }
                         )
                     )
                 }
             }
 
             // Check misplaced shows (S01E01 pattern but not in TV Shows folder)
-            if (entry.isShow && !entry.path.contains("/TV Shows/", ignoreCase = true)) {
-                val seasonEpisode = extractSeasonEpisode(entry.name)
+            if (isShow && !entryPath.contains("/TV Shows/", ignoreCase = true)) {
+                val seasonEpisode = extractSeasonEpisode(entryName)
                 if (seasonEpisode != null) {
-                    val showName = getShowName(entry.name)
-                    val afterPath = "/TV Shows/$showName/Season ${seasonEpisode.first.toString().padStart(2, '0')}/$showName S${seasonEpisode.first.toString().padStart(2, '0')}E${seasonEpisode.second.toString().padStart(2, '0')}${File(entry.path).extension.let { if (it.isNotBlank()) ".$it" else "" }}"
+                    val showName = getShowName(entryName)
+                    val afterPath = "/TV Shows/$showName/Season ${seasonEpisode.first.toString().padStart(2, '0')}/$showName S${seasonEpisode.first.toString().padStart(2, '0')}E${seasonEpisode.second.toString().padStart(2, '0')}${File(entryPath).extension.let { if (it.isNotBlank()) ".$it" else "" }}"
                     misplacedShows.add(
                         FileSuggestion(
-                            id = "${entry.id}_move_show",
-                            beforePath = entry.path,
+                            id = "${entryId}_move_show",
+                            beforePath = entryPath,
                             afterPath = afterPath,
                             reason = "TV show detected ${seasonEpisode.first}x${seasonEpisode.second}",
                             type = "move_show",
-                            size = File(entry.path).length()
+                            size = try { File(entryPath).length() } catch (_: Exception) { 0L }
                         )
                     )
                 }
@@ -224,7 +228,7 @@ class OrganizeAssistant(private val context: Context) {
         try {
             val current = getIgnoreList().toMutableSet()
             current.add(path)
-            ignoreFile.writeText(json.encodeToString(kotlinx.serialization.builtins.SetSerializer(kotlinx.serialization.builtins.serializer<String>()), current))
+            ignoreFile.writeText(json.encodeToString(current))
         } catch (_: Exception) {
         }
     }

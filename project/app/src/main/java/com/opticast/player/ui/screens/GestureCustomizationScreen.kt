@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.opticast.player.data.AppContainer
 import com.opticast.player.data.GestureConfig
-import com.opticast.player.data.model.AppSettings
+import com.opticast.player.data.AppSettings
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

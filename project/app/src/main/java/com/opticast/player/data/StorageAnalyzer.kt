@@ -18,17 +18,17 @@ data class StorageStats(
 object StorageAnalyzer {
 
     fun analyze(entries: List<LibraryEntry>): StorageStats {
-        val movies = entries.filter { !it.isShow }
-        val shows = entries.filter { it.isShow }
+        val movies = entries.filter { !it.video.isEpisode }
+        val shows = entries.filter { it.video.isEpisode }
 
-        val moviesSize = movies.sumOf { getFileSize(it.path) }
-        val showsSize = shows.sumOf { getFileSize(it.path) }
+        val moviesSize = movies.sumOf { getFileSize(it.video.uri) }
+        val showsSize = shows.sumOf { getFileSize(it.video.uri) }
         val totalSize = moviesSize + showsSize
 
-        val biggestFiles = entries.sortedByDescending { getFileSize(it.path) }.take(10)
+        val biggestFiles = entries.sortedByDescending { getFileSize(it.video.uri) }.take(10)
 
         val stat = try {
-            val path = entries.firstOrNull()?.path?.let { File(it).parent } ?: "/storage/emulated/0"
+            val path = entries.firstOrNull()?.video?.uri?.let { File(it).parent } ?: "/storage/emulated/0"
             val statFs = StatFs(path)
             val available = statFs.availableBytes
             val total = statFs.totalBytes

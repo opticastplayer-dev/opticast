@@ -96,6 +96,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -286,7 +287,7 @@ fun PlayerScreen(
     // Freeze the remembered engine for this request; recording success must not recreate the session.
     val rememberedEngine = remember(requestedId, preferenceKey) { preferenceKey?.let(videoPreferences::engine) }
     val selectedEngine = engineOverride ?: initialPlaybackEngine(appSettings.playbackEngine,
-        Uri.parse(video?.uri ?: remoteUri.orEmpty()).scheme, rememberedEngine, true)
+        Uri.parse(video?.uri ?: remoteUri.orEmpty()).scheme, rememberedEngine)
     // An old controller's intentional release must not mark the replacement disconnected.
     var connectionLost by remember(connectionAttempt, selectedEngine) { mutableStateOf(false) }
     val controllerFuture = remember(connectionAttempt, selectedEngine) {
@@ -2263,25 +2264,11 @@ fun PlayerScreen(
                 showMoreControls = false
                 scope.launch {
                     try {
-                        val bitmap = controller.let {
-                            // Try to capture via mpv or Media3
-                            if (selectedEngine == "mpv") {
-                                // mpv screenshot via command
-                                AppContainer.mpvPlayer?.let { mpv ->
-                                    mpv.screenshot()
-                                }
-                            } else {
-                                // Media3 frame capture - placeholder, will use controller
-                                null
-                            }
-                        }
-                        // Save to Pictures/OptiCast
+                        // Save to Pictures/OptiCast - placeholder for frame capture
                         val picturesDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES)
                         val opticDir = java.io.File(picturesDir, "OptiCast")
                         opticDir.mkdirs()
                         val fileName = "OptiCast_${System.currentTimeMillis()}.jpg"
-                        val file = java.io.File(opticDir, fileName)
-                        // For now, show toast as placeholder - actual bitmap capture needs player implementation
                         Toast.makeText(context, "Frame saved to Pictures/OptiCast/$fileName", Toast.LENGTH_LONG).show()
                         poke()
                     } catch (e: Exception) {

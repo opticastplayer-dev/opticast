@@ -1115,8 +1115,6 @@ private fun EngineSettingsCard(settings: AppSettings, scope: CoroutineScope) {
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         Spacer(Modifier.height(10.dp))
-        }
-        }
         var enginesCleared by remember { mutableStateOf(false) }
         TextButton(onClick = {
             com.opticast.player.player.VideoPlaybackPreferences(playbackContext).clearEngines()

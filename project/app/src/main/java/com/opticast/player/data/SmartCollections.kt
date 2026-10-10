@@ -18,40 +18,45 @@ object SmartCollections {
                 id = "unwatched",
                 name = "Unwatched",
                 description = "Movies and shows you haven't watched yet",
-                filter = { it.watched == false && it.progressMs < 1000 }
+                filter = { entry ->
+                    val state = AppContainer.playbackState.state(entry.video.id)
+                    state?.isWatched != true && (state?.positionMs ?: 0L) < 1000
+                }
             ),
             SmartCollection(
                 id = "recent",
                 name = "Recently Added",
                 description = "Added in last 30 days",
-                filter = { it.addedAt > System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000 }
+                filter = { entry ->
+                    entry.video.dateAddedSec * 1000L > System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000
+                }
             ),
             SmartCollection(
                 id = "favorites",
                 name = "Favorites",
                 description = "Your favorite videos",
-                filter = { it.favorite }
+                filter = { entry -> AppContainer.favorites.isFavorite(entry.video.id) }
             ),
             SmartCollection(
                 id = "shorts",
                 name = "Shorts",
                 description = "Videos under 20 minutes",
-                filter = { it.durationMs in 1..20 * 60 * 1000 }
+                filter = { entry -> entry.video.durationMs in 1..20 * 60 * 1000 }
             ),
             SmartCollection(
                 id = "long",
                 name = "Long Movies",
                 description = "Movies over 2 hours",
-                filter = { it.durationMs > 2 * 60 * 60 * 1000 }
+                filter = { entry -> entry.video.durationMs > 2 * 60 * 60 * 1000 }
             ),
             SmartCollection(
                 id = "4k",
                 name = "4K",
                 description = "4K resolution videos",
                 filter = { entry ->
-                    entry.name.contains("2160p", ignoreCase = true) ||
-                    entry.name.contains("4K", ignoreCase = true) ||
-                    entry.name.contains("UHD", ignoreCase = true)
+                    entry.video.name.contains("2160p", ignoreCase = true) ||
+                    entry.video.name.contains("4K", ignoreCase = true) ||
+                    entry.video.name.contains("UHD", ignoreCase = true)
                 }
             ),
             SmartCollection(
@@ -70,7 +75,11 @@ object SmartCollections {
                 id = "continue_watching",
                 name = "Continue Watching",
                 description = "Resume where you left off",
-                filter = { it.progressMs > 1000 && it.progressMs < it.durationMs - 5000 }
+                filter = { entry ->
+                    val state = AppContainer.playbackState.state(entry.video.id)
+                    val pos = state?.positionMs ?: 0L
+                    pos > 1000 && pos < entry.video.durationMs - 5000
+                }
             )
         )
     }

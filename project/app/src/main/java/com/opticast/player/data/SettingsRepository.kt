@@ -46,9 +46,7 @@ data class AppSettings(
     val volumeNormalization: Boolean = false,
     val showBatteryClock: Boolean = true,
     val autoNextEpisode: Boolean = true,
-    val resumePlayback: Boolean = true,
-    val enableNetworkBrowsing: Boolean = false, // Advanced: SMB/NFS browsing, off by default for lightness
-    // Progress bar look, and which buttons the playing screen shows.
+    val resumePlayback: Boolean = true,    // Progress bar look, and which buttons the playing screen shows.
     val showChapterStamps: Boolean = false,
     val progressBarStyle: String = "thick", // thick | gradient | hidden
     val playerControls: List<String> = listOf(
@@ -74,9 +72,7 @@ data class AppSettings(
     // New features
     val trashEnabled: Boolean = true,
     val trashRetentionDays: Int = 30,
-    val gestureCustomization: String = "default", // default, custom
-    val organizeAssistantEnabled: Boolean = false,
-    val organizeLevel: Int = 1, // 1 suggest only, 2 rename only, 3 allow moves
+    val gestureCustomization: String = "default", // default, custom    val organizeLevel: Int = 1, // 1 suggest only, 2 rename only, 3 allow moves
 )
 
 private val Context.settingsDataStore: DataStore<Preferences> by
@@ -102,9 +98,7 @@ class SettingsRepository(private val context: Context) {
     private val embeddedLanguageKey = stringPreferencesKey("embedded_subtitle_language")
     private val embeddedModeKey = stringPreferencesKey("embedded_subtitle_mode")
     private val avoidCommentaryKey = booleanPreferencesKey("avoid_commentary")
-    private val dialogueBoostKey = booleanPreferencesKey("dialogue_boost")
-    private val networkBrowsingKey = booleanPreferencesKey("enable_network_browsing")
-    private val holdToSpeedKey = booleanPreferencesKey("hold_to_speed")
+    private val dialogueBoostKey = booleanPreferencesKey("dialogue_boost")    private val holdToSpeedKey = booleanPreferencesKey("hold_to_speed")
     private val holdSpeedFactorKey = floatPreferencesKey("hold_speed_factor")
     private val gestureSeekKey = booleanPreferencesKey("gesture_seek")
     private val gestureVolKey = booleanPreferencesKey("gesture_volume_brightness")
@@ -125,9 +119,7 @@ class SettingsRepository(private val context: Context) {
     private val batteryClockKey = booleanPreferencesKey("show_battery_clock")
     private val trashEnabledKey = booleanPreferencesKey("trash_enabled")
     private val trashRetentionKey = intPreferencesKey("trash_retention_days")
-    private val gestureCustomKey = stringPreferencesKey("gesture_customization")
-    private val organizeEnabledKey = booleanPreferencesKey("organize_assistant_enabled")
-    private val organizeLevelKey = intPreferencesKey("organize_level")
+    private val gestureCustomKey = stringPreferencesKey("gesture_customization")    private val organizeLevelKey = intPreferencesKey("organize_level")
 
     val settings: Flow<AppSettings> = context.settingsDataStore.data.map { prefs ->
         AppSettings(
@@ -172,9 +164,7 @@ class SettingsRepository(private val context: Context) {
             volumeNormalization = prefs[volumeNormKey] ?: false,
             showBatteryClock = prefs[batteryClockKey] ?: true,
             autoNextEpisode = prefs[autoNextKey] ?: true,
-            resumePlayback = prefs[resumeKey] ?: true,
-            enableNetworkBrowsing = prefs[networkBrowsingKey] ?: false,
-            showChapterStamps = prefs[chapterStampsKey] ?: false,
+            resumePlayback = prefs[resumeKey] ?: true,            showChapterStamps = prefs[chapterStampsKey] ?: false,
             progressBarStyle = resolvedProgressStyle(prefs[progressBarStyleKey]),
             playerControls = resolvedPlayerControls(
                 prefs[playerControlsKey]
@@ -187,9 +177,7 @@ class SettingsRepository(private val context: Context) {
             libraryGrid = resolvedLibraryGrid(prefs[gridKey]),
             trashEnabled = prefs[trashEnabledKey] ?: true,
             trashRetentionDays = prefs[trashRetentionKey] ?: 30,
-            gestureCustomization = prefs[gestureCustomKey] ?: "default",
-            organizeAssistantEnabled = prefs[organizeEnabledKey] ?: false,
-            organizeLevel = prefs[organizeLevelKey] ?: 1,
+            gestureCustomization = prefs[gestureCustomKey] ?: "default",            organizeLevel = prefs[organizeLevelKey] ?: 1,
         )
     }
 

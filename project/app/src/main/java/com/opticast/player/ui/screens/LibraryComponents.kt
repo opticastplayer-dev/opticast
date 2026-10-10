@@ -508,37 +508,6 @@ internal fun WhatsNewCard(version: String, onDismiss: () -> Unit) {
 }
 
 @Composable
-internal fun StatsCard(stats: LibraryStats) {
-    Surface(Modifier.fillMaxWidth().padding(horizontal = DiscoveryGutterDp.dp, vertical = 6.dp),
-        shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surfaceContainerLow) {
-        BoxWithConstraints(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp)) {
-            val columns = com.opticast.player.ui.layout.adaptiveStatsColumns(maxWidth.value, LocalDensity.current.fontScale)
-            val cells = listOf(stats.watched.toString() to "Watched",
-                (if (stats.totalHours >= 10) "%.0fh".format(stats.totalHours) else "%.1fh".format(stats.totalHours)) to "Library time")
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                cells.chunked(columns).forEach { group ->
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        group.forEach { (value, label) -> StatCell(value, label, Modifier.weight(1f)) }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-internal fun StatCell(value: String, label: String, modifier: Modifier = Modifier) {
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        com.opticast.player.ui.components.AutoFitLabel(value, maxSp = 22, minSp = 20,
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold, lineHeight = 28.sp),
-            color = MaterialTheme.colorScheme.primary)
-        Text(label, Modifier.fillMaxWidth(), fontSize = 13.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center,
-            maxLines = 2, overflow = TextOverflow.Ellipsis)
-    }
-}
-
-@Composable
 internal fun FilterChipsRow(sortBy: String, onSortChange: (String) -> Unit, selectedGenre: String, onGenreClick: () -> Unit) {
     val fontScale = LocalDensity.current.fontScale
     val visualHeight = com.opticast.player.ui.layout.adaptiveChipHeightDp(fontScale).dp

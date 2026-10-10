@@ -586,21 +586,10 @@ private fun StatRow(label: String, value: String) {
 // ============================ helpers ============================
 
 private fun measureCaches(context: Context): List<Pair<String, Long>> {
-    fun size(name: String) = runCatching {
-        File(context.filesDir, name).walkTopDown().filter { it.isFile }.sumOf { it.length() }
+    val total = runCatching {
+        context.filesDir.walkTopDown().filter { it.isFile }.sumOf { it.length() }
     }.getOrDefault(0L)
-
-    return listOf(
-        "Poster artwork" to size("posters"),
-        "Video frame thumbnails" to size("frames"),
-        "Scrub previews" to size("thumbs"),
-        "Chapter indexes" to size("chapters"),
-        "Downloaded from network" to size("network"),
-        "Subtitles & metadata" to (size("subtitles") + size("metadata")),
-        "App total" to runCatching {
-            context.filesDir.walkTopDown().filter { it.isFile }.sumOf { it.length() }
-        }.getOrDefault(0L),
-    )
+    return listOf("App total" to total)
 }
 
 /** Same byte size and a near-identical name: the same file, twice. */

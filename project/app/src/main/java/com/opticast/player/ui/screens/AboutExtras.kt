@@ -203,21 +203,6 @@ internal fun UpdateCheckOption(version: String) {
     }
 }
 
-@Composable
-internal fun ProviderCredits() {
-    // Provider credits and legal notices moved to website per user request.
-    // Keep composable for compatibility but show only website link.
-    val ctx = LocalContext.current
-    OutlinedButton(
-        onClick = {
-            runCatching {
-                ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://opticastplayer-dev.github.io/opticast/")))
-            }
-        }
-    ) {
-        Text("View legal notices and credits on website")
-    }
-}
 
 @Composable
 internal fun WhatsNewDialog() {

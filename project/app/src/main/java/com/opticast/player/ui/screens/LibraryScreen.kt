@@ -624,9 +624,6 @@ fun LibraryScreen(
                 onRecheck = { viewModel.recheckFiles() }
             )
             if (state.entries.isNotEmpty()) {
-                if (showLibraryStatistics(design.style, design.stats, searching)) item(span = { GridItemSpan(maxLineSpan) }) {
-                    StatsCard(stats)
-                }
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     FilterChipsRow(
                         sortBy = sortBy,

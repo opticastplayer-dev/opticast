@@ -98,11 +98,7 @@ internal fun LibraryCustomizeDialog(tab: String, design: LibraryDesign, onChange
                         }
                     }
                     if (design.style == "classic") {
-                        item(key = LibraryCustomizeControl.STATISTICS.lazyKey) {
-                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(design.stats, { onChange(design.copy(stats = it)) })
-                                Text("Library statistics", style = MaterialTheme.typography.bodyMedium)
-                            }
+                        item(key = "drag-hint") {
                             Text("Hold a handle to drag. Use ⋮ for move buttons.", Modifier.padding(bottom = 8.dp), style = MaterialTheme.typography.bodySmall)
                         }
                         items(design.order, key = { it }) { id ->
@@ -133,7 +129,7 @@ internal fun LibraryCustomizeDialog(tab: String, design: LibraryDesign, onChange
                             }
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
                         }
-                        item(key = LibraryCustomizeControl.RESET.lazyKey) { TextButton(onClick = { onChange(design.copy(order = classicSectionOrder, hidden = emptySet(), stats = true)) }) { Text("Reset this tab") } }
+                        item(key = LibraryCustomizeControl.RESET.lazyKey) { TextButton(onClick = { onChange(design.copy(order = classicSectionOrder, hidden = emptySet())) }) { Text("Reset this tab") } }
                     } else item(key = LibraryCustomizeControl.MINIMAL_DESCRIPTION.lazyKey) { Text("Poster grids only. Switch to Classic to reorder sections.", style = MaterialTheme.typography.bodyMedium) }
                     item(key = LibraryCustomizeControl.MANAGE_COLLECTIONS.lazyKey) { TextButton(onClick = onCollections) { Text("Manage collections") } }
                 }

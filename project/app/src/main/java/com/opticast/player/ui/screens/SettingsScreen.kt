@@ -858,9 +858,6 @@ private fun BehaviourSettingsCard(settings: AppSettings, scope: CoroutineScope, 
         PrefToggle(
             label = "Enable network browsing",
             description = "Show network libraries.",
-            checked = settings.enableNetworkBrowsing,
-        ) { enabled -> scope.launch { AppContainer.settings.setEnableNetworkBrowsing(enabled) } }
-        if (settings.enableNetworkBrowsing) {
             Spacer(Modifier.height(8.dp))
             OutlinedButton(onClick = onOpenNetwork, shape = RoundedCornerShape(16.dp)) {
                 Text("Open network libraries")

@@ -63,7 +63,6 @@ object UpdateChecker {
         data class Asset(val name: String = "", val browser_download_url: String = "", val size: Long = 0L)
     }
 
-    @Serializable
     data class UpdateInfo(
         val version: String,
         val versionCode: Long,
@@ -96,11 +95,9 @@ object UpdateChecker {
     fun shouldShowWhatsNew(context: Context): Boolean = prefs(context).getBoolean(KEY_WHATS_NEW_SHOWN, false)
     fun dismissWhatsNew(context: Context) { prefs(context).edit().putBoolean(KEY_WHATS_NEW_SHOWN, false).apply() }
 
-    fun getAvailableUpdateInfo(context: Context): UpdateInfo? = try {
-        prefs(context).getString(KEY_AVAILABLE_UPDATE_JSON, null)?.let { json.decodeFromString<UpdateInfo>(it) }
-    } catch (_: Exception) { null }
+    fun getAvailableUpdateInfo(context: Context): UpdateInfo? = null
 
-    fun clearAvailableUpdate(context: Context) { prefs(context).edit().remove(KEY_AVAILABLE_UPDATE_JSON).apply() }
+    fun clearAvailableUpdate(context: Context) {}
     fun skipVersion(context: Context, version: String) { prefs(context).edit().putString(KEY_SKIPPED_VERSION, version).apply() }
     fun isSkipped(context: Context, version: String): Boolean = prefs(context).getString(KEY_SKIPPED_VERSION, null) == version
 
@@ -125,7 +122,8 @@ object UpdateChecker {
             val isNewer = isVersionNewer(tag, installed.first)
             val apk = release.assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains("OptiCast", true) } ?: release.assets.firstOrNull { it.name.endsWith(".apk") }
             val info = UpdateInfo(tag, parseVersionCode(tag), release.body, apk?.browser_download_url ?: release.html_url, release.html_url.ifBlank { GITHUB_RELEASES_URL }, apk?.size ?: 0L, isNewer)
-            prefs(context).edit().putString(KEY_AVAILABLE_UPDATE_JSON, json.encodeToString<UpdateInfo>(info)).apply()
+            // skip storing JSON to avoid serialization issues
+
             if (isNewer) {
                 prefs(context).edit().putString(KEY_LAST_VERSION, tag).putString(KEY_WHATS_NEW_VERSION, tag).putString(KEY_WHATS_NEW_CHANGELOG, release.body).putBoolean(KEY_WHATS_NEW_SHOWN, true).apply()
             } else {
@@ -167,7 +165,7 @@ object UpdateChecker {
     fun openReleasesPage(context: Context) { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_RELEASES_URL)).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }) } }
     fun openReleasePage(context: Context, url: String) { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }) } }
 
-    fun startDownloadInBackground(context: Context, downloadUrl: String) {
+    fun startDownloadInBackground(context: Context, downloadUrl: String, onProgress: (Int) -> Unit = {}, onResult: (Boolean) -> Unit = {}) {
         downloadJob?.cancel()
         downloadJob = downloadScope.launch {
             _isDownloading.value = true
@@ -187,12 +185,14 @@ object UpdateChecker {
                         while (input.read(buf).also { read = it } != -1) {
                             output.write(buf, 0, read)
                             downloaded += read
-                            if (total > 0) _downloadProgress.value = ((downloaded * 100) / total).toInt()
+                            if (total > 0) { val p = ((downloaded * 100) / total).toInt(); _downloadProgress.value = p; onProgress(p) }
                         }
                     }
                 }
                 _readyToInstall.value = file
+                onResult(true)
             } catch (_: Exception) {
+                onResult(false)
             } finally { _isDownloading.value = false }
         }
     }

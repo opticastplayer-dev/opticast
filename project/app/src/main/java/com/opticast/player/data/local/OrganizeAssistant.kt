@@ -228,7 +228,7 @@ class OrganizeAssistant(private val context: Context) {
         try {
             val current = getIgnoreList().toMutableSet()
             current.add(path)
-            ignoreFile.writeText(json.encodeToString(current))
+            ignoreFile.writeText(json.encodeToString<Set<String>>(current.toSet()))
         } catch (_: Exception) {
         }
     }

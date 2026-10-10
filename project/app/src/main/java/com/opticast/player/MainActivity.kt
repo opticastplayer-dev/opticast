@@ -253,21 +253,21 @@ private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0
                 )
             }
             composable(ROUTE_STORAGE_ANALYZER) {
-                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList<com.opticast.player.data.model.LibraryEntry>())
+                val entries by com.opticast.player.data.ServiceLocator.libraryRepository.entries.collectAsStateWithLifecycle(initialValue = emptyList<com.opticast.player.data.model.LibraryEntry>())
                 StorageAnalyzerScreen(entries = entries, onBack = { navController.popBackStack() })
             }
             composable(ROUTE_TRASH) {
                 TrashScreen(onBack = { navController.popBackStack() })
             }
             composable(ROUTE_QUEUE) {
-                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList<com.opticast.player.data.model.LibraryEntry>())
+                val entries by com.opticast.player.data.ServiceLocator.libraryRepository.entries.collectAsStateWithLifecycle(initialValue = emptyList<com.opticast.player.data.model.LibraryEntry>())
                 QueueScreen(entries = entries, onBack = { navController.popBackStack() }, onPlay = { id ->
                     val intent = playerIntent(context, id)
                     context.startActivity(intent)
                 })
             }
             composable(ROUTE_ORGANIZE) {
-                val entries by AppContainer.offlineLibrary.entries.collectAsStateWithLifecycle(initialValue = emptyList<com.opticast.player.data.model.LibraryEntry>())
+                val entries by com.opticast.player.data.ServiceLocator.libraryRepository.entries.collectAsStateWithLifecycle(initialValue = emptyList<com.opticast.player.data.model.LibraryEntry>())
                 OrganizeAssistantScreen(entries = entries, onBack = { navController.popBackStack() })
             }
             composable(ROUTE_GESTURE) {

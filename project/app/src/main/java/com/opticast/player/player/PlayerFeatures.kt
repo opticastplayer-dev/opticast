@@ -62,12 +62,13 @@ class DialogueBoostManager {
     var isEnabled by mutableStateOf(false)
         private set
     var level by mutableStateOf(1) // 1-3
+        private set
 
     fun toggle() {
         isEnabled = !isEnabled
     }
 
-    fun setLevel(newLevel: Int) {
+    fun updateLevel(newLevel: Int) {
         level = newLevel.coerceIn(1, 3)
         isEnabled = true
     }

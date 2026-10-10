@@ -2291,7 +2291,7 @@ fun PlayerScreen(
                 settings = appSettings,
                 onDialogueBoost = { enabled ->
                     scope.launch { AppContainer.settings.setDialogueBoost(enabled) }
-                    if (enabled) dialogueBoostManager.setLevel(2) else dialogueBoostManager.toggle()
+                    if (enabled) dialogueBoostManager.updateLevel(2) else dialogueBoostManager.toggle()
                 },
                 onVolumeBoost = { pct ->
                     scope.launch { AppContainer.settings.setAudioBoostPct(pct) }
@@ -2302,7 +2302,7 @@ fun PlayerScreen(
                 Text("Dialogue boost level", style = MaterialTheme.typography.labelLarge)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(1 to "Low", 2 to "Med", 3 to "High").forEach { (lvl, label) ->
-                        FilterChip(selected = dialogueBoostManager.level == lvl && dialogueBoostManager.isEnabled, onClick = { dialogueBoostManager.setLevel(lvl); scope.launch { AppContainer.settings.setDialogueBoost(true) } }, label = { Text(label) })
+                        FilterChip(selected = dialogueBoostManager.level == lvl && dialogueBoostManager.isEnabled, onClick = { dialogueBoostManager.updateLevel(lvl); scope.launch { AppContainer.settings.setDialogueBoost(true) } }, label = { Text(label) })
                     }
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {

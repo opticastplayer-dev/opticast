@@ -160,15 +160,10 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onOpenStorage: () -> Unit = {},
     onOpenNetwork: () -> Unit = {},
-    onOpenStorageAnalyzer: () -> Unit = {},
-    onOpenTrash: () -> Unit = {},
-    onOpenOrganizeAssistant: () -> Unit = {},
-    onOpenGestureCustomization: () -> Unit = {},
 ) {
     val settings by AppContainer.settings.settings
         .collectAsStateWithLifecycle(initialValue = AppSettings())
     val scope = rememberCoroutineScope()
-    var confirmClear by remember { mutableStateOf(false) }
     var appearanceExpanded by rememberSaveable { mutableStateOf(false) }
     var playbackExpanded by rememberSaveable { mutableStateOf(false) }
     var subtitlesExpanded by rememberSaveable { mutableStateOf(false) }
@@ -177,7 +172,6 @@ fun SettingsScreen(
     var aboutExpanded by rememberSaveable { mutableStateOf(false) }
     var tweaksExpanded by rememberSaveable { mutableStateOf(false) }
     var developerExpanded by rememberSaveable { mutableStateOf(false) }
-    var customFolder by remember { mutableStateOf("") }
 
     // Preserve the settings' modest type emphasis without replacing Android's
     // native density/font-scaling implementation (including nonlinear scaling).
@@ -235,7 +229,7 @@ fun SettingsScreen(
             }
             item(key = "File Management") {
                 SettingsGroup("File Management") {
-                CombinedFilesCard(settings, scope, customFolder, { customFolder = it }, onOpenStorage, onOpenTrash, { confirmClear = true }, filesExpanded, { filesExpanded = !filesExpanded })
+                CombinedFilesCard(settings, scope, onOpenStorage, filesExpanded, { filesExpanded = !filesExpanded })
                 }
             }
             item(key = "Media Settings") {
@@ -254,24 +248,6 @@ fun SettingsScreen(
     }
     }
 
-    if (confirmClear) {
-        AlertDialog(containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f), 
-            onDismissRequest = { confirmClear = false },
-            title = { Text("Clear all metadata?") },
-            text = { Text("Removes all saved provider matches on this device. Your video files are not touched.") },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmClear = false
-                    scope.launch {
-                        withContext(Dispatchers.IO) { AppContainer.metadataStore.clearAll() }
-                    }
-                }) { Text("Clear") }
-            },
-            dismissButton = {
-                TextButton(onClick = { confirmClear = false }) { Text("Cancel") }
-            },
-        )
-    }
 }
 
 /** Device + build facts, shown in About. */
@@ -870,11 +846,7 @@ private fun CombinedAppearanceCard(
 private fun CombinedFilesCard(
     settings: AppSettings,
     scope: CoroutineScope,
-    customFolder: String,
-    onCustomFolderChange: (String) -> Unit,
     onOpenStorage: () -> Unit,
-    onOpenTrash: () -> Unit,
-    confirmClear: () -> Unit,
     expanded: Boolean,
     onToggle: () -> Unit
 ) {

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -192,13 +193,14 @@ fun StorageScreen(onBack: () -> Unit, onOpenMatch: (Long) -> Unit) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .statusBarsPadding()
+                .padding(horizontal = 8.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", modifier = Modifier.size(24.dp))
             }
-            Text("Storage", style = MaterialTheme.typography.headlineSmall)
+            Text("Storage", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(start = 8.dp))
         }
 
         if (loading) {
@@ -213,18 +215,22 @@ fun StorageScreen(onBack: () -> Unit, onOpenMatch: (Long) -> Unit) {
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            // ---------------- excluded folders (moved from Files & Storage) ----------------
+            // ---------------- scanned folders (simplified, no duplicate) ----------------
             item {
-                StorageCard("Excluded folders", Icons.Filled.FolderOff) {
-                    Text("Videos inside these folders are skipped when scanning.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                StorageCard("Scanned folders", Icons.Filled.FolderOff) {
+                    Text("App scans all video files on your device via MediaStore.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(6.dp))
+                    Text("Typical locations: Movies, DCIM, Download, Pictures, etc.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(12.dp))
+                    Text("Excluded: ${appSettings.excludedFolders.size} folders", style = MaterialTheme.typography.labelLarge)
+                    Spacer(Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         OutlinedTextField(
                             value = customFolder,
                             onValueChange = { customFolder = it },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(18.dp),
-                            placeholder = { Text("Custom path, e.g. Movies/Clips") },
+                            placeholder = { Text("Add folder to exclude, e.g. Movies/Clips") },
                             singleLine = true,
                             colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer, unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer)
                         )
@@ -241,22 +247,70 @@ fun StorageScreen(onBack: () -> Unit, onOpenMatch: (Long) -> Unit) {
                             }
                         }) { Icon(Icons.Filled.Add, "Add folder", tint = MaterialTheme.colorScheme.primary) }
                     }
-                    Spacer(Modifier.height(8.dp))
-                    appSettings.excludedFolders.forEach { folder ->
-                        Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(folder, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                            IconButton(onClick = {
-                                val next = appSettings.excludedFolders - folder
-                                scope.launch {
-                                    AppContainer.settings.setExcludedFolders(next)
-                                    FolderExclusions.hydrate(next)
-                                    AppContainer.metadataStore.touch()
-                                }
-                            }) { Icon(Icons.Filled.Close, "Remove", tint = MaterialTheme.colorScheme.error) }
+                    if (appSettings.excludedFolders.isNotEmpty()) {
+                        Spacer(Modifier.height(8.dp))
+                        appSettings.excludedFolders.forEach { folder ->
+                            Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Text(folder, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                                IconButton(onClick = {
+                                    val next = appSettings.excludedFolders - folder
+                                    scope.launch {
+                                        AppContainer.settings.setExcludedFolders(next)
+                                        FolderExclusions.hydrate(next)
+                                        AppContainer.metadataStore.touch()
+                                    }
+                                }) { Icon(Icons.Filled.Close, "Remove", tint = MaterialTheme.colorScheme.error) }
+                            }
                         }
                     }
-                    if (appSettings.excludedFolders.isEmpty()) {
-                        Text("No excluded folders", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+
+            // ---------------- trash (added) ----------------
+            item {
+                val trashEntries = remember(refresh) { AppContainer.trashStore.getAll() }
+                val trashSize = remember(trashEntries) { trashEntries.sumOf { it.size } }
+                StorageCard("Trash", Icons.Filled.Delete) {
+                    Text("${trashEntries.size} items · ${formatSize(trashSize)}", style = MaterialTheme.typography.bodyMedium)
+                    Spacer(Modifier.height(6.dp))
+                    Text("Files moved to trash stay for ${appSettings.trashRetentionDays} days. You can restore or delete permanently.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(onClick = {
+                            scope.launch {
+                                trashEntries.forEach { AppContainer.trashStore.deletePermanently(it) }
+                                refresh++
+                                message = "Trash emptied"
+                            }
+                        }, enabled = trashEntries.isNotEmpty()) { Text("Empty trash") }
+                        OutlinedButton(onClick = { refresh++ }) { Text("Refresh") }
+                    }
+                    if (trashEntries.isNotEmpty()) {
+                        Spacer(Modifier.height(8.dp))
+                        trashEntries.take(5).forEach { entry ->
+                            Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Column(Modifier.weight(1f)) {
+                                    Text(entry.name, style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    Text(formatSize(entry.size), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                TextButton(onClick = {
+                                    scope.launch {
+                                        AppContainer.trashStore.restore(entry)
+                                        refresh++
+                                        message = "Restored ${entry.name}"
+                                    }
+                                }) { Text("Restore") }
+                                IconButton(onClick = {
+                                    scope.launch {
+                                        AppContainer.trashStore.deletePermanently(entry)
+                                        refresh++
+                                    }
+                                }) { Icon(Icons.Filled.Close, "Delete", tint = MaterialTheme.colorScheme.error) }
+                            }
+                        }
+                        if (trashEntries.size > 5) {
+                            Text("+${trashEntries.size - 5} more", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
                 }
             }

@@ -868,6 +868,7 @@ private fun CombinedAppearanceCard(
 }
 
 @Composable
+@Composable
 private fun CombinedFilesCard(
     settings: AppSettings,
     scope: CoroutineScope,
@@ -882,53 +883,11 @@ private fun CombinedFilesCard(
     CollapsibleSettingsCard(
         icon = Icons.Filled.FolderOff,
         title = "Files & Storage",
-        subtitle = "Excluded folders and storage",
+        subtitle = "Storage and trash",
         expanded = expanded,
         onToggle = onToggle
     ) {
-        Text("Videos inside these folders are skipped when scanning.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(12.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(
-                value = customFolder,
-                onValueChange = onCustomFolderChange,
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(18.dp),
-                placeholder = { Text("Custom path, e.g. Movies/Clips") },
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer, unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer)
-            )
-            IconButton(onClick = {
-                val path = customFolder.trim().trim('/')
-                if (path.isNotBlank() && !settings.excludedFolders.contains(path)) {
-                    val next = settings.excludedFolders + path
-                    scope.launch {
-                        AppContainer.settings.setExcludedFolders(next)
-                        FolderExclusions.hydrate(next)
-                        AppContainer.metadataStore.touch()
-                    }
-                    onCustomFolderChange("")
-                }
-            }) { Icon(Icons.Filled.Add, "Add folder", tint = MaterialTheme.colorScheme.primary) }
-        }
-        val customFolders = settings.excludedFolders
-        customFolders.forEach { folder ->
-            Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(folder, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                IconButton(onClick = {
-                    val next = settings.excludedFolders - folder
-                    scope.launch {
-                        AppContainer.settings.setExcludedFolders(next)
-                        FolderExclusions.hydrate(next)
-                        AppContainer.metadataStore.touch()
-                    }
-                }) { Icon(Icons.Filled.Close, "Remove", tint = MaterialTheme.colorScheme.error) }
-            }
-        }
-
-        HorizontalDivider(Modifier.padding(vertical = 14.dp))
-
-        Text("Manage space, cached files and backups.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("Manage space, cached files and excluded folders.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(10.dp))
         OutlinedButton(onClick = onOpenStorage, shape = RoundedCornerShape(16.dp)) { Text("Open storage dashboard") }
     }

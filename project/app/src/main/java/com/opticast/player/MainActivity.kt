@@ -227,7 +227,7 @@ private fun OptiCastApp(libraryReturnRevision: Int = 0, returnDetailId: Long = 0
             composable(ROUTE_SETTINGS) {
                 SettingsScreen(
                     onBack = { navController.popBackStack() },
-                    onOpenStorage = { navController.navigate(ROUTE_STORAGE) },                    onOpenGestureCustomization = { navController.navigate(ROUTE_GESTURE) },
+                    onOpenStorage = { navController.navigate(ROUTE_STORAGE) },
                 )
             }
 

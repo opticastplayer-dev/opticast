@@ -265,36 +265,21 @@ private fun StatusBadge(status: PosterBadge, modifier: Modifier = Modifier, sing
  * first time) the drawn film-frame placeholder stands in, so a card is never
  * blank and never a flat colour block.
  */
-@Composable
 private fun findFirstCachedFrame(ids: List<Long>): File? {
     return ids.firstNotNullOfOrNull { AppContainer.frameArtwork.cached(it) }
 }
 
 @Composable
 fun rememberFrameArtwork(videoId: Long?): File? {
-    var file by remember(videoId) { mutableStateOf(videoId?.let { AppContainer.frameArtwork.cached(it) }) }
+    var artwork by remember(videoId) {
+        mutableStateOf(videoId?.let { AppContainer.frameArtwork.cached(it) })
+    }
     LaunchedEffect(videoId) {
-        if (videoId == null || file != null) return@LaunchedEffect
-        file = AppContainer.frameArtwork.generate(videoId)
+        if (videoId == null || videoId <= 0L || artwork != null) return@LaunchedEffect
+        artwork = AppContainer.frameArtwork.generate(videoId)
     }
-    return file
+    return artwork
 }
-
-@Composable
-fun rememberShowFrameArtwork(episodes: List<LibraryEntry>): File? {
-    val ids = remember(episodes) { episodes.map { it.video.id } }
-    var file by remember(ids) { mutableStateOf(findFirstCachedFrame(ids)) }
-    LaunchedEffect(ids) {
-        if (file != null) return@LaunchedEffect
-        for (id in ids) {
-            val generated = AppContainer.frameArtwork.generate(id)
-            if (generated != null) { file = generated; break }
-        }
-        if (file == null && ids.isNotEmpty()) file = AppContainer.frameArtwork.cached(ids.first())
-    }
-    return file
-}
-
 
 /** Loads a poster image with placeholder for smooth scrolling on low-RAM 32-bit 3GB devices. */
 @Composable
@@ -401,36 +386,19 @@ private fun BasePosterCard(
     cacheBust: Int = 0,
 ) {
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .aspectRatio(2f / 3f)
-            .clip(RoundedCornerShape(12.dp))
+        modifier = modifier.fillMaxWidth().aspectRatio(2f / 3f).clip(RoundedCornerShape(12.dp))
             .border(1.dp, Color.White.copy(alpha = 0.16f), RoundedCornerShape(12.dp))
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .background(MaterialTheme.colorScheme.surfaceContainer),
     ) {
         if (posterUrl != null || remotePosterUrl != null) {
-            PosterImage(
-                url = posterUrl,
-                fallbackTitle = title,
-                modifier = Modifier.fillMaxSize(),
-                cacheBust = cacheBust,
-                remoteUrl = remotePosterUrl,
-                videoId = fallbackVideoId,
-            )
+            PosterImage(url = posterUrl, fallbackTitle = title, modifier = Modifier.fillMaxSize(), cacheBust = cacheBust, remoteUrl = remotePosterUrl, videoId = fallbackVideoId)
         } else if (showFrame != null) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current).data(showFrame).crossfade(false).build(),
-                contentDescription = title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
+            AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(showFrame).crossfade(false).build(), contentDescription = title, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
         } else {
             FallbackPoster(title, modifier = Modifier.fillMaxSize())
         }
-        Box(
-            Modifier.fillMaxWidth().align(Alignment.BottomCenter).background(PosterScrim).padding(horizontal = 10.dp, vertical = 8.dp),
-        ) {
+        Box(Modifier.fillMaxWidth().align(Alignment.BottomCenter).background(PosterScrim).padding(horizontal = 10.dp, vertical = 8.dp)) {
             Column {
                 Text(title, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis)
                 Text(subtitle, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.7f))
@@ -463,21 +431,7 @@ fun PosterCard(
     val badge = primaryPosterBadge(entry.video.isNewlyAdded(), playback?.isWatched == true, playback?.isResumable == true)
     val subtitle = metadata?.year?.toString() ?: entry.video.seasonEpisodeTag ?: entry.video.durationMs.formatDuration()
     val resume = if (playback?.isResumable == true) playback else null
-    BasePosterCard(
-        title = metadata?.displayTitle ?: fallbackTitle,
-        subtitle = subtitle,
-        posterUrl = posterUrl,
-        remotePosterUrl = remotePosterUrl,
-        fallbackVideoId = entry.video.id,
-        showFrame = null,
-        badge = badge,
-        extraPill = entry.video.seasonEpisodeTag,
-        resumeState = resume,
-        onClick = onClick,
-        onLongClick = onLongClick,
-        modifier = modifier,
-        cacheBust = cacheBust,
-    )
+    BasePosterCard(title = metadata?.displayTitle ?: fallbackTitle, subtitle = subtitle, posterUrl = posterUrl, remotePosterUrl = remotePosterUrl, fallbackVideoId = entry.video.id, showFrame = null, badge = badge, extraPill = entry.video.seasonEpisodeTag, resumeState = resume, onClick = onClick, onLongClick = onLongClick, modifier = modifier, cacheBust = cacheBust)
 }
 
 
@@ -490,22 +444,14 @@ fun PosterCard(
 @Composable
 fun rememberShowFrameArtwork(episodes: List<LibraryEntry>): File? {
     val ids = remember(episodes) { episodes.map { it.video.id } }
-    var file by remember(ids) {
-        mutableStateOf(ids.firstNotNullOfOrNull { AppContainer.frameArtwork.cached(it) })
-    }
+    var file by remember(ids) { mutableStateOf(findFirstCachedFrame(ids)) }
     LaunchedEffect(ids) {
         if (file != null) return@LaunchedEffect
         for (id in ids) {
             val generated = AppContainer.frameArtwork.generate(id)
-            if (generated != null) {
-                file = generated
-                break
-            }
+            if (generated != null) { file = generated; break }
         }
-        // If none generated (all failed), still try first id for placeholder parity.
-        if (file == null && ids.isNotEmpty()) {
-            file = AppContainer.frameArtwork.cached(ids.first())
-        }
+        if (file == null && ids.isNotEmpty()) file = AppContainer.frameArtwork.cached(ids.first())
     }
     return file
 }
@@ -534,24 +480,9 @@ fun ShowCard(
             ?: episodes.firstNotNullOfOrNull { e -> AppContainer.frameArtwork.cached(e.video.id)?.let { e.video.id } }
             ?: episodes.firstOrNull()?.video?.id
     }
-    val badge = primaryPosterBadge(newlyAdded, watched, resumeState == null && watched)
+    val badge = primaryPosterBadge(newlyAdded, watched, resumeState != null)
     val subtitle = "${episodes.size} episode${if (episodes.size == 1) "" else "s"}" + (if (vote > 0.0) " · ★ %.1f".format(vote) else "")
-    val resume = if (!watched) resumeState else null
-    BasePosterCard(
-        title = showTitle,
-        subtitle = subtitle,
-        posterUrl = posterUrl,
-        remotePosterUrl = remotePoster,
-        fallbackVideoId = fallbackVideoId,
-        showFrame = showFrame,
-        badge = badge,
-        extraPill = null,
-        resumeState = resume,
-        onClick = onClick,
-        onLongClick = onLongClick,
-        modifier = modifier,
-        cacheBust = cacheBust,
-    )
+    BasePosterCard(title = showTitle, subtitle = subtitle, posterUrl = posterUrl, remotePosterUrl = remotePoster, fallbackVideoId = fallbackVideoId, showFrame = showFrame, badge = badge, extraPill = null, resumeState = if (!watched) resumeState else null, onClick = onClick, onLongClick = onLongClick, modifier = modifier, cacheBust = cacheBust)
 }
 
 

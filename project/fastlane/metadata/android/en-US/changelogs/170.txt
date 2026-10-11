@@ -1,0 +1,6 @@
+OptiCast v2.6.121 — Poster fixes and unification
+
+• Fixed library posters to show generated video thumbnails when no metadata
+• Unified PosterCard and ShowCard for cleaner, maintainable code (90+ lines saved)
+• Posters now always fallback to local frame artwork
+• Build optimizations and stability improvements

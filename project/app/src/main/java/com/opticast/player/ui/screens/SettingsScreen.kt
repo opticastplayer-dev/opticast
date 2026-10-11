@@ -231,7 +231,6 @@ fun SettingsScreen(
             item(key = "Playback & Controls") {
                 SettingsGroup("Playback & Controls") {
                 CombinedPlaybackCard(settings, scope, onOpenNetwork, playbackExpanded, { playbackExpanded = !playbackExpanded })
-                GestureSettingsCard(settings, scope, onOpenGestureCustomization)
                 }
             }
             item(key = "File Management") {
@@ -867,7 +866,6 @@ private fun CombinedAppearanceCard(
     }
 }
 
-@Composable
 @Composable
 private fun CombinedFilesCard(
     settings: AppSettings,

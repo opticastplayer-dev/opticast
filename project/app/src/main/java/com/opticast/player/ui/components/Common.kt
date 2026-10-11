@@ -391,12 +391,10 @@ private fun BasePosterCard(
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
             .background(MaterialTheme.colorScheme.surfaceContainer),
     ) {
-        if (posterUrl != null || remotePosterUrl != null) {
-            PosterImage(url = posterUrl, fallbackTitle = title, modifier = Modifier.fillMaxSize(), cacheBust = cacheBust, remoteUrl = remotePosterUrl, videoId = fallbackVideoId)
-        } else if (showFrame != null) {
+        if (showFrame != null) {
             AsyncImage(model = ImageRequest.Builder(LocalContext.current).data(showFrame).crossfade(false).build(), contentDescription = title, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
         } else {
-            FallbackPoster(title, modifier = Modifier.fillMaxSize())
+            PosterImage(url = posterUrl, fallbackTitle = title, modifier = Modifier.fillMaxSize(), cacheBust = cacheBust, remoteUrl = remotePosterUrl, videoId = fallbackVideoId)
         }
         Box(Modifier.fillMaxWidth().align(Alignment.BottomCenter).background(PosterScrim).padding(horizontal = 10.dp, vertical = 8.dp)) {
             Column {

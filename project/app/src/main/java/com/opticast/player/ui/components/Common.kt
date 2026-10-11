@@ -413,6 +413,7 @@ private fun BasePosterCard(
 }
 
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PosterCard(
     entry: LibraryEntry,

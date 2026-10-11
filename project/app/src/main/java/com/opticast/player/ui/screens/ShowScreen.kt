@@ -147,6 +147,7 @@ fun ShowScreen(
     val anyMeta = episodes.firstNotNullOfOrNull { it.metadata }
     val showMeta = state.showMeta
     val backdropUrl = tmdbBackdropUrl(showMeta?.backdropPath ?: anyMeta?.backdropPath)
+    val posterUrl = (episodes.firstOrNull()?.let { AppContainer.posterCache.localUrl(it.video.id, showMeta ?: anyMeta) } ?: com.opticast.player.data.remote.tmdbPosterUrl(showMeta?.posterPath ?: anyMeta?.posterPath))
     val logoUrl: String? = null
     val title = showMeta?.title ?: anyMeta?.showTitle ?: showName
     val year = showMeta?.year ?: anyMeta?.year
@@ -214,27 +215,27 @@ fun ShowScreen(
                             modifier = Modifier.fillMaxSize(),
                         )
                     } else {
-                        // No TMDB backdrop: use a real frame from any episode in
-                        // the show - not just the first, so the hero never stays
-                        // blank when the first episode fails to decode (fix: shows
-                        // were blank while episodes had thumbnails).
-                        val heroFrame = if (episodes.isEmpty()) null else rememberShowFrameArtwork(episodes)
-                        if (heroFrame != null) {
+                        // TV shows: show official poster as background when no backdrop, not video thumbnail
+                        // Episodes leave as is (thumbnail) per user request, but for show overview use poster
+                        if (posterUrl != null) {
                             AsyncImage(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(heroFrame)
-                                    .crossfade(true)
-                                    .build(),
+                                model = ImageRequest.Builder(LocalContext.current).data(posterUrl).crossfade(true).build(),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize(),
                             )
                         } else {
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .background(MaterialTheme.colorScheme.surfaceContainer)
-                            )
+                            val heroFrame = if (episodes.isEmpty()) null else rememberShowFrameArtwork(episodes)
+                            if (heroFrame != null) {
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current).data(heroFrame).crossfade(true).build(),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            } else {
+                                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceContainer))
+                            }
                         }
                     }
                     Box(

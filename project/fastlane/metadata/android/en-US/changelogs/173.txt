@@ -1,0 +1,6 @@
+OptiCast v2.6.124 — Startup updates and library cleanup
+
+• Checks for a newer release on each app start when online and presents an in-app update prompt
+• Dismissing all unavailable files on the Library now clears the notices and their saved title data
+• Video files themselves are never deleted
+• Same official signing key; installs over existing official versions

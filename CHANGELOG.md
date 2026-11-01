@@ -1,6 +1,13 @@
 # Changelog - OptiCast
 
-**Current:** v2.6.123 (172) - 2026-11-01
+**Current:** v2.6.124 (173) - 2026-11-01
+
+## v2.6.124 (173) - 2026-11-01
+
+**Updates**
+- Checks for new releases at each app start when online and shows an in-app update prompt with download/install and later actions
+- Dismissing all unavailable files from the Library now removes the notices and associated saved title data
+- Video files themselves are never deleted
 
 ## v2.6.123 (172) - 2026-11-01
 

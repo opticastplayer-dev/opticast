@@ -6,7 +6,7 @@
 [![Tests](https://img.shields.io/github/actions/workflow/status/opticastplayer-dev/opticast/test.yml?label=Tests&branch=main)](https://github.com/opticastplayer-dev/opticast/actions/workflows/test.yml)
 [![Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen)](https://opticastplayer-dev.github.io/opticast/)
 
-**Current:** v2.6.123 (172)
+**Current:** v2.6.124 (173)
 
 Get a great local video player experience with OptiCast. It finds and organizes your Movies and TV shows with posters and info, and plays them offline.
 

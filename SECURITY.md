@@ -1,13 +1,13 @@
 # Security Policy - OptiCast
 
-**Current:** v2.6.123 (172)
+**Current:** v2.6.124 (173)
 
 ## Supported Versions
 
 | Version | Supported |
 |---------|-----------|
-| 2.6.123 | ✅ Yes |
-| < 2.6.123 | ❌ Please update to latest |
+| 2.6.124 | ✅ Yes |
+| < 2.6.124 | ❌ Please update to latest |
 
 We support only the latest stable release.
 

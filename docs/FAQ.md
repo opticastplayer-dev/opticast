@@ -1,6 +1,6 @@
 # OptiCast FAQ - Common Questions
 
-**Current:** v2.6.120 (169)
+**Current:** v2.6.123 (172)
 
 ### Is OptiCast for TV?
 No - designed for phones. Works on Android 8 and newer, including older devices. Focused on the best phone experience.

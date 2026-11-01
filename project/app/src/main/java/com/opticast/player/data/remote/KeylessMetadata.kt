@@ -33,7 +33,7 @@ class KeylessMetadata {
                 lastRequest = android.os.SystemClock.elapsedRealtime()
                 try {
                     client.newCall(Request.Builder().url(url)
-                        .header("User-Agent", "OptiCast/2.6.120 (Android; personal media metadata)")
+                        .header("User-Agent", "OptiCast/2.6.123 (Android; personal media metadata)")
                         .build()).execute().use { response ->
                         if (response.code == 429 || response.code == 503) {
                             val seconds = response.header("Retry-After")?.toLongOrNull() ?: 60L

@@ -38,11 +38,11 @@ Official releases include SHA256 checksums and are signed with the same key for 
 
 ```bash
 # Verify SHA256 checksum
-sha256sum OptiCast-v2.6.120.apk
+sha256sum OptiCast-v2.6.123.apk
 # Compare with SHA256SUMS file in the GitHub release
 
 # Verify signing certificate (same key allows install over old version, data preserved)
-apksigner verify --print-certs OptiCast-v2.6.120.apk
+apksigner verify --print-certs OptiCast-v2.6.123.apk
 # Expected: certificate SHA256 should match across all official releases
 # If Android reports conflicting signature during install, APK is from unofficial source
 ```
@@ -65,4 +65,4 @@ Starting from v2.6.120, the app displays installation source information in Sett
 - GitHub Issues: https://github.com/opticastplayer-dev/opticast/issues
 - Website: https://opticastplayer-dev.github.io/opticast/
 
-**Last updated:** 2026-10-09 - v2.6.120 (169)
+**Last updated:** 2026-11-01 - v2.6.123 (172)

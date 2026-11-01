@@ -1,0 +1,6 @@
+OptiCast v2.6.123 — Missing-file cleanup
+
+• Dismiss one or all unavailable-file notices from the Library
+• Removing a notice now clears that title’s saved metadata, artwork, subtitles, playback progress, favourites and collection links
+• Video files are never deleted; if one returns, OptiCast can scan it again
+• Same official signing key; installs over existing official versions

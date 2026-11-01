@@ -1,6 +1,17 @@
 # Changelog - OptiCast
 
-**Current:** v2.6.120 (169) - 2026-10-04
+**Current:** v2.6.123 (172) - 2026-11-01
+
+## v2.6.123 (172) - 2026-11-01
+
+**Library cleanup**
+- Added dismiss actions for one or all unavailable-file notices
+- Dismissing removes the title's saved metadata, artwork, downloaded subtitles, playback progress, favourites, collection links and skip settings
+- Video files themselves are never deleted; returned files can be scanned again
+
+## v2.6.122 (171) - 2026-10-11
+
+- Corrected TV show media-info background to use the official poster while episodes retain their thumbnails
 
 ## v2.6.120 (169) - 2026-10-04
 
@@ -83,5 +94,5 @@
 ## Links
 
 - GitHub: https://github.com/opticastplayer-dev/opticast
-- Latest release: https://github.com/opticastplayer-dev/opticast/releases/tag/v2.6.120
+- Latest release: https://github.com/opticastplayer-dev/opticast/releases/latest
 - Website: https://opticastplayer-dev.github.io/opticast/

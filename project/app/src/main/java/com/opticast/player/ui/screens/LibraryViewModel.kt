@@ -150,7 +150,9 @@ class LibraryViewModel(
                 val missing = AppContainer.mediaScanner.inventory.missing().filter { it.id == id }
                 purgeMissingData(missing)
             }
-            result.onFailure {
+            result.onSuccess {
+                _uiState.update { state -> state.copy(fileScanError = null) }
+            }.onFailure {
                 _uiState.update { state -> state.copy(fileScanError = "Could not clear saved data for this missing file. The remaining record was kept.") }
             }
         }
@@ -161,7 +163,9 @@ class LibraryViewModel(
             val result = runCatching {
                 purgeMissingData(AppContainer.mediaScanner.inventory.missing())
             }
-            result.onFailure {
+            result.onSuccess {
+                _uiState.update { state -> state.copy(fileScanError = null) }
+            }.onFailure {
                 _uiState.update { state -> state.copy(fileScanError = "Could not clear all missing-file data. Remaining records were kept.") }
             }
         }

@@ -47,7 +47,7 @@ internal fun LazyGridScope.libraryFileAvailability(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        fileScanError ?: "Saved posters and progress are kept. Review files that were moved, removed or are temporarily inaccessible.",
+                        fileScanError ?: "Dismissal clears saved details and progress for unavailable files. The video files themselves are never deleted.",
                         style = MaterialTheme.typography.bodySmall
                     )
                     Row {

@@ -69,8 +69,6 @@ internal fun UpdateCheckOption(version: String) {
 @Composable
 internal fun WhatsNewDialog() {}
 
-@Composable
-internal fun AutoUpdateDialog() {}
 
 @Composable
 internal fun GlobalUpdateInstallDialog() {}

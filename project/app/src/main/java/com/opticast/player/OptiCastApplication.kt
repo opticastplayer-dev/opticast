@@ -74,18 +74,11 @@ class OptiCastApplication : Application() {
         // Idempotent: second call no-op, so single immediate is enough for 12/16/24/32 MB budget
         startupScope.launch { AppContainer.posterCache.warmUp() }
 
-        // OFFLINE-FIRST: Check for updates once when internet detected, not every 6 hours, minimal data usage
-        // User priority: offline use, little data, check once when internet detected
-        // Only one check at startup, delayed to not affect library scrolling, checks only if online
-        // No second check at 12s - saves data, respects offline rule
+        // Check once on each cold start after the library's first frame, and surface newer releases globally.
+        // UpdateChecker skips the request while offline and the in-app auto-check setting can disable it.
         startupScope.launch {
             try {
-                // Delay 6s to let library be smooth first, then check once if online
                 kotlinx.coroutines.delay(6000)
-                if (AppContainer.isOnline()) {
-                    com.opticast.player.data.remote.UpdateChecker.checkWhenInternetDetected(this@OptiCastApplication)
-                }
-                // Also run regular startup check which will handle what's new and version tracking
                 com.opticast.player.data.remote.UpdateChecker.checkAtStartup(this@OptiCastApplication)
             } catch (_: Exception) { }
         }

@@ -12,6 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -34,6 +36,9 @@ object UpdateChecker {
     private const val KEY_WHATS_NEW_VERSION = "whats_new_version"
     private const val KEY_WHATS_NEW_CHANGELOG = "whats_new_changelog"
     private const val CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000L
+
+    private val _availableUpdate = kotlinx.coroutines.flow.MutableStateFlow<UpdateInfo?>(null)
+    val availableUpdate: kotlinx.coroutines.flow.StateFlow<UpdateInfo?> = _availableUpdate
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
@@ -63,6 +68,7 @@ object UpdateChecker {
         data class Asset(val name: String = "", val browser_download_url: String = "", val size: Long = 0L)
     }
 
+    @Serializable
     data class UpdateInfo(
         val version: String,
         val versionCode: Long,
@@ -95,10 +101,21 @@ object UpdateChecker {
     fun shouldShowWhatsNew(context: Context): Boolean = prefs(context).getBoolean(KEY_WHATS_NEW_SHOWN, false)
     fun dismissWhatsNew(context: Context) { prefs(context).edit().putBoolean(KEY_WHATS_NEW_SHOWN, false).apply() }
 
-    fun getAvailableUpdateInfo(context: Context): UpdateInfo? = null
+    fun getAvailableUpdateInfo(context: Context): UpdateInfo? {
+        val saved = prefs(context).getString(KEY_AVAILABLE_UPDATE_JSON, null) ?: return null
+        val cached = runCatching { json.decodeFromString<UpdateInfo>(saved) }.getOrNull() ?: return null
+        val isNewer = isVersionNewer(cached.version, getInstalledVersion(context).first)
+        return cached.copy(isNewer = isNewer).takeIf { isNewer && !isSkipped(context, cached.version) }
+    }
 
-    fun clearAvailableUpdate(context: Context) {}
-    fun skipVersion(context: Context, version: String) { prefs(context).edit().putString(KEY_SKIPPED_VERSION, version).apply() }
+    fun clearAvailableUpdate(context: Context) {
+        prefs(context).edit().remove(KEY_AVAILABLE_UPDATE_JSON).apply()
+        _availableUpdate.value = null
+    }
+    fun skipVersion(context: Context, version: String) {
+        prefs(context).edit().putString(KEY_SKIPPED_VERSION, version).apply()
+        if (_availableUpdate.value?.version == version) _availableUpdate.value = null
+    }
     fun isSkipped(context: Context, version: String): Boolean = prefs(context).getString(KEY_SKIPPED_VERSION, null) == version
 
     suspend fun checkForUpdate(context: Context, force: Boolean = false): UpdateInfo? = withContext(Dispatchers.IO) {
@@ -122,20 +139,33 @@ object UpdateChecker {
             val isNewer = isVersionNewer(tag, installed.first)
             val apk = release.assets.firstOrNull { it.name.endsWith(".apk") && it.name.contains("OptiCast", true) } ?: release.assets.firstOrNull { it.name.endsWith(".apk") }
             val info = UpdateInfo(tag, parseVersionCode(tag), release.body, apk?.browser_download_url ?: release.html_url, release.html_url.ifBlank { GITHUB_RELEASES_URL }, apk?.size ?: 0L, isNewer)
-            // skip storing JSON to avoid serialization issues
-
             if (isNewer) {
-                prefs(context).edit().putString(KEY_LAST_VERSION, tag).putString(KEY_WHATS_NEW_VERSION, tag).putString(KEY_WHATS_NEW_CHANGELOG, release.body).putBoolean(KEY_WHATS_NEW_SHOWN, true).apply()
+                prefs(context).edit()
+                    .putString(KEY_AVAILABLE_UPDATE_JSON, json.encodeToString(info))
+                    .putString(KEY_LAST_VERSION, tag)
+                    .putString(KEY_WHATS_NEW_VERSION, tag)
+                    .putString(KEY_WHATS_NEW_CHANGELOG, release.body)
+                    .putBoolean(KEY_WHATS_NEW_SHOWN, true)
+                    .apply()
             } else {
-                prefs(context).edit().putString(KEY_UP_TO_DATE_VERSION, installed.first).putLong(KEY_UP_TO_DATE_TIME, System.currentTimeMillis()).apply()
+                prefs(context).edit()
+                    .remove(KEY_AVAILABLE_UPDATE_JSON)
+                    .putString(KEY_UP_TO_DATE_VERSION, installed.first)
+                    .putLong(KEY_UP_TO_DATE_TIME, System.currentTimeMillis())
+                    .apply()
             }
             info
         } catch (_: Exception) { null }
     }
 
     suspend fun checkAtStartup(context: Context) {
-        if (!isAutoCheckEnabled(context)) return
-        checkForUpdate(context, force = false)
+        if (!isAutoCheckEnabled(context)) {
+            _availableUpdate.value = null
+            return
+        }
+        // Check each cold app start when online, then surface the result to the global update prompt.
+        val result = checkForUpdate(context, force = true) ?: getAvailableUpdateInfo(context)
+        _availableUpdate.value = result?.takeIf { it.isNewer && !isSkipped(context, it.version) }
     }
 
     suspend fun checkWhenInternetDetected(context: Context) {

@@ -627,7 +627,7 @@ fun LibraryScreen(
                 checkingFiles = state.checkingFiles,
                 onReview = { showMissingFiles = true },
                 onRecheck = { viewModel.recheckFiles() },
-                onDismissAll = { showMissingFiles = true }
+                onDismissAll = { dismissAllMissingEntries() }
             )
             if (state.entries.isNotEmpty()) {
                 item(span = { GridItemSpan(maxLineSpan) }) {

@@ -29,6 +29,18 @@ class OfflineArtwork(context: Context) {
         val name = key(url)
         return if (name in existing) "file://${File(directory, name).absolutePath}" else null
     }
+
+    suspend fun forget(urls: Collection<String?>) = withContext(Dispatchers.IO) {
+        gate.withLock {
+            urls.filterNotNull().distinct().forEach { raw ->
+                val url = downsampleTmdbUrl(raw) ?: raw
+                val name = key(url)
+                File(directory, name).delete()
+                existing.remove(name)
+            }
+        }
+    }
+
     suspend fun prefetch(urls: List<String?>, deferDuringPlayback: Boolean = true) = withContext(Dispatchers.IO) {
         for (raw in urls.filterNotNull().distinct()) {
             // Never wait for playback while holding the mutex: explicit foreground work can proceed.

@@ -290,7 +290,7 @@ fun LibraryScreen(
     var openCollectionId by rememberSaveable { mutableStateOf<String?>(null) }
     var searchScope by rememberSaveable { mutableStateOf("all") }
     val libraryEntriesById = remember(state.entries) { state.entries.associateBy { it.video.id } }
-    val extrasStore = remember(context) { com.opticast.player.data.local.LibraryExtrasStore(context) }
+    val extrasStore = AppContainer.libraryExtras
     var extrasRevision by remember { mutableStateOf(0) }
     var showSmartCollections by rememberSaveable { mutableStateOf(false) }
     val smartRules = remember(extrasRevision) { extrasStore.rules() }
@@ -353,6 +353,22 @@ fun LibraryScreen(
         initialValue = emptyList(), inventoryVersion, appSettings.excludedFolders
                         ) {
         value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { AppContainer.mediaScanner.inventory.missing() }
+    }
+    fun forgetMissingUiReferences(ids: Collection<Long>) {
+        if (ids.isEmpty()) return
+        designStore.forgetVideos(ids)
+        ids.forEach { extrasStore.forgetVideo(it) }
+        designRevision++
+        extrasRevision++
+    }
+    fun dismissMissingEntry(id: Long) {
+        viewModel.dismissMissing(id)
+        forgetMissingUiReferences(listOf(id))
+    }
+    fun dismissAllMissingEntries() {
+        val ids = missingFiles.map { it.id }
+        viewModel.dismissAllMissing()
+        forgetMissingUiReferences(ids)
     }
     var tab by rememberSaveable { mutableStateOf("movies") } // independent tab state
     val design = remember(tab, designRevision) { designStore.design(tab) }
@@ -610,7 +626,8 @@ fun LibraryScreen(
                 fileScanError = state.fileScanError,
                 checkingFiles = state.checkingFiles,
                 onReview = { showMissingFiles = true },
-                onRecheck = { viewModel.recheckFiles() }
+                onRecheck = { viewModel.recheckFiles() },
+                onDismissAll = { showMissingFiles = true }
             )
             if (state.entries.isNotEmpty()) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
@@ -959,6 +976,8 @@ fun LibraryScreen(
         fileScanError = state.fileScanError,
         checkingFiles = state.checkingFiles,
         onShowMissingFilesChange = { showMissingFiles = it },
+        onDismissMissing = { dismissMissingEntry(it) },
+        onDismissAllMissing = { dismissAllMissingEntries() },
         showGenrePicker = showGenrePicker,
         genres = genres,
         selectedGenre = selectedGenre,

@@ -13,4 +13,8 @@ class LibraryExtrasStore(context: Context) {
     fun profiles(): Map<String,SkipProfile> = runCatching { json.decodeFromString<Map<String,SkipProfile>>(prefs.getString("skip_profiles","{}") ?: "{}") }.getOrDefault(emptyMap())
     fun profile(id: Long) = profiles()[id.toString()] ?: SkipProfile()
     fun saveProfiles(values: Map<Long,SkipProfile>) { prefs.edit().putString("skip_profiles",json.encodeToString(profiles()+values.mapKeys { it.key.toString() })).apply() }
+    fun forgetVideo(videoId: Long) {
+        val updated = profiles() - videoId.toString()
+        prefs.edit().putString("skip_profiles", json.encodeToString(updated)).apply()
+    }
 }

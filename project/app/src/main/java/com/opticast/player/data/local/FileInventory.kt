@@ -47,6 +47,14 @@ class FileInventory(private val context: Context) {
         commit(records.map { if (it.video.id == id && !it.available) it.copy(dismissed = true) else it })
     }
 
+    /** Remove unavailable rows after their title-specific saved data has been cleared. */
+    @Synchronized
+    fun forgetMissing(ids: Collection<Long>) {
+        check(!loadFailed) { "Saved file inventory could not be read; no records were changed." }
+        val forgotten = ids.toSet()
+        commit(records.filterNot { it.video.id in forgotten && !it.available })
+    }
+
     @Synchronized
     fun reconcile(videos: List<LocalVideo>): List<LocalVideo> {
         check(!loadFailed) { "Saved file inventory could not be read; no records were changed." }

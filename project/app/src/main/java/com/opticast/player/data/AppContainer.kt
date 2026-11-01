@@ -125,6 +125,7 @@ object AppContainer {
     val keyless by lazy { com.opticast.player.data.remote.KeylessMetadata() }
     val offlineLibrary by lazy { OfflineLibrary(application) }
     val favorites: FavoritesStore by lazy { FavoritesStore(application) }
+    val libraryExtras: com.opticast.player.data.local.LibraryExtrasStore by lazy { com.opticast.player.data.local.LibraryExtrasStore(application) }
     val chapters: ChapterIndexer by lazy { ChapterIndexer(application) }
     val networkSources: NetworkSourceStore by lazy { NetworkSourceStore(application) }
     val frameArtwork: FrameArtwork by lazy { FrameArtwork(application) }

@@ -42,6 +42,8 @@ internal fun LibraryDialogsHost(
     fileScanError: String?,
     checkingFiles: Boolean,
     onShowMissingFilesChange: (Boolean) -> Unit,
+    onDismissMissing: (Long) -> Unit,
+    onDismissAllMissing: () -> Unit,
     showGenrePicker: Boolean,
     genres: List<String>,
     selectedGenre: String,
@@ -94,7 +96,8 @@ internal fun LibraryDialogsHost(
             checking = checkingFiles,
             error = fileScanError,
             onRecheck = { viewModel.recheckFiles() },
-            onDismissEntry = { viewModel.dismissMissing(it) },
+            onDismissEntry = onDismissMissing,
+            onDismissAll = onDismissAllMissing,
             onClose = { onShowMissingFilesChange(false) }
         )
     }

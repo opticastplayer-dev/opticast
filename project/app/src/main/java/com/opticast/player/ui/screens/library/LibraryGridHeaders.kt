@@ -29,7 +29,8 @@ internal fun LazyGridScope.libraryFileAvailability(
     fileScanError: String?,
     checkingFiles: Boolean,
     onReview: () -> Unit,
-    onRecheck: () -> Unit
+    onRecheck: () -> Unit,
+    onDismissAll: () -> Unit
 ) {
     if (missingCount > 0 || fileScanError != null) {
         item(key = "file-availability", span = { GridItemSpan(maxLineSpan) }) {
@@ -52,6 +53,11 @@ internal fun LazyGridScope.libraryFileAvailability(
                     Row {
                         TextButton(onClick = onReview) { Text("Review files") }
                         TextButton(onClick = onRecheck, enabled = !checkingFiles) { Text("Recheck storage") }
+                    }
+                    if (missingCount > 0) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End) {
+                            TextButton(onClick = onDismissAll) { Text("Dismiss all") }
+                        }
                     }
                 }
             }

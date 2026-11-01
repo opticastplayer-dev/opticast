@@ -147,6 +147,17 @@ class PlaybackStateStore(context: Context) {
         _version.value++
     }
 
+    /** Permanently remove the saved resume/watched state for a forgotten title. */
+    fun forget(videoId: Long) {
+        synchronized(cache) {
+            if (cache.remove(videoId.toString()) == null) return
+            enqueueCheckpointLocked()
+        }
+        progressStates.remove(videoId)
+        progressTick++
+        _version.value++
+    }
+
     /** Manually marks a video watched / unwatched. */
     fun setWatched(videoId: Long, watched: Boolean, durationMs: Long) {
         if (durationMs <= 0) return

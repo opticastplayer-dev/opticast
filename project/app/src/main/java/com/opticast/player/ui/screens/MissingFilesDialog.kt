@@ -21,8 +21,9 @@ import com.opticast.player.ui.components.formatDuration
 
 @Composable
 internal fun MissingFilesDialog(files: List<LocalVideo>, checking: Boolean, error: String?,
-    onRecheck: () -> Unit, onDismissEntry: (Long) -> Unit, onClose: () -> Unit) {
+    onRecheck: () -> Unit, onDismissEntry: (Long) -> Unit, onDismissAll: () -> Unit, onClose: () -> Unit) {
     var dismissEntry by remember { mutableStateOf<LocalVideo?>(null) }
+    var confirmDismissAll by remember { mutableStateOf(false) }
     val maxHeight = (LocalConfiguration.current.screenHeightDp * 0.82f).dp
     Dialog(onDismissRequest = onClose) {
         Surface(shape = RoundedCornerShape(24.dp), color = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.92f)) {
@@ -49,7 +50,7 @@ internal fun MissingFilesDialog(files: List<LocalVideo>, checking: Boolean, erro
                                     progress?.isResumable == true -> "Resume saved at ${progress.positionMs.formatDuration()}"
                                     else -> "Library record retained"
                                 }, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-                                TextButton(onClick = { dismissEntry = video }) { Text("Dismiss from review") }
+                                TextButton(onClick = { dismissEntry = video }) { Text("Remove saved data") }
                             }
                         }
                     }
@@ -57,18 +58,29 @@ internal fun MissingFilesDialog(files: List<LocalVideo>, checking: Boolean, erro
                 Text("Renamed copies, duplicate matches or changed files may remain separate to protect each video's history.",
                     style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    if (files.isNotEmpty()) TextButton(onClick = { confirmDismissAll = true }) { Text("Dismiss all") }
                     TextButton(onClick = onClose) { Text("Close") }
                     TextButton(onClick = onRecheck, enabled = !checking) { Text(if (checking) "Checking…" else "Recheck") }
                 }
             }
         }
     }
+    if (confirmDismissAll) {
+        AlertDialog(
+            onDismissRequest = { confirmDismissAll = false },
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
+            title = { Text("Remove data for all missing files?") },
+            text = { Text("This permanently removes the current missing-file records and their saved metadata, artwork, subtitles, favourites, collections and playback progress. It does not delete any video files. New unavailable files can appear later.") },
+            confirmButton = { TextButton(onClick = { onDismissAll(); confirmDismissAll = false; onClose() }) { Text("Remove saved data") } },
+            dismissButton = { TextButton(onClick = { confirmDismissAll = false }) { Text("Cancel") } }
+        )
+    }
     dismissEntry?.let { entry ->
         AlertDialog(onDismissRequest = { dismissEntry = null },
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.92f),
-            title = { Text("Dismiss this notice?") },
-            text = { Text("This only hides the unavailable-file notice. Metadata, favourites, subtitles and playback history stay saved. If a unique matching file returns, it can reconnect automatically.") },
-            confirmButton = { TextButton(onClick = { onDismissEntry(entry.id); dismissEntry = null }) { Text("Dismiss notice") } },
+            title = { Text("Remove saved data for this file?") },
+            text = { Text("This permanently removes its missing-file record, metadata, cached artwork, downloaded subtitles, favourite/collection links and playback progress. It does not delete the video file. If it returns, OptiCast will scan it as a new library item.") },
+            confirmButton = { TextButton(onClick = { onDismissEntry(entry.id); dismissEntry = null }) { Text("Remove saved data") } },
             dismissButton = { TextButton(onClick = { dismissEntry = null }) { Text("Cancel") } })
     }
 }

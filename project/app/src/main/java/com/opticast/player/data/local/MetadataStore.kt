@@ -87,6 +87,21 @@ class MetadataStore(context: Context) {
         _version.value++
     }
 
+    /** Remove metadata, downloaded subtitles and per-title subtitle settings. */
+    fun clearVideoData(videoId: Long) {
+        clear(videoId)
+        subtitlesDir.listFiles()?.filter { it.name.startsWith("$videoId-") }?.forEach { it.delete() }
+        synchronized(offsets) {
+            offsets.remove(videoId.toString())
+            runCatching { offsetsFile.writeText(json.encodeToString(offsets.toMap())) }
+        }
+        synchronized(secondarySubs) {
+            secondarySubs.remove(videoId.toString())
+            runCatching { secondaryFile.writeText(json.encodeToString(secondarySubs.toMap())) }
+        }
+        _version.value++
+    }
+
     fun clearAll() {
         memory.clear()
         knownAbsent.clear()

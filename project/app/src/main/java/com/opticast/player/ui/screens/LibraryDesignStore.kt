@@ -28,4 +28,9 @@ internal class LibraryDesignStore(context: Context) {
         values.forEach { value -> a.put(JSONObject().put("id",value.id).put("name",value.name.trim().take(60)).put("ids",JSONArray(value.videoIds.distinct()))) }
         prefs.edit().putString("collections",a.toString()).apply()
     }
+    fun forgetVideos(videoIds: Collection<Long>) {
+        val removed = videoIds.toSet()
+        if (removed.isEmpty()) return
+        saveCollections(collections().map { it.copy(videoIds = it.videoIds.filterNot(removed::contains)) })
+    }
 }

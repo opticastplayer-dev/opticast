@@ -141,6 +141,10 @@ class ThumbnailCache(private val context: Context) {
     /** Housekeeping hook for the future storage dashboard. */
     fun sizeBytes(): Long = root.walkTopDown().filter { it.isFile }.sumOf { it.length() }
 
+    fun deleteFor(videoId: Long) {
+        runCatching { dirFor(videoId).deleteRecursively() }
+    }
+
     fun deleteAll() {
         runCatching { root.deleteRecursively() }
         runCatching { root.mkdirs() }

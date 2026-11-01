@@ -146,10 +146,53 @@ class LibraryViewModel(
 
     fun dismissMissing(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            runCatching { AppContainer.mediaScanner.inventory.dismiss(id) }.onFailure {
-                _uiState.update { state -> state.copy(fileScanError = "Could not save review changes. Your records were kept.") }
+            val result = runCatching {
+                val missing = AppContainer.mediaScanner.inventory.missing().filter { it.id == id }
+                purgeMissingData(missing)
+            }
+            result.onFailure {
+                _uiState.update { state -> state.copy(fileScanError = "Could not clear saved data for this missing file. The remaining record was kept.") }
             }
         }
+    }
+
+    fun dismissAllMissing() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = runCatching {
+                purgeMissingData(AppContainer.mediaScanner.inventory.missing())
+            }
+            result.onFailure {
+                _uiState.update { state -> state.copy(fileScanError = "Could not clear all missing-file data. Remaining records were kept.") }
+            }
+        }
+    }
+
+    private suspend fun purgeMissingData(videos: List<LocalVideo>) {
+        if (videos.isEmpty()) return
+        val ids = videos.map { it.id }.distinct()
+        ids.forEach { id ->
+            val metadata = AppContainer.metadataStore.get(id)
+            val details = AppContainer.detailCache.get(id)
+            val artworkUrls = buildList {
+                metadata?.let {
+                    add(com.opticast.player.data.remote.tmdbPosterUrl(it.posterPath))
+                    add(com.opticast.player.data.remote.tmdbBackdropUrl(it.backdropPath))
+                    add(com.opticast.player.data.remote.tmdbBackdropUrl(it.episodeStillPath))
+                }
+                details?.imageUrls()?.forEach { add(com.opticast.player.data.remote.tmdbImageUrl(it, "w185")) }
+            }
+            AppContainer.offlineArtwork.forget(artworkUrls)
+            AppContainer.metadataStore.clearVideoData(id)
+            AppContainer.playbackState.forget(id)
+            AppContainer.favorites.remove(listOf(id))
+            AppContainer.posterCache.deleteForVideo(id)
+            AppContainer.detailCache.clear(id)
+            AppContainer.thumbnails.deleteFor(id)
+            AppContainer.frameArtwork.deleteFor(id)
+            AppContainer.chapters.forget(id)
+            AppContainer.libraryExtras.forgetVideo(id)
+        }
+        AppContainer.mediaScanner.inventory.forgetMissing(ids)
     }
 
     private suspend fun rebuild(rescan: Boolean, prefetch: Boolean = true): Boolean {

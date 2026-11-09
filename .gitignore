@@ -19,3 +19,4 @@ dist/
 !project/fastlane/**/images/**/*.png
 !project/fastlane/**/images/**/*.jpg
 !project/fastlane/**/images/**/*.jpeg
+!fastlane/**/images/**/*.png

@@ -8,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.opticast.player.BuildConfig
 import com.opticast.player.data.remote.UpdateChecker
 import kotlinx.coroutines.launch
 
@@ -23,29 +24,39 @@ internal fun UpdateCheckOption(version: String) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("App updates", style = MaterialTheme.typography.titleMedium)
         Text(version, style = MaterialTheme.typography.bodySmall)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (BuildConfig.FDROID_BUILD) {
             OutlinedButton(onClick = {
-                scope.launch {
-                    checking = true
-                    error = null
-                    try {
-                        val info = UpdateChecker.checkForUpdate(context, force = true)
-                        if (info == null) error = "No update info. Check internet."
-                        else {
-                            updateInfo = info
-                            show = info.isNewer
-                            if (!info.isNewer) error = "You have the latest version."
-                        }
-                    } catch (e: Exception) {
-                        error = "Check failed: ${e.message}"
-                    } finally { checking = false }
+                error = "F-Droid manages updates for this build."
+                runCatching {
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://f-droid.org/packages/com.opticast.player/")))
                 }
-            }, enabled = !checking) {
-                Text(if (checking) "Checking..." else "Check for updates")
+            }) { Text("Check for updates") }
+            Text("Updates for this build are distributed through F-Droid.", style = MaterialTheme.typography.bodySmall)
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = {
+                    scope.launch {
+                        checking = true
+                        error = null
+                        try {
+                            val info = UpdateChecker.checkForUpdate(context, force = true)
+                            if (info == null) error = "No update info. Check internet."
+                            else {
+                                updateInfo = info
+                                show = info.isNewer
+                                if (!info.isNewer) error = "You have the latest version."
+                            }
+                        } catch (e: Exception) {
+                            error = "Check failed: ${e.message}"
+                        } finally { checking = false }
+                    }
+                }, enabled = !checking) {
+                    Text(if (checking) "Checking..." else "Check for updates")
+                }
+                TextButton(onClick = {
+                    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/opticastplayer-dev/opticast/releases"))) }
+                }) { Text("Releases") }
             }
-            TextButton(onClick = {
-                runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/opticastplayer-dev/opticast/releases"))) }
-            }) { Text("Releases") }
         }
         error?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
     }

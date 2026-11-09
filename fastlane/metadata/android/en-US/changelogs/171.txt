@@ -1,0 +1,6 @@
+OptiCast v2.6.122 — Optimized TV show posters
+
+• TV show media info now shows official poster as background, not video thumbnail
+• Episodes keep thumbnail background as intended
+• Optimized release with cleaner poster handling
+• Same APK, same signing key, installs over all previous versions

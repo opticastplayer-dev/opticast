@@ -76,11 +76,13 @@ class OptiCastApplication : Application() {
 
         // Check once on each cold start after the library's first frame, and surface newer releases globally.
         // UpdateChecker skips the request while offline and the in-app auto-check setting can disable it.
-        startupScope.launch {
-            try {
-                kotlinx.coroutines.delay(6000)
-                com.opticast.player.data.remote.UpdateChecker.checkAtStartup(this@OptiCastApplication)
-            } catch (_: Exception) { }
+        if (!BuildConfig.FDROID_BUILD) {
+            startupScope.launch {
+                try {
+                    kotlinx.coroutines.delay(6000)
+                    com.opticast.player.data.remote.UpdateChecker.checkAtStartup(this@OptiCastApplication)
+                } catch (_: Exception) { }
+            }
         }
     }
 

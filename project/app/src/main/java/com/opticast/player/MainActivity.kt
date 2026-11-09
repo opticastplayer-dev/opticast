@@ -113,8 +113,10 @@ class MainActivity : ComponentActivity() {
                 OptiCastApp(libraryReturnRevision.intValue, returnDetailId.longValue, returnShowTitle.value)
                 // REMOVED WhatsNewDialog popup - user requested remove popup what's new card when app is updated in library screen
                 // com.opticast.player.ui.screens.WhatsNewDialog() removed
-                com.opticast.player.ui.screens.AutoUpdateDialog()
-                com.opticast.player.ui.screens.GlobalUpdateInstallDialog()
+                if (!BuildConfig.FDROID_BUILD) {
+                    com.opticast.player.ui.screens.AutoUpdateDialog()
+                    com.opticast.player.ui.screens.GlobalUpdateInstallDialog()
+                }
             }
         }
     }

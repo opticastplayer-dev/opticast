@@ -1,0 +1,7 @@
+OptiCast v2.6.120 — Website and protection improvements
+
+• New official website with direct download, QR code, and verified badges
+• Improved readability in light and dark themes
+• Clearer feature descriptions focused on local playback and privacy
+• Added installation source detection with guidance for official builds
+• Improved stability and security compliance

@@ -1,0 +1,6 @@
+OptiCast v2.6.119 — Updates and polish
+
+• Simplified update experience with clear status and automatic checks
+• Downloads continue in background and can be installed from any screen
+• Cleaner library view without intrusive popups
+• Larger artwork in movie details for better presentation

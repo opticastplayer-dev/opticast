@@ -1,0 +1,46 @@
+OptiCast — Your videos, beautifully organized.
+
+Get a great local video player experience with OptiCast! It finds and organizes your movies and TV shows with posters and information, and plays them flawlessly offline.
+
+Why it's different:
+Most players try to do everything. OptiCast focuses on one thing: playing your own videos well. No streaming catalogs, no login walls. Just your personal collection, beautifully organized and easy to enjoy.
+
+Focused local playback:
+Automatically organizes your movies and TV shows with clear artwork. Continue where you left off, browse by category, and find what you want quickly. Designed to be smooth and responsive on all phones.
+
+Offline-first, by design:
+Works fully offline after the initial setup. Posters and subtitles are saved to your device, so you can watch without an internet connection. Updates are checked only when you are online, using minimal data.
+
+Private and simple:
+No advertisements, no tracking, and no accounts required. Your videos stay on your device. Open source, lightweight, and built to be secure and easy to use.
+
+Library:
+Finds your videos automatically and displays them with clear posters. Browse Continue Watching, Movies and TV Shows, Favorites, Recently Added, and Collections. Fast search helps you find any title instantly.
+
+Movie information:
+Recognizes movies and TV shows from file names and shows posters, cast, genres, and runtime. All information is saved for offline viewing.
+
+Subtitles:
+Supports multiple languages and saves subtitles for offline viewing. Customize fonts and display two subtitles at once.
+
+Player:
+Plays common video formats with intuitive controls. Adjust brightness and volume with gestures, change playback speed, select audio and subtitle tracks, use picture-in-picture, and set a sleep timer.
+
+Updates:
+Updates for this F-Droid build are delivered through F-Droid. The app does not download or install updates itself.
+
+Getting started (30 seconds):
+1. Install the app and allow access to videos
+2. Open the app — your videos are organized automatically
+3. Tap any poster to start watching
+
+Privacy:
+No advertisements, no tracking, open source. Your media stays on your device with no accounts required. Permissions are used only for essential features: network playback and finding local videos.
+
+Links:
+GitHub: https://github.com/opticastplayer-dev/opticast
+Website: https://opticastplayer-dev.github.io/opticast/
+FAQ: https://opticastplayer-dev.github.io/opticast/faq/
+Privacy: https://opticastplayer-dev.github.io/opticast/privacy/
+
+Your personal collection, beautifully organized and always available offline.

@@ -21,6 +21,9 @@ val proxySecret = localProps.getProperty("tmdb.proxy.secret")
     ?: System.getenv("APP_SECRET")
     ?: "" // no hardcoded public secret — must come from local.properties or env
 
+// F-Droid sets this only in its build metadata; standard GitHub builds remain unchanged.
+val isFdroidBuild = localProps.getProperty("fdroid.build")?.toBoolean() == true
+
 // FAIL-FAST for gold standard — never ship official APK with blank secret that would cause silent 403
 // F-Droid builds Media3-only and doesn't need proxy secret, so allow blank for non-official Release
 val isOfficialRelease = gradle.startParameter.taskNames.any { 
@@ -61,6 +64,8 @@ android {
         // Secure proxy secret — injected as BuildConfig field, not plain string in code
         // local.properties: tmdb.proxy.secret=YOUR_SECRET, or env TMDB_PROXY_SECRET
         buildConfigField("String", "TMDB_PROXY_SECRET", "\"$proxySecret\"")
+        buildConfigField("Boolean", "FDROID_BUILD", isFdroidBuild.toString())
+        manifestPlaceholders["allowCleartextTraffic"] = (!isFdroidBuild).toString()
         // Keep secret in BuildConfig, not in strings.xml, harder to extract than hardcoded URL
         if (proxySecret.isBlank()) {
             println("WARNING: tmdb.proxy.secret not set in local.properties — proxy will return 403. Set it for local builds.")
